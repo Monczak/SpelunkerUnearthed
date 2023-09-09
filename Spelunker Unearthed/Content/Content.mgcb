@@ -1,0 +1,24 @@
+
+#----------------------------- Global Properties ----------------------------#
+
+/outputDir:bin/$(Platform)
+/intermediateDir:obj/$(Platform)
+/platform:DesktopGL
+/config:
+/profile:Reach
+/compress:False
+
+#-------------------------------- References --------------------------------#
+
+
+#---------------------------------- Content ---------------------------------#
+
+#begin Fonts/Hack-Regular.ttf
+/copy:Fonts/Hack-Regular.ttf
+
+#begin Fonts/Monospace.ttf
+/copy:Fonts/Monospace.ttf
+
+#begin Tiles/Stone.yml
+/copy:Tiles/Stone.yml
+

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SpelunkerUnearthed.Engine;
+using SpelunkerUnearthed.Engine.Logging;
 using SpelunkerUnearthed.Engine.Rendering;
 using SpelunkerUnearthed.Engine.Services;
 using SpelunkerUnearthed.Engine.Tiles;
@@ -33,7 +34,7 @@ public class SpelunkerUnearthedGame : Game
         
         ServiceRegistry.RegisterService(new TileLoader());
 
-        scene = new Scene();
+        scene = new Scene(Window);
 
         Entity tilemap = new("Tilemap");
         tilemap.AttachComponent(new Tilemap(10, 10));
@@ -64,13 +65,9 @@ public class SpelunkerUnearthedGame : Game
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.Black);
-
-        // TODO: Render with a camera instead
-
-        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
+        
         scene.Render(spriteBatch);
-        spriteBatch.End();
-
+        
         base.Draw(gameTime);
     }
 }

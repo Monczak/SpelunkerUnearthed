@@ -21,8 +21,7 @@ public class Tilemap : Component
 
     public override void Update(GameTime gameTime)
     {
-        Fill(ServiceRegistry.Get<TileLoader>().GetTile("Nothing"));
-        this[0, 0] = ServiceRegistry.Get<TileLoader>().GetTile("Stone");
+        Fill(ServiceRegistry.Get<TileLoader>().GetTile("Stone"));
     }
 
     public void Fill(Tile tile)

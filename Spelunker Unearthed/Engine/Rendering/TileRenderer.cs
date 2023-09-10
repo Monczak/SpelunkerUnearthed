@@ -10,8 +10,6 @@ public class TileRenderer : Renderer
 {
     private Tilemap tilemap;
 
-    public int TileSize { get; } = 24;
-
     private FontSystem fontSystem;
     private SpriteFontBase font;
 
@@ -34,31 +32,36 @@ public class TileRenderer : Renderer
         fontSystem.AddFont(File.ReadAllBytes($"Content/Fonts/{fontName}.ttf"));
     }
 
-    public Vector2 CalculateOffset(char character)
+    public Vector2 CalculateTextOffset(char character, int tileSize)
     {
         Vector2 charSize = font.MeasureString(character.ToString());
         return new Vector2(
-            TileSize / 2f - charSize.X / 2f,
-            TileSize / 2f - charSize.Y / 2f
+            tileSize / 2f - charSize.X / 2f,
+            tileSize / 2f - charSize.Y / 2f
         );
     }
     
-    public override void Render(SpriteBatch spriteBatch)
+    public override void Render(SpriteBatch spriteBatch, Camera camera)
     {
-        font = fontSystem.GetFont(TileSize);
+        font = fontSystem.GetFont(camera.TileSize);
         
-        for (int y = 0; y < tilemap.MapWidth; y++)
+        for (int y = 0; y < tilemap.MapHeight; y++)
         {
             for (int x = 0; x < tilemap.MapWidth; x++)
             {
-                RenderTile(spriteBatch, new Vector2(x * TileSize, y * TileSize), tilemap[x, y]);
+                RenderTile(spriteBatch, camera, new Vector2(x * camera.TileSize, y * camera.TileSize) + CalculateCenterOffset(camera), tilemap[x, y]);
             }
         }
     }
 
-    private void RenderTile(SpriteBatch spriteBatch, Vector2 pos, Tile tile)
+    protected override Vector2 CalculateCenterOffset(Camera camera)
     {
-        spriteBatch.Draw(backgroundTexture, new Rectangle((int)pos.X, (int)pos.Y, TileSize, TileSize), tile.BackgroundColor);
-        spriteBatch.DrawString(font, tile.Character.ToString(), pos + CalculateOffset(tile.Character), tile.ForegroundColor);
+        return -new Vector2(camera.TileSize * tilemap.MapWidth / 2f, camera.TileSize * tilemap.MapHeight / 2f);
+    }
+
+    private void RenderTile(SpriteBatch spriteBatch, Camera camera, Vector2 pos, Tile tile)
+    {
+        spriteBatch.Draw(backgroundTexture, new Rectangle((int)pos.X, (int)pos.Y, camera.TileSize, camera.TileSize), tile.BackgroundColor);
+        spriteBatch.DrawString(font, tile.Character.ToString(), pos + CalculateTextOffset(tile.Character, camera.TileSize), tile.ForegroundColor);
     }
 }

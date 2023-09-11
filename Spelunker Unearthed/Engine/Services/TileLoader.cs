@@ -54,5 +54,5 @@ public class TileLoader : Service
         Logger.Log($"Loaded {tiles.Count} tiles");
     }
 
-    public Tile GetTile(string id) => tiles[id];
+    public Tile GetTile(string id) => new(tiles[id]);
 }

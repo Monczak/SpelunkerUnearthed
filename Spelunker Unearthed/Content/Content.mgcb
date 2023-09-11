@@ -19,6 +19,9 @@
 #begin Fonts/Monospace.ttf
 /copy:Fonts/Monospace.ttf
 
+#begin Tiles/Player.yml
+/copy:Tiles/Player.yml
+
 #begin Tiles/Stone.yml
 /copy:Tiles/Stone.yml
 

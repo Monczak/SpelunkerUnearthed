@@ -1,12 +1,15 @@
-﻿using FontStashSharp;
+﻿using System.Linq;
+using FontStashSharp;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SpelunkerUnearthed.Engine;
+using SpelunkerUnearthed.Engine.Components;
 using SpelunkerUnearthed.Engine.Logging;
 using SpelunkerUnearthed.Engine.Rendering;
 using SpelunkerUnearthed.Engine.Services;
 using SpelunkerUnearthed.Engine.Tiles;
+using SpelunkerUnearthed.Scripts.TileEntities;
 
 namespace SpelunkerUnearthed;
 
@@ -37,8 +40,9 @@ public class SpelunkerUnearthedGame : Game
         scene = new Scene(Window);
 
         Entity tilemap = new("Tilemap");
+        tilemap.AttachComponent(new Transform());
         tilemap.AttachComponent(new Tilemap(10, 10));
-        tilemap.AttachComponent(new TileRenderer(GraphicsDevice, tilemap.GetComponent<Tilemap>()));
+        tilemap.AttachComponent(new TilemapRenderer(GraphicsDevice, tilemap.GetComponent<Tilemap>()));
         scene.AddEntity(tilemap);
         
         base.Initialize();
@@ -49,6 +53,11 @@ public class SpelunkerUnearthedGame : Game
         spriteBatch = new SpriteBatch(GraphicsDevice);
 
         ServiceRegistry.Get<TileLoader>().LoadTiles();
+        
+        // TODO: Remove this, this is for testing only
+        var tilemap = scene.Entities.First(e => e.Name == "Tilemap").GetComponent<Tilemap>();
+        var player = new Player { Tile = ServiceRegistry.Get<TileLoader>().GetTile("Player") };
+        tilemap.AddTileEntity(player);
     }
 
     protected override void Update(GameTime gameTime)

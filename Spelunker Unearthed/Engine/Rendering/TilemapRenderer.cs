@@ -2,11 +2,12 @@
 using FontStashSharp;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SpelunkerUnearthed.Engine.Components;
 using SpelunkerUnearthed.Engine.Tiles;
 
 namespace SpelunkerUnearthed.Engine.Rendering;
 
-public class TileRenderer : Renderer
+public class TilemapRenderer : Renderer
 {
     private Tilemap tilemap;
 
@@ -15,7 +16,7 @@ public class TileRenderer : Renderer
 
     private readonly Texture2D backgroundTexture;
     
-    public TileRenderer(GraphicsDevice graphicsDevice, Tilemap tilemap)
+    public TilemapRenderer(GraphicsDevice graphicsDevice, Tilemap tilemap)
     {
         this.tilemap = tilemap;
         fontSystem = new FontSystem();
@@ -40,17 +41,31 @@ public class TileRenderer : Renderer
             tileSize / 2f - charSize.Y / 2f
         );
     }
-    
+
     public override void Render(SpriteBatch spriteBatch, Camera camera)
     {
+        var transform = GetComponent<Transform>();
+
         font = fontSystem.GetFont(camera.TileSize);
         
         for (int y = 0; y < tilemap.MapHeight; y++)
         {
             for (int x = 0; x < tilemap.MapWidth; x++)
             {
-                RenderTile(spriteBatch, camera, new Vector2(x * camera.TileSize, y * camera.TileSize) + CalculateCenterOffset(camera), tilemap[x, y]);
+                RenderTile(spriteBatch, camera, CalculatePosition(new Coord(x, y)), tilemap[x, y]);
             }
+        }
+
+        foreach (TileEntity entity in tilemap.TileEntities)
+        {
+            RenderTile(spriteBatch, camera, CalculatePosition(entity.Position), entity.Tile);
+        }
+
+        return;
+
+        Vector2 CalculatePosition(Coord coord)
+        {
+            return ((Vector2)coord + transform.Position) * camera.TileSize + CalculateCenterOffset(camera);
         }
     }
 

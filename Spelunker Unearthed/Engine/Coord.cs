@@ -1,4 +1,6 @@
-﻿namespace SpelunkerUnearthed.Engine;
+﻿using Microsoft.Xna.Framework;
+
+namespace SpelunkerUnearthed.Engine;
 
 public struct Coord
 {
@@ -15,4 +17,9 @@ public struct Coord
     {
         return $"({X}, {Y})";
     }
+
+    public static explicit operator Vector2(Coord coord) => new(coord.X, coord.Y);
+
+    public static Coord operator +(Coord coord1, Coord coord2) => new(coord1.X + coord2.X, coord1.Y + coord2.Y);
+    public static Coord operator -(Coord coord1, Coord coord2) => new(coord1.X - coord2.X, coord1.Y - coord2.Y);
 }

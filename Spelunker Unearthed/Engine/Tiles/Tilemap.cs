@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using SpelunkerUnearthed.Engine.Components;
 using SpelunkerUnearthed.Engine.Exceptions;
 using SpelunkerUnearthed.Engine.Services;
@@ -9,6 +10,8 @@ public class Tilemap : Component
 {
     private Tile[,] map;
     
+    public HashSet<TileEntity> TileEntities { get; }
+    
     public int MapWidth { get; }
     public int MapHeight { get; }
 
@@ -17,11 +20,35 @@ public class Tilemap : Component
         map = new Tile[height, width];
         MapHeight = height;
         MapWidth = width;
+
+        TileEntities = new HashSet<TileEntity>();
     }
 
     public override void Update(GameTime gameTime)
     {
+        // TODO: Optimize this to build a set of behaviors to update
+        foreach (Tile tile in map)
+        {
+            if (tile is null) continue;
+            foreach (var behavior in tile.Behaviors)
+            {
+                behavior.Update(gameTime);
+            }
+        }
+
+        foreach (TileEntity tileEntity in TileEntities)
+        {
+            tileEntity.Update(gameTime);
+        }
+        
+        // TODO: Remove this, this is for testing only
         Fill(ServiceRegistry.Get<TileLoader>().GetTile("Stone"));
+    }
+
+    public void Place(Tile tile, Coord coord)
+    {
+        this[coord] = tile;
+        tile.OwnerTilemap = this;
     }
 
     public void Fill(Tile tile)
@@ -30,7 +57,7 @@ public class Tilemap : Component
         {
             for (int x = 0; x < MapWidth; x++)
             {
-                this[x, y] = tile;
+                Place(tile, new Coord(x, y));
             }
         }
     }
@@ -40,7 +67,7 @@ public class Tilemap : Component
         get
         {
             if (!IsInBounds(coord))
-                return null;
+                throw new OutOfBoundsException(coord);
             return map[coord.Y, coord.X];
         }
         set
@@ -51,7 +78,7 @@ public class Tilemap : Component
         }
     }
 
-    private bool IsInBounds(Coord coord)
+    public bool IsInBounds(Coord coord)
     {
         return coord.X >= 0 && coord.X < MapWidth && coord.Y >= 0 && coord.Y < MapHeight;
     }
@@ -70,7 +97,13 @@ public class Tilemap : Component
     public Tile Get(Coord coord)
     {
         if (!IsInBounds(coord))
-            return null;
+            throw new OutOfBoundsException(coord);
         return this[coord];
+    }
+
+    public void AddTileEntity(TileEntity tileEntity)
+    {
+        TileEntities.Add(tileEntity);
+        tileEntity.AttachToTilemap(this);
     }
 }

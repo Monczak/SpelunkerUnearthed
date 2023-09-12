@@ -23,7 +23,8 @@ public class Entity
     {
         AssertComponent<T>();
         
-        components[typeof(T)] = Activator.CreateInstance<T>();
+        var component = Activator.CreateInstance<T>();
+        AttachComponent(component);
         return (T)components[typeof(T)];
     }
 

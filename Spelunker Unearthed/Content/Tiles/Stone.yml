@@ -1,3 +1,5 @@
 ﻿foregroundColor: "#a69c9c"
 backgroundColor: "#332f2f"
 character: '#'
+tags:
+  - Wall

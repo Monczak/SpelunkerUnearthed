@@ -8,7 +8,7 @@ public class Camera
     
     public Vector2 Position { get; set; } = Vector2.Zero;
     public float Scale { get; set; } = 1f;
-    public int TileSize { get; set; } = 32;
+    public int TileSize { get; set; } = 16;
 
     public Camera(GameWindow window)
     {

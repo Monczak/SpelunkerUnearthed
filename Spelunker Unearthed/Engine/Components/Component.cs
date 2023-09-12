@@ -4,7 +4,7 @@ namespace SpelunkerUnearthed.Engine.Components;
 
 public abstract class Component
 {
-    private Entity ownerEntity;
+    protected Entity ownerEntity;
 
     public Component()
     {
@@ -14,6 +14,7 @@ public abstract class Component
     public void SetOwner(Entity ownerEntity)
     {
         this.ownerEntity = ownerEntity;
+        OnAttach();
     }
 
     public T AddComponent<T>() where T : Component
@@ -27,6 +28,11 @@ public abstract class Component
     }
 
     public virtual void Update(GameTime gameTime)
+    {
+        
+    }
+
+    public virtual void OnAttach()
     {
         
     }

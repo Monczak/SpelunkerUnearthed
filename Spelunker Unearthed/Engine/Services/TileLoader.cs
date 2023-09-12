@@ -15,18 +15,18 @@ public class TileLoader : Service
 {
     private readonly string TilePath = "Content/Tiles";
 
-    private Dictionary<string, Tile> tiles;
+    public Dictionary<string, Tile> Tiles { get; private set; }
 
     public TileLoader()
     {
         Logger.Log("Initialized tile loader");
     }
 
-    public void LoadTiles()
+    public Dictionary<string, Tile> LoadTiles()
     {
-        tiles = new Dictionary<string, Tile>
+        Tiles = new Dictionary<string, Tile>
         {
-            ["Nothing"] = new(Color.Black, Color.Black, ' ')
+            ["Nothing"] = new("Nothing", Color.Black, Color.Black, ' ', Array.Empty<string>())
         };
 
         var deserializer = new DeserializerBuilder()
@@ -38,12 +38,12 @@ public class TileLoader : Service
             string tileId = Path.GetFileNameWithoutExtension(file);
             try
             {
-                Tile tile = new(deserializer.Deserialize<TileData>(File.ReadAllText(file)));
-                if (tiles.ContainsKey(tileId))
+                Tile tile = new(tileId, deserializer.Deserialize<TileData>(File.ReadAllText(file)));
+                if (Tiles.ContainsKey(tileId))
                 {
                     throw new TileLoadingException($"Tile with ID {tileId} already exists.");
                 }
-                tiles[tileId] = tile;
+                Tiles[tileId] = tile;
             }
             catch (Exception e)
             {
@@ -51,8 +51,10 @@ public class TileLoader : Service
             }
         }
         
-        Logger.Log($"Loaded {tiles.Count} tiles");
+        Logger.Log($"Loaded {Tiles.Count} tiles");
+
+        return Tiles;
     }
 
-    public Tile GetTile(string id) => new(tiles[id]);
+    public Tile GetTile(string id) => new(Tiles[id]);
 }

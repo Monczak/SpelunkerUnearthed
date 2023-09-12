@@ -25,6 +25,9 @@
         <PackageReference Include="Pastel" Version="4.1.0" />
         <PackageReference Include="YamlDotNet" Version="13.3.1" />
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Scripts\Components\" />
+    </ItemGroup>
     <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
         <Message Text="Restoring dotnet tools" Importance="High" />
         <Exec Command="dotnet tool restore" />

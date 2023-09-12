@@ -3,6 +3,7 @@ using FontStashSharp;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SpelunkerUnearthed.Engine.Components;
+using SpelunkerUnearthed.Engine.Services;
 using SpelunkerUnearthed.Engine.Tiles;
 
 namespace SpelunkerUnearthed.Engine.Rendering;
@@ -10,43 +11,22 @@ namespace SpelunkerUnearthed.Engine.Rendering;
 public class TilemapRenderer : Renderer
 {
     private Tilemap tilemap;
-
-    private FontSystem fontSystem;
-    private SpriteFontBase font;
-
-    private readonly Texture2D backgroundTexture;
     
-    public TilemapRenderer(GraphicsDevice graphicsDevice, Tilemap tilemap)
+    public TilemapRenderer(GraphicsDevice graphicsDevice)
     {
-        this.tilemap = tilemap;
-        fontSystem = new FontSystem();
-
-        backgroundTexture = new Texture2D(graphicsDevice, 1, 1);
-        backgroundTexture.SetData(new[] { Color.White });
         
-        AddFont("Hack-Regular");
-        AddFont("Monospace");
     }
 
-    public void AddFont(string fontName)
+    public override void OnAttach()
     {
-        fontSystem.AddFont(File.ReadAllBytes($"Content/Fonts/{fontName}.ttf"));
-    }
-
-    public Vector2 CalculateTextOffset(char character, int tileSize)
-    {
-        Vector2 charSize = font.MeasureString(character.ToString());
-        return new Vector2(
-            tileSize / 2f - charSize.X / 2f,
-            tileSize / 2f - charSize.Y / 2f
-        );
+        tilemap = GetComponent<Tilemap>();
     }
 
     public override void Render(SpriteBatch spriteBatch, Camera camera)
     {
         var transform = GetComponent<Transform>();
-
-        font = fontSystem.GetFont(camera.TileSize);
+        
+        spriteBatch.Begin(SpriteSortMode.Texture, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: camera.WorldToScreenMatrix);
         
         for (int y = 0; y < tilemap.MapHeight; y++)
         {
@@ -55,12 +35,18 @@ public class TilemapRenderer : Renderer
                 RenderTile(spriteBatch, camera, CalculatePosition(new Coord(x, y)), tilemap[x, y]);
             }
         }
+        
+        spriteBatch.End();
+        
+        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: camera.WorldToScreenMatrix);
 
         foreach (TileEntity entity in tilemap.TileEntities)
         {
             RenderTile(spriteBatch, camera, CalculatePosition(entity.Position), entity.Tile);
         }
 
+        spriteBatch.End();
+        
         return;
 
         Vector2 CalculatePosition(Coord coord)
@@ -76,7 +62,11 @@ public class TilemapRenderer : Renderer
 
     private void RenderTile(SpriteBatch spriteBatch, Camera camera, Vector2 pos, Tile tile)
     {
-        spriteBatch.Draw(backgroundTexture, new Rectangle((int)pos.X, (int)pos.Y, camera.TileSize, camera.TileSize), tile.BackgroundColor);
-        spriteBatch.DrawString(font, tile.Character.ToString(), pos + CalculateTextOffset(tile.Character, camera.TileSize), tile.ForegroundColor);
+        // TODO: Add scaling support back (it was nuked when switching over to the tile atlas)
+        
+        // TODO: Optimize this to use GPU instancing (or whatever it's called, drawing primitives with setup vertex/index buffers)
+        // 1 or 2 draw calls (one for background, one for foreground)
+        // https://badecho.com/index.php/2022/08/04/drawing-tiles/
+        ServiceRegistry.Get<TileAtlas>().DrawTile(spriteBatch, pos, tile.Id);
     }
 }

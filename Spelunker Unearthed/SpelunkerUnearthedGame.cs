@@ -9,7 +9,10 @@ using SpelunkerUnearthed.Engine.Logging;
 using SpelunkerUnearthed.Engine.Rendering;
 using SpelunkerUnearthed.Engine.Services;
 using SpelunkerUnearthed.Engine.Tiles;
+using SpelunkerUnearthed.Scripts.Scenes;
 using SpelunkerUnearthed.Scripts.TileEntities;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace SpelunkerUnearthed;
 
@@ -37,13 +40,7 @@ public class SpelunkerUnearthedGame : Game
         
         ServiceRegistry.RegisterService(new TileLoader());
 
-        scene = new Scene(Window);
-
-        Entity tilemap = new("Tilemap");
-        tilemap.AttachComponent(new Transform());
-        tilemap.AttachComponent(new Tilemap(10, 10));
-        tilemap.AttachComponent(new TilemapRenderer(GraphicsDevice, tilemap.GetComponent<Tilemap>()));
-        scene.AddEntity(tilemap);
+        scene = new TestScene(Window, GraphicsDevice);
         
         base.Initialize();
     }
@@ -51,13 +48,13 @@ public class SpelunkerUnearthedGame : Game
     protected override void LoadContent()
     {
         spriteBatch = new SpriteBatch(GraphicsDevice);
-
-        ServiceRegistry.Get<TileLoader>().LoadTiles();
         
-        // TODO: Remove this, this is for testing only
-        var tilemap = scene.Entities.First(e => e.Name == "Tilemap").GetComponent<Tilemap>();
-        var player = new Player { Tile = ServiceRegistry.Get<TileLoader>().GetTile("Player") };
-        tilemap.AddTileEntity(player);
+        ServiceRegistry.RegisterService(new TileAtlas(GraphicsDevice, spriteBatch, 16));
+
+        var tiles = ServiceRegistry.Get<TileLoader>().LoadTiles();
+        ServiceRegistry.Get<TileAtlas>().CreateAtlas(tiles);
+        
+        scene.Load();
     }
 
     protected override void Update(GameTime gameTime)

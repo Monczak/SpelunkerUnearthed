@@ -1,0 +1,14 @@
+﻿# TODO: Figure out a way to deserialize this, we'll probably switch to storing scenes like this later
+
+name: "TestScene"
+entities:
+  - Tilemap:
+      components:
+        - Transform
+        - Tilemap:
+            mapWidth: 10
+            mapHeight: 10
+            tileEntities:
+              - Player:
+                  position: (0, 0)
+        - TilemapRenderer

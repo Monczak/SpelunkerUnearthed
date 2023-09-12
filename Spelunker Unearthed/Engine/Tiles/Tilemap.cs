@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using SpelunkerUnearthed.Engine.Components;
 using SpelunkerUnearthed.Engine.Exceptions;
@@ -24,6 +25,11 @@ public class Tilemap : Component
         TileEntities = new HashSet<TileEntity>();
     }
 
+    public override void OnAttach()
+    {
+        Fill(ServiceRegistry.Get<TileLoader>().GetTile("Nothing"));
+    }
+
     public override void Update(GameTime gameTime)
     {
         // TODO: Optimize this to build a set of behaviors to update
@@ -40,9 +46,6 @@ public class Tilemap : Component
         {
             tileEntity.Update(gameTime);
         }
-        
-        // TODO: Remove this, this is for testing only
-        Fill(ServiceRegistry.Get<TileLoader>().GetTile("Stone"));
     }
 
     public void Place(Tile tile, Coord coord)
@@ -58,6 +61,32 @@ public class Tilemap : Component
             for (int x = 0; x < MapWidth; x++)
             {
                 Place(tile, new Coord(x, y));
+            }
+        }
+    }
+
+    public void CopyFrom(Tile[,] tiles)
+    {
+        if (tiles.GetLength(0) != map.GetLength(0) || tiles.GetLength(1) != map.GetLength(1))
+            throw new ArgumentException($"Tilemaps must be same size");
+        
+        for (int y = 0; y < MapHeight; y++)
+        {
+            for (int x = 0; x < MapWidth; x++)
+            {
+                Place(tiles[x, y], new Coord(x, y));
+            }
+        }
+    }
+
+    public void CopyTo(out Tile[,] tiles)
+    {
+        tiles = new Tile[MapWidth, MapHeight];
+        for (int y = 0; y < MapHeight; y++)
+        {
+            for (int x = 0; x < MapWidth; x++)
+            {
+                tiles[x, y] = map[x, y];
             }
         }
     }
@@ -105,5 +134,19 @@ public class Tilemap : Component
     {
         TileEntities.Add(tileEntity);
         tileEntity.AttachToTilemap(this);
+    }
+
+    public IEnumerable<Coord> Coords
+    {
+        get
+        {
+            for (int y = 0; y < MapHeight; y++)
+            {
+                for (int x = 0; x < MapWidth; x++)
+                {
+                    yield return new Coord(x, y);
+                }
+            }
+        }
     }
 }

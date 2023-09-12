@@ -7,14 +7,19 @@ using SpelunkerUnearthed.Engine.Rendering;
 
 namespace SpelunkerUnearthed.Engine;
 
-public class Scene
+public abstract class Scene
 {
     public List<Entity> Entities { get; } = new();
     public Camera Camera { get; }
 
-    public Scene(GameWindow window)
+    protected GraphicsDevice graphicsDevice;
+
+    public abstract void Load();
+
+    public Scene(GameWindow window, GraphicsDevice graphicsDevice)
     {
         Camera = new Camera(window);
+        this.graphicsDevice = graphicsDevice;
     }    
 
     public void AddEntity(Entity entity)
@@ -22,7 +27,7 @@ public class Scene
         Entities.Add(entity);
     }
 
-    public void Update(GameTime gameTime)
+    public virtual void Update(GameTime gameTime)
     {
         foreach (Entity entity in Entities)
         {
@@ -32,12 +37,9 @@ public class Scene
 
     public void Render(SpriteBatch spriteBatch)
     {
-        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: Camera.WorldToScreenMatrix);
         foreach (Entity entity in Entities.Where(e => e.HasComponent<Renderer>()))
         {
             entity.GetComponent<Renderer>().Render(spriteBatch, Camera);
         }
-
-        spriteBatch.End();
     }
 }

@@ -26,7 +26,7 @@ public class TileLoader : Service
     {
         Tiles = new Dictionary<string, Tile>
         {
-            ["Nothing"] = new("Nothing", Color.Black, Color.Black, ' ', Array.Empty<string>())
+            ["Nothing"] = new("Nothing", Color.Black, Color.Black, ' ', null, null)
         };
 
         var deserializer = new DeserializerBuilder()

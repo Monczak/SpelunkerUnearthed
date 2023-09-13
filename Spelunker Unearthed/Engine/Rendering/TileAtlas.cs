@@ -44,10 +44,11 @@ public class TileAtlas : Service
     
     public void AddFont(string fontName)
     {
+        // TODO: Don't use hardcoded paths
         fontSystem.AddFont(File.ReadAllBytes($"Content/Fonts/{fontName}.ttf"));
     }
     
-    public Vector2 CalculateTextOffset(char character, int tileSize)
+    public Vector2 CalculateTextOffset(char character)
     {
         Vector2 charSize = font.MeasureString(character.ToString());
         return new Vector2(
@@ -63,7 +64,7 @@ public class TileAtlas : Service
         DrawBackgrounds(tiles.Values);
         DrawForegrounds(tiles.Values);
         
-        Logger.Log($"Created {atlasSize.X}x{atlasSize.Y} tile atlas");
+        Logger.Log($"Created 2x {atlasSize.X}x{atlasSize.Y} ({atlasSize.X * tileSize}x{atlasSize.Y * tileSize}) tile atlas");
     }
 
     private void InitializeRenderTargets(Dictionary<string, Tile> tiles)
@@ -133,7 +134,7 @@ public class TileAtlas : Service
         foreach (Tile tile in tiles)
         {
             Coord coord = tileAtlasCoords[tile.Id];
-            spriteBatch.DrawString(font, tile.Character.ToString(), (Vector2)coord * tileSize + CalculateTextOffset(tile.Character, tileSize), tile.ForegroundColor);
+            spriteBatch.DrawString(font, tile.Character.ToString(), (Vector2)coord * tileSize + CalculateTextOffset(tile.Character), tile.ForegroundColor);
         }
 
         spriteBatch.End();

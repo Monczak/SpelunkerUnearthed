@@ -23,6 +23,8 @@ public struct Coord
     public static Coord operator +(Coord coord1, Coord coord2) => new(coord1.X + coord2.X, coord1.Y + coord2.Y);
     public static Coord operator -(Coord coord1, Coord coord2) => new(coord1.X - coord2.X, coord1.Y - coord2.Y);
 
+    public static Coord operator *(Coord coord1, Coord coord2) => new(coord1.X * coord2.X, coord1.Y * coord2.Y);
+
     public void Deconstruct(out int x, out int y)
     {
         x = X;

@@ -12,6 +12,12 @@ public class TileEntity
     public void AttachToTilemap(Tilemap tilemap)
     {
         Tilemap = tilemap;
+        OnAttach();
+    }
+
+    protected virtual void OnAttach()
+    {
+        
     }
 
     public virtual void Update(GameTime gameTime)
@@ -25,4 +31,6 @@ public class TileEntity
         Position = new Coord(MathHelper.Clamp(Position.X, 0, Tilemap.MapWidth - 1),
             MathHelper.Clamp(Position.Y, 0, Tilemap.MapHeight - 1));
     }
+
+    protected void Move(Coord delta) => Move(delta.X, delta.Y);
 }

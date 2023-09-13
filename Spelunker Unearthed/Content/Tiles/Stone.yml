@@ -3,3 +3,5 @@ backgroundColor: "#332f2f"
 character: '#'
 tags:
   - Wall
+collisionGroups:
+  - Group1

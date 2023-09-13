@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SpelunkerUnearthed.Engine;
+using SpelunkerUnearthed.Engine.Collision;
 using SpelunkerUnearthed.Engine.Components;
 using SpelunkerUnearthed.Engine.Rendering;
 using SpelunkerUnearthed.Engine.Services;
@@ -28,11 +29,12 @@ public class TestScene : Scene
     private void MakeTilemap()
     {
         Entity tilemapEntity = new("Tilemap");
-        tilemap = new Tilemap(100, 100);
+        tilemap = new Tilemap(30, 30);
         
         tilemapEntity.AttachComponent(new Transform());
         tilemapEntity.AttachComponent(tilemap);
         tilemapEntity.AttachComponent(new TilemapRenderer(graphicsDevice));
+        tilemapEntity.AttachComponent(new TilemapCollider());
         
         tilemapEntity.AttachComponent(new MapGenerator());
 

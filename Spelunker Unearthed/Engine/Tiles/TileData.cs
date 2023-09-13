@@ -11,4 +11,6 @@ public struct TileData
     public string[] Tags { get; private set; }
     
     public string[] Behaviors { get; private set; }
+    
+    public string[] CollisionGroups { get; private set; }
 }

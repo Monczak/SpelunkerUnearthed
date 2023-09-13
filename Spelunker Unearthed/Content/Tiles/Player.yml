@@ -1,3 +1,5 @@
 ﻿foregroundColor: "#bad0de"
 backgroundColor: "#4995c4"
 character: 'O'
+collisionGroups:
+  - Group1

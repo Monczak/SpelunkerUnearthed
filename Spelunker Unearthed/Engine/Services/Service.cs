@@ -6,4 +6,9 @@ public class Service
     {
         
     }
+
+    public virtual void Update()
+    {
+        
+    }
 }

@@ -25,4 +25,10 @@ public static class ServiceRegistry
             throw new ArgumentException($"Service of type {typeof(T).Name} has not been registered");
         return (T)services[typeof(T)];
     }
+
+    public static void UpdateServices()
+    {
+        foreach (Service service in services.Values)
+            service.Update();
+    }
 }

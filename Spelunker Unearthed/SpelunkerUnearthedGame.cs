@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SpelunkerUnearthed.Engine;
 using SpelunkerUnearthed.Engine.Components;
+using SpelunkerUnearthed.Engine.Input;
 using SpelunkerUnearthed.Engine.Logging;
 using SpelunkerUnearthed.Engine.Rendering;
 using SpelunkerUnearthed.Engine.Services;
@@ -39,10 +40,23 @@ public class SpelunkerUnearthedGame : Game
         FontSystemDefaults.KernelHeight = 4;
         
         ServiceRegistry.RegisterService(new TileLoader());
+        ServiceRegistry.RegisterService(new InputManager());
+
+        InitializeInputs();
 
         scene = new TestScene(Window, GraphicsDevice);
         
         base.Initialize();
+    }
+
+    private void InitializeInputs()
+    {
+        // TODO: Load inputs from a config file
+        InputManager inputManager = ServiceRegistry.Get<InputManager>();
+        inputManager.RegisterEvent(new InputEvent("Up", Keys.Up));
+        inputManager.RegisterEvent(new InputEvent("Down", Keys.Down));
+        inputManager.RegisterEvent(new InputEvent("Left", Keys.Left));
+        inputManager.RegisterEvent(new InputEvent("Right", Keys.Right));
     }
 
     protected override void LoadContent()
@@ -63,6 +77,7 @@ public class SpelunkerUnearthedGame : Game
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
+        ServiceRegistry.UpdateServices();
         scene.Update(gameTime);
 
         base.Update(gameTime);

@@ -1,15 +1,19 @@
 ﻿using System;
+using Microsoft.Xna.Framework;
 using SpelunkerUnearthed.Engine;
 using SpelunkerUnearthed.Engine.Components;
 using SpelunkerUnearthed.Engine.Logging;
 using SpelunkerUnearthed.Engine.Services;
 using SpelunkerUnearthed.Engine.Tiles;
+using SpelunkerUnearthed.Engine.Utils;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration;
 
 public class MapGenerator : Component
 {
     private Tilemap tilemap;
+
+    private Random random;
 
     public override void OnAttach()
     {
@@ -18,27 +22,57 @@ public class MapGenerator : Component
 
     public void GenerateMap(MapGenerationParameters parameters)
     {
+        random = new Random(parameters.Seed);
+        
         FillRandom(parameters.RandomFillAmount, parameters.WallTile, parameters.NothingTile);
+        
+        MakeBorder(parameters.BorderSize, parameters.WallTile);
+        SmoothBorder(parameters.BorderSize, parameters.BorderGradientSize, parameters.BorderGradientFillAmount, parameters.WallTile);
 
         for (int i = 0; i < parameters.SmoothIterations; i++)
         {
             Smooth(parameters.WallTile, parameters.NothingTile);
         }
-        
     }
 
     private void FillRandom(float fillAmount, Tile positiveTile, Tile negativeTile)
     {
-        Random random = new Random();
-
         foreach (Coord coord in tilemap.Coords)
         {
             tilemap[coord] = random.NextSingle() < fillAmount ? positiveTile : negativeTile;
         }
     }
 
+    private void MakeBorder(int size, Tile borderTile)
+    {
+        foreach (Coord coord in tilemap.Coords)
+        {
+            if (IsInRing(coord, 0, size))
+                tilemap[coord] = borderTile;
+        }
+    }
+
+    private bool IsInRing(Coord coord, int outerMargin, int size)
+    {
+        return (coord.X >= outerMargin && coord.X < outerMargin + size) || (coord.X > tilemap.MapWidth - outerMargin - size && coord.X <= tilemap.MapWidth - outerMargin)
+            || (coord.Y >= outerMargin && coord.Y < outerMargin + size) || (coord.Y > tilemap.MapHeight - outerMargin - size && coord.Y <= tilemap.MapHeight - outerMargin);
+    }
+
+    private void SmoothBorder(int borderSize, int gradientSize, float fillPercent, Tile tile)
+    {
+        foreach (Coord coord in tilemap.Coords)
+        {
+            if (IsInRing(coord, borderSize, gradientSize))
+            {
+                if (random.NextSingle() < fillPercent)
+                    tilemap[coord] = tile;
+            }
+        }
+    }
+
     private void Smooth(Tile positiveTile, Tile negativeTile)
     {
+        // TODO: Use double buffering if this ends up too slow
         tilemap.CopyTo(out var newMap);
 
         for (int y = 0; y < tilemap.MapHeight; y++)
@@ -68,8 +102,9 @@ public class MapGenerator : Component
                 if (x == y) continue;
                 
                 Coord neighborCoord = new(x, y);
-                if (tilemap.IsInBounds(neighborCoord)
-                    && tilemap[neighborCoord].Tags.Contains(tag))
+                if (!tilemap.IsInBounds(neighborCoord)) 
+                    count++;
+                else if (tilemap[neighborCoord].Tags.Contains(tag))
                     count++;
             }
         }

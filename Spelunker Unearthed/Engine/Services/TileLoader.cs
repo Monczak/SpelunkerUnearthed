@@ -17,11 +17,6 @@ public class TileLoader : Service
 
     public Dictionary<string, Tile> Tiles { get; private set; }
 
-    public TileLoader()
-    {
-        Logger.Log("Initialized tile loader");
-    }
-
     public Dictionary<string, Tile> LoadTiles()
     {
         Tiles = new Dictionary<string, Tile>

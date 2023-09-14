@@ -38,7 +38,9 @@ public class TestScene : Scene
         
         tilemapEntity.AttachComponent(new MapGenerator());
 
-        player = new Player { Tile = ServiceRegistry.Get<TileLoader>().GetTile("Player") };
+        // TODO: Place player in an appropriate spot (randomly, ensuring there is no wall where the player is supposed to spawn)
+        // or next to a ladder that was taken to get to this level
+        player = new Player { Tile = ServiceRegistry.Get<TileLoader>().GetTile("Player"), Position = new Coord(15, 15)};
         tilemap.AddTileEntity(player);
 
         AddEntity(tilemapEntity);
@@ -50,10 +52,14 @@ public class TestScene : Scene
 
         MapGenerationParameters parameters = new MapGenerationParameters
         {
+            Seed = 0,
             NothingTile = ServiceRegistry.Get<TileLoader>().GetTile("Nothing"),
             WallTile = ServiceRegistry.Get<TileLoader>().GetTile("Stone"),
-            RandomFillAmount = 0.5f,
+            RandomFillAmount = 0.45f,
             SmoothIterations = 3,
+            BorderSize = 1,
+            BorderGradientSize = 2,
+            BorderGradientFillAmount = 0.6f,
         };
         mapGenerator.GenerateMap(parameters);
     }

@@ -41,6 +41,20 @@ public class InputManager : Service
         releasedHandlers[inputEvents[inputName]].Add(handler);
     }
 
+    public bool IsHeld(string inputName) => pressedKeys.Contains(inputEvents[inputName].Key);
+
+    public void UnbindOnPressed(string inputName, InputHandler handler)
+    {
+        Logger.Log($"Unbound pressed from {inputName}");
+        pressedHandlers[inputEvents[inputName]].Remove(handler);
+    }
+    
+    public void UnbindOnReleased(string inputName, InputHandler handler)
+    {
+        Logger.Log($"Unbound released from {inputName}");
+        releasedHandlers[inputEvents[inputName]].Remove(handler);
+    }
+
     public override void Update()
     {
         var state = Keyboard.GetState();

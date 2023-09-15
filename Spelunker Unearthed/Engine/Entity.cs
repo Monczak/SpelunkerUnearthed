@@ -73,4 +73,6 @@ public class Entity
     }
 
     public bool HasComponent<T>() where T : Component => components.Keys.Any(c => c.IsAssignableTo(typeof(T)));
+    
+    // TODO: Implement handlers for destroying this object, components and stuff
 }

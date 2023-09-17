@@ -11,6 +11,8 @@ public class Entity
 {
     public string Name { get; set; }
 
+    public bool ToBeDestroyed { get; private set; }
+
     private Dictionary<Type, Component> components;
 
     public Entity(string name)
@@ -35,6 +37,19 @@ public class Entity
         return (T)components[type];
     }
 
+    public void RemoveComponent<T>() where T : Component
+    {
+        T component = GetComponent<T>();
+        if (component is null) return;
+
+        components.Remove(typeof(T));
+    }
+
+    public void RemoveComponent<T>(T component) where T : Component
+    {
+        components.Remove(component.GetType());
+    }
+ 
     public void AttachComponent<T>(T component) where T : Component
     {
         AssertComponent<T>();
@@ -74,5 +89,11 @@ public class Entity
 
     public bool HasComponent<T>() where T : Component => components.Keys.Any(c => c.IsAssignableTo(typeof(T)));
     
-    // TODO: Implement handlers for destroying this object, components and stuff
+    public void Destroy()
+    {
+        ToBeDestroyed = true;
+        
+        foreach (Component component in components.Values)
+            component.Destroy();
+    }
 }

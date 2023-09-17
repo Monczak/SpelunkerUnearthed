@@ -21,6 +21,8 @@ public class Player : TileEntity
     private float movementSpeed = 8;
     private Vector2 moveCooldown;
 
+    private Coord facingDirection;
+
     protected override void OnAttach()
     {
         tilemapCollider = Tilemap.GetComponent<TilemapCollider>(); 
@@ -35,6 +37,14 @@ public class Player : TileEntity
         inputManager.OnReleased("Down", ReadInput);
         inputManager.OnReleased("Left", ReadInput);
         inputManager.OnReleased("Right", ReadInput);
+        
+        inputManager.OnPressed("Mine", Mine);
+    }
+
+    private void Mine()
+    {
+        if (Tilemap.IsInBounds(Position + facingDirection))
+            Tilemap.Mine(Position + facingDirection);
     }
 
     private void OnUp()
@@ -64,6 +74,7 @@ public class Player : TileEntity
     private void MoveDirection(Coord direction)
     {
         Coord delta = input * direction;
+        
         if (moveCooldown * direction == Vector2.Zero && delta != Coord.Zero)
         {
             if (tilemapCollider.TileEntityCollides(this, Position + delta))
@@ -80,6 +91,10 @@ public class Player : TileEntity
 
     public override void Update(GameTime gameTime)
     {
+        // TODO: Figure out what to do when mining diagonally
+        if (input != Coord.Zero)
+            facingDirection = input;
+        
         // TODO: Better movement on diagonals
         MoveDirection(new Coord(1, 0));
         MoveDirection(new Coord(0, 1));
@@ -115,9 +130,8 @@ public class Player : TileEntity
         if (previousInput.Y != input.Y)
             moveCooldown.Y = 0;
     }
-
-    // TODO: Implement some kind of proper destroy handler instead of overriding destructor (IDisposable?)
-    ~Player() 
+    
+    protected override void OnDestroy()
     {
         inputManager.UnbindOnPressed("Up", OnUp);
         inputManager.UnbindOnPressed("Down", OnDown);

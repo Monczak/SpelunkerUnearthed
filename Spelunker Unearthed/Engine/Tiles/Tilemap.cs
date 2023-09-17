@@ -52,6 +52,19 @@ public class Tilemap : Component
     {
         this[coord] = tile;
         tile.OwnerTilemap = this;
+        tile.OnPlaced();
+    }
+    
+    public void Mine(Coord tileCoord)
+    {
+        this[tileCoord].OnMined();
+        
+        Place(ServiceRegistry.Get<TileLoader>().GetTile("Nothing"), tileCoord);
+    }
+
+    public void StepOn(TileEntity steppingEntity, Coord tileCoord)
+    {
+        this[tileCoord].OnSteppedOn(steppingEntity);
     }
 
     public void Fill(Tile tile)
@@ -148,5 +161,11 @@ public class Tilemap : Component
                 }
             }
         }
+    }
+
+    protected override void OnDestroy()
+    {
+        foreach (TileEntity tileEntity in TileEntities)
+            tileEntity.Destroy();
     }
 }

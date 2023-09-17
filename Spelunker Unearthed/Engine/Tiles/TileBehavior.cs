@@ -8,4 +8,19 @@ public class TileBehavior
     {
         
     }
+
+    public virtual void OnPlaced()
+    {
+        
+    }
+
+    public virtual void OnMined()
+    {
+        
+    }
+
+    public virtual void OnSteppedOn(TileEntity steppingEntity)
+    {
+        
+    }
 }

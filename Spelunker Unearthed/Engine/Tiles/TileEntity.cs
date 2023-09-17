@@ -34,4 +34,15 @@ public class TileEntity
     }
 
     protected void Move(Coord delta) => Move(delta.X, delta.Y);
+
+    public void Destroy()
+    {
+        Tilemap.TileEntities.Remove(this);
+        OnDestroy();
+    }
+
+    protected virtual void OnDestroy()
+    {
+        
+    }
 }

@@ -4,7 +4,7 @@ namespace SpelunkerUnearthed.Engine.Components;
 
 public abstract class Component
 {
-    protected Entity ownerEntity;
+    protected Entity OwnerEntity;
 
     public Component()
     {
@@ -13,18 +13,18 @@ public abstract class Component
 
     public void SetOwner(Entity ownerEntity)
     {
-        this.ownerEntity = ownerEntity;
+        this.OwnerEntity = ownerEntity;
         OnAttach();
     }
 
     public T AddComponent<T>() where T : Component
     {
-        return ownerEntity.AddComponent<T>();
+        return OwnerEntity.AddComponent<T>();
     }
 
     public T GetComponent<T>() where T : Component
     {
-        return ownerEntity.GetComponent<T>();
+        return OwnerEntity.GetComponent<T>();
     }
 
     public virtual void Update(GameTime gameTime)
@@ -33,6 +33,16 @@ public abstract class Component
     }
 
     public virtual void OnAttach()
+    {
+        
+    }
+
+    public void Destroy()
+    {
+        OwnerEntity.RemoveComponent(this);
+    }
+
+    protected virtual void OnDestroy()
     {
         
     }

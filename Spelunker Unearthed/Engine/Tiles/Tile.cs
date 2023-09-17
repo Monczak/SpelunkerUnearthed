@@ -65,4 +65,22 @@ public class Tile
 
         Behaviors = new HashSet<TileBehavior>(tile.Behaviors);
     }
+
+    public void OnPlaced()
+    {
+        foreach (var behavior in Behaviors)
+            behavior.OnPlaced();
+    }
+    
+    public void OnMined()
+    {
+        foreach (var behavior in Behaviors)
+            behavior.OnMined();
+    }
+    
+    public void OnSteppedOn(TileEntity steppingEntity)
+    {
+        foreach (var behavior in Behaviors)
+            behavior.OnSteppedOn(steppingEntity);
+    }
 }

@@ -57,6 +57,7 @@ public class SpelunkerUnearthedGame : Game
         inputManager.RegisterEvent(new InputEvent("Down", Keys.Down));
         inputManager.RegisterEvent(new InputEvent("Left", Keys.Left));
         inputManager.RegisterEvent(new InputEvent("Right", Keys.Right));
+        inputManager.RegisterEvent(new InputEvent("Mine", Keys.Z));
     }
 
     protected override void LoadContent()

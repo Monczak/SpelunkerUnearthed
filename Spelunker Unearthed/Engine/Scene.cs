@@ -33,6 +33,8 @@ public abstract class Scene
         {
             entity.Update(gameTime);
         }
+
+        Entities.RemoveAll(e => e.ToBeDestroyed);
     }
 
     public void Render(SpriteBatch spriteBatch)

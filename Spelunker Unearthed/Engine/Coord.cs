@@ -57,7 +57,7 @@ public struct Coord
     public static Coord Zero => new(0, 0);
 
     public int SqrMagnitude => X * X + Y * Y;
-    public double Magnitude => Math.Sqrt(SqrMagnitude);
+    public float Magnitude => (float)Math.Sqrt(SqrMagnitude);
 
     public static Coord Abs(Coord coord) => new(Math.Abs(coord.X), Math.Abs(coord.Y));
     public static Coord Orthogonal(Coord coord) => new(-coord.Y, coord.X);

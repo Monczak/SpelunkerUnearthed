@@ -14,6 +14,8 @@ public class Tile
     public Color BackgroundColor { get; }
     public char Character { get; }
     
+    public float LightAttenuation { get; }
+    
     public HashSet<string> Tags { get; }
     
     public Tilemap OwnerTilemap { get; set; }
@@ -21,33 +23,26 @@ public class Tile
 
     public CollisionGroup CollisionGroup { get; }
     
-    public Tile(string id, TileData data) : this(
-        id,
-        ColorUtils.FromHex(data.ForegroundColor), 
-        ColorUtils.FromHex(data.BackgroundColor), 
-        data.Character, data.Tags, data.CollisionGroups)
-    {
-        
-    }
-
-    public Tile(string id, Color foregroundColor, Color backgroundColor, char character, string[] tags, string[] collisionGroups)
+    public Tile(string id, TileData data)
     {
         Id = id;
-        ForegroundColor = foregroundColor;
-        BackgroundColor = backgroundColor;
-        Character = character;
+        ForegroundColor = ColorUtils.FromHex(data.ForegroundColor);
+        BackgroundColor = ColorUtils.FromHex(data.BackgroundColor);
+        Character = data.Character;
 
-        Tags = tags is null ? new HashSet<string>() : new HashSet<string>(tags);
+        Tags = data.Tags is null ? new HashSet<string>() : new HashSet<string>(data.Tags);
 
         CollisionGroup = CollisionGroup.None;
-        if (collisionGroups is not null)
+        if (data.CollisionGroups is not null)
         {
-            foreach (string groupStr in collisionGroups)
+            foreach (string groupStr in data.CollisionGroups)
             {
                 CollisionGroup group = (CollisionGroup)Enum.Parse(typeof(CollisionGroup), groupStr, true);
                 CollisionGroup |= group;
             }
         }
+
+        LightAttenuation = data.LightAttenuation;
         
         Behaviors = new HashSet<TileBehavior>();
     }
@@ -60,6 +55,8 @@ public class Tile
         Character = tile.Character;
         
         Tags = tile.Tags is null ? new HashSet<string>() : new HashSet<string>(tile.Tags);
+
+        LightAttenuation = tile.LightAttenuation;
 
         CollisionGroup = tile.CollisionGroup;
 

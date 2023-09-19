@@ -150,10 +150,10 @@ public class TileAtlas : Service
         return new Coord(atlasSizeX, atlasSizeY);
     }
 
-    public void DrawTile(SpriteBatch localSpriteBatch, Vector2 pos, string tileId)
+    public void DrawTile(SpriteBatch localSpriteBatch, Vector2 pos, string tileId, Color tint)
     {
         Coord atlasCoord = tileAtlasCoords[tileId];
-        localSpriteBatch.Draw(backgroundRenderTarget, pos, new Rectangle(atlasCoord.X * tileSize, atlasCoord.Y * tileSize, tileSize, tileSize), Color.White);
-        localSpriteBatch.Draw(foregroundRenderTarget, pos, new Rectangle(atlasCoord.X * tileSize, atlasCoord.Y * tileSize, tileSize, tileSize), Color.White);
+        localSpriteBatch.Draw(backgroundRenderTarget, pos, new Rectangle(atlasCoord.X * tileSize, atlasCoord.Y * tileSize, tileSize, tileSize), tint);
+        localSpriteBatch.Draw(foregroundRenderTarget, pos, new Rectangle(atlasCoord.X * tileSize, atlasCoord.Y * tileSize, tileSize, tileSize), tint);
     }
 }

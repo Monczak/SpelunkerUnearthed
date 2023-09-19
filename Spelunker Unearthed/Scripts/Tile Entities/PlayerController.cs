@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using SpelunkerUnearthed.Engine;
 using SpelunkerUnearthed.Engine.Collision;
+using SpelunkerUnearthed.Engine.Components;
 using SpelunkerUnearthed.Engine.Input;
 using SpelunkerUnearthed.Engine.Logging;
 using SpelunkerUnearthed.Engine.Services;
@@ -10,7 +11,7 @@ using SpelunkerUnearthed.Engine.Tiles;
 
 namespace SpelunkerUnearthed.Scripts.TileEntities;
 
-public class Player : TileEntity
+public class PlayerController : TileEntityComponent
 {
     private InputManager inputManager;
     private TilemapCollider tilemapCollider;
@@ -25,7 +26,7 @@ public class Player : TileEntity
 
     protected override void OnAttach()
     {
-        tilemapCollider = Tilemap.GetComponent<TilemapCollider>(); 
+        tilemapCollider = OwnerEntity.Tilemap.GetComponent<TilemapCollider>(); 
         inputManager = ServiceRegistry.Get<InputManager>();
 
         inputManager.OnPressed("Up", OnUp);
@@ -43,8 +44,8 @@ public class Player : TileEntity
 
     private void Mine()
     {
-        if (Tilemap.IsInBounds(Position + facingDirection))
-            Tilemap.Mine(Position + facingDirection);
+        if (OwnerEntity.Tilemap.IsInBounds(OwnerEntity.Position + facingDirection))
+            OwnerEntity.Tilemap.Mine(OwnerEntity.Position + facingDirection);
     }
 
     private void OnUp()
@@ -77,10 +78,10 @@ public class Player : TileEntity
         
         if (moveCooldown * direction == Vector2.Zero && delta != Coord.Zero)
         {
-            if (tilemapCollider.TileEntityCollides(this, Position + delta))
+            if (tilemapCollider.TileEntityCollides(OwnerEntity, OwnerEntity.Position + delta))
                 delta *= Coord.Abs(Coord.Orthogonal(direction));
 
-            Move(delta);
+            OwnerEntity.Move(delta);
             
             if (direction.X == 0)
                 moveCooldown.Y = 1f / movementSpeed;

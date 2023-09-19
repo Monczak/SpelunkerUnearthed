@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using SpelunkerUnearthed.Engine;
 using SpelunkerUnearthed.Engine.Collision;
 using SpelunkerUnearthed.Engine.Components;
+using SpelunkerUnearthed.Engine.Light;
 using SpelunkerUnearthed.Engine.Rendering;
 using SpelunkerUnearthed.Engine.Services;
 using SpelunkerUnearthed.Engine.Tiles;
@@ -14,7 +15,7 @@ namespace SpelunkerUnearthed.Scripts.Scenes;
 public class TestScene : Scene
 {
     private Tilemap tilemap;
-    private Player player;
+    private PlayerController playerController;
     
     public TestScene(GameWindow window, GraphicsDevice graphicsDevice) : base(window, graphicsDevice)
     {
@@ -29,10 +30,15 @@ public class TestScene : Scene
     private void MakeTilemap()
     {
         Entity tilemapEntity = new("Tilemap");
-        tilemap = new Tilemap(30, 30);
+        tilemap = new Tilemap(64, 64);
         
         tilemapEntity.AttachComponent(new Transform());
         tilemapEntity.AttachComponent(tilemap);
+        tilemapEntity.AttachComponent(new LightMap
+        {
+            AmbientLight = new Color(20, 15, 17),
+            // AmbientLight = Color.Black,
+        });
         tilemapEntity.AttachComponent(new TilemapRenderer(graphicsDevice));
         tilemapEntity.AttachComponent(new TilemapCollider());
         
@@ -40,8 +46,18 @@ public class TestScene : Scene
 
         // TODO: Place player in an appropriate spot (randomly, ensuring there is no wall where the player is supposed to spawn)
         // or next to a ladder that was taken to get to this level
-        player = new Player { Tile = ServiceRegistry.Get<TileLoader>().GetTile("Player"), Position = new Coord(15, 15)};
+
+        TileEntity player = new TileEntity("Player")
+        {
+            Tile = ServiceRegistry.Get<TileLoader>().GetTile("Player"),
+            Position = new Coord(32, 32)
+        };
         tilemap.AddTileEntity(player);
+        
+        playerController = new PlayerController();
+        player.AttachComponent(playerController);
+        
+        player.AttachComponent(new PointLight { Color = new Color(237, 222, 138), Radius = 10 });
 
         AddEntity(tilemapEntity);
     }

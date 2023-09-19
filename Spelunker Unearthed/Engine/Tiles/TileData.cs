@@ -4,13 +4,15 @@ namespace SpelunkerUnearthed.Engine.Tiles;
 
 public struct TileData
 {
-    public string ForegroundColor { get; private set; }
-    public string BackgroundColor { get; private set; }
-    public char Character { get; private set; }
+    public string ForegroundColor { get; init; }
+    public string BackgroundColor { get; init; }
+    public char Character { get; init; }
 
-    public string[] Tags { get; private set; }
+    public string[] Tags { get; init; }
     
-    public string[] Behaviors { get; private set; }
+    public string[] Behaviors { get; init; }
     
-    public string[] CollisionGroups { get; private set; }
+    public float LightAttenuation { get; init; }
+    
+    public string[] CollisionGroups { get; init; }
 }

@@ -5,3 +5,4 @@ tags:
   - Wall
 collisionGroups:
   - Group1
+lightAttenuation: 0.3

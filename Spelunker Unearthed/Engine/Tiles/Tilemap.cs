@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using SpelunkerUnearthed.Engine.Components;
 using SpelunkerUnearthed.Engine.Exceptions;
+using SpelunkerUnearthed.Engine.Light;
 using SpelunkerUnearthed.Engine.Services;
 
 namespace SpelunkerUnearthed.Engine.Tiles;
@@ -50,9 +51,18 @@ public class Tilemap : Component
 
     public void Place(Tile tile, Coord coord)
     {
+        if (this[coord] is not null && this[coord].LightSource is not null)
+            GetComponent<LightMap>()?.RemoveEmittingTile(this[coord]);
+        
         this[coord] = tile;
         tile.OwnerTilemap = this;
         tile.OnPlaced();
+
+        if (tile.LightSource is not null)
+        {
+            tile.LightSource.AttachTilemap(this);
+            GetComponent<LightMap>()?.AddEmittingTile(tile, coord);
+        }
     }
     
     public void Mine(Coord tileCoord)
@@ -87,7 +97,7 @@ public class Tilemap : Component
         {
             for (int x = 0; x < MapWidth; x++)
             {
-                Place(tiles[x, y], new Coord(x, y));
+                Place(new Tile(tiles[x, y]), new Coord(x, y));
             }
         }
     }

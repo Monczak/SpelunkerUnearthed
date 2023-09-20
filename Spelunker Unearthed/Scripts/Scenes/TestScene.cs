@@ -36,8 +36,8 @@ public class TestScene : Scene
         tilemapEntity.AttachComponent(tilemap);
         tilemapEntity.AttachComponent(new LightMap
         {
-            AmbientLight = new Color(20, 15, 17),
-            // AmbientLight = Color.Black,
+            // AmbientLight = new Color(20, 15, 17),
+            AmbientLight = Color.Black,
         });
         tilemapEntity.AttachComponent(new TilemapRenderer(graphicsDevice));
         tilemapEntity.AttachComponent(new TilemapCollider());
@@ -57,7 +57,7 @@ public class TestScene : Scene
         playerController = new PlayerController();
         player.AttachComponent(playerController);
         
-        player.AttachComponent(new PointLight { Color = new Color(237, 222, 138), Radius = 10 });
+        player.AttachComponent(new LightEmitter { Light = new PointLight { Color = new Color(237, 222, 138), Radius = 30 } });
 
         AddEntity(tilemapEntity);
     }

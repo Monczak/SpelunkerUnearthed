@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using SpelunkerUnearthed.Engine.Collision;
+using SpelunkerUnearthed.Engine.Light;
 using SpelunkerUnearthed.Engine.Utils;
 
 namespace SpelunkerUnearthed.Engine.Tiles;
@@ -14,6 +15,7 @@ public class Tile
     public Color BackgroundColor { get; }
     public char Character { get; }
     
+    public LightSource LightSource { get; }
     public float LightAttenuation { get; }
     
     public HashSet<string> Tags { get; }
@@ -43,6 +45,16 @@ public class Tile
         }
 
         LightAttenuation = data.LightAttenuation;
+
+        if (data.Light is not null)
+        {
+            LightSource = new PointLight
+            {
+                Color = ColorUtils.FromHex(data.Light.Value.Color),
+                Radius = data.Light.Value.Radius
+            };
+        }
+            
         
         Behaviors = new HashSet<TileBehavior>();
     }
@@ -56,6 +68,8 @@ public class Tile
         
         Tags = tile.Tags is null ? new HashSet<string>() : new HashSet<string>(tile.Tags);
 
+        if (tile.LightSource is not null)
+            LightSource = tile.LightSource.Clone() as LightSource;
         LightAttenuation = tile.LightAttenuation;
 
         CollisionGroup = tile.CollisionGroup;

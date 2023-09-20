@@ -29,12 +29,13 @@ public class TilemapRenderer : Renderer
     {
         var transform = GetComponent<Transform>();
         
-        // TODO: Maybe use a (compute) shader to calculate lighting?
+        lightMap.RenderLightMap();
+        
         spriteBatch.Begin(SpriteSortMode.Texture, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: camera.WorldToScreenMatrix);
         
         foreach (Coord coord in tilemap.Coords)
         {
-            RenderTile(spriteBatch, camera, CalculatePosition(coord), tilemap[coord], lightMap.GetLight(coord));
+            RenderTile(spriteBatch, camera, CalculatePosition(coord), tilemap[coord], lightMap.GetRenderedLight(coord));
         }
         
         spriteBatch.End();
@@ -43,7 +44,7 @@ public class TilemapRenderer : Renderer
 
         foreach (TileEntity entity in tilemap.TileEntities)
         {
-            RenderTile(spriteBatch, camera, CalculatePosition(entity.Position), entity.Tile, lightMap.GetLight(entity.Position));
+            RenderTile(spriteBatch, camera, CalculatePosition(entity.Position), entity.Tile, lightMap.GetRenderedLight(entity.Position));
         }
 
         spriteBatch.End();

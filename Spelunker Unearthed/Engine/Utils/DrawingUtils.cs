@@ -13,6 +13,7 @@ public static class DrawingUtils
         int dy = Math.Abs(end.Y - start.Y);
         
         Coords.Clear();
+        // List<Coord> coords = new();
 
         Coord step = new(start.X < end.X ? 1 : -1, start.Y < end.Y ? 1 : -1);
 
@@ -25,6 +26,7 @@ public static class DrawingUtils
                 break;
 
             Coords.Add(pos);
+            // coords.Add(pos);
 
             if (pos == end)
                 break;
@@ -43,5 +45,6 @@ public static class DrawingUtils
         }
 
         return Coords;
+        // return coords;
     }
 }

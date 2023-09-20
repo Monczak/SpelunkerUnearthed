@@ -11,17 +11,15 @@ public class PointLight : LightSource
 {
     public int Radius { get; set; }
 
-    protected override Color CalculateLight(Coord position)
+    protected override Color CalculateLight(Coord sourcePosition, Coord receiverPosition)
     {
-        if ((position - OwnerEntity.Position).Magnitude > Radius)
-            return default;
-        return Color * CalculateAttenuation(position);
+        return Color * CalculateAttenuation(sourcePosition, receiverPosition);
     }
     
     // TODO: Work out a way to optimize this, if necessary
-    protected override float CalculateAttenuation(Coord position)
+    protected override float CalculateAttenuation(Coord sourcePosition, Coord receiverPosition)
     {
-        float distance = (OwnerEntity.Position - position).Magnitude;
+        float distance = (receiverPosition - sourcePosition).Magnitude;
         float normDistance = distance / Radius;
         
         float distanceAttenuation = 1 - MathF.Pow(normDistance, 3);
@@ -29,12 +27,17 @@ public class PointLight : LightSource
         float tileAttenuation = 1;
         
         // TODO: Improve the line generating algo (something different from Bresenham?)
-        foreach (Coord coord in DrawingUtils.BresenhamLine(OwnerEntity.Position, position, endPreemptively: true))
+        foreach (Coord coord in DrawingUtils.BresenhamLine(sourcePosition, receiverPosition, endPreemptively: true))
         {
-            Tile tile = OwnerEntity.Tilemap[coord];
+            Tile tile = Tilemap[coord];
             tileAttenuation *= 1 - tile.LightAttenuation;
         }
 
         return distanceAttenuation * tileAttenuation;
     }
+
+    public override bool IsInRange(Coord sourcePosition, Coord receiverPosition) =>
+        (receiverPosition - sourcePosition).Magnitude <= Radius;
+
+    protected override LightSource MakeClone() => new PointLight { Color = Color, Radius = Radius, Tilemap = Tilemap };
 }

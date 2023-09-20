@@ -6,7 +6,7 @@ namespace SpelunkerUnearthed.Engine.Components;
 // TODO: Refactor this to use a generic base class for all components
 public class TileEntityComponent
 {
-    protected TileEntity OwnerEntity;
+    public TileEntity OwnerEntity { get; private set; }
     
     public void SetOwner(TileEntity ownerEntity)
     {

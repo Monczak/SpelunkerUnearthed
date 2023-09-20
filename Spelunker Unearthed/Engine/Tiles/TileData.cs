@@ -12,6 +12,7 @@ public struct TileData
     
     public string[] Behaviors { get; init; }
     
+    public TileLightData? Light { get; init; }
     public float LightAttenuation { get; init; }
     
     public string[] CollisionGroups { get; init; }

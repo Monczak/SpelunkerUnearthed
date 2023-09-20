@@ -6,15 +6,30 @@ using SpelunkerUnearthed.Engine.Utils;
 
 namespace SpelunkerUnearthed.Engine.Light;
 
-public abstract class LightSource : TileEntityComponent
+public abstract class LightSource : ICloneable
 {
     public Color Color { get; set; }
+    protected Tilemap Tilemap;
 
-    protected abstract Color CalculateLight(Coord position);
-    protected abstract float CalculateAttenuation(Coord position);
-
-    public Color GetLight(Coord position)
+    public void AttachTilemap(Tilemap tilemap)
     {
-        return CalculateLight(position) * CalculateAttenuation(position);
+        Tilemap = tilemap;
     }
+
+    protected abstract Color CalculateLight(Coord sourcePosition, Coord receiverPosition);
+    protected abstract float CalculateAttenuation(Coord sourcePosition, Coord receiverPosition);
+    
+    public abstract bool IsInRange(Coord sourcePosition, Coord receiverPosition);
+
+    public Color GetLight(Coord sourcePosition, Coord receiverPosition)
+    {
+        return CalculateLight(sourcePosition, receiverPosition) * CalculateAttenuation(sourcePosition, receiverPosition);
+    }
+
+    public object Clone()
+    {
+        return MakeClone();
+    }
+
+    protected abstract LightSource MakeClone();
 }

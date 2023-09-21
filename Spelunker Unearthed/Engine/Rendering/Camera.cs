@@ -31,9 +31,12 @@ public class Camera
 
     public Matrix InverseTransformMatrix => Matrix.Invert(TransformMatrix);
     
-    public Coord ScreenToWorldPoint(Vector2 screenPos)
+    public Vector2 ScreenToWorldPoint(Vector2 screenPos)
     {
         Vector3 worldPos = Vector3.Transform(new Vector3(screenPos, 0), InverseTransformMatrix) / TileSize;
-        return new Coord((int)MathF.Floor(worldPos.X), (int)MathF.Floor(worldPos.Y));
+        return new Vector2(worldPos.X, worldPos.Y);
     }
+
+    public Bounds ViewingWindow => Bounds.MakeCorners(ScreenToWorldPoint(Vector2.Zero),
+        ScreenToWorldPoint(new Vector2(window.ClientBounds.Width, window.ClientBounds.Height)));
 }

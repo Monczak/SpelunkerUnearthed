@@ -1,9 +1,11 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using FontStashSharp;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SpelunkerUnearthed.Engine.Components;
 using SpelunkerUnearthed.Engine.Light;
+using SpelunkerUnearthed.Engine.Logging;
 using SpelunkerUnearthed.Engine.Services;
 using SpelunkerUnearthed.Engine.Tiles;
 
@@ -29,13 +31,23 @@ public class TilemapRenderer : Renderer
 
     public override void Render(SpriteBatch spriteBatch)
     {
-        lightMap.RenderLightMap();
+        var cullingBoundsTest = GetCullingBounds();
+        if (cullingBoundsTest is null) return;
+
+        Bounds cullingBounds = Bounds.MakeCorners((Vector2)WorldPointToCoord(cullingBoundsTest.Value.TopLeft), (Vector2)WorldPointToCoord(cullingBoundsTest.Value.BottomRight));
+        
+        lightMap.RenderLightMap(cullingBounds);
         
         spriteBatch.Begin(SpriteSortMode.Texture, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: camera.TransformMatrix);
-        
-        foreach (Coord coord in tilemap.Coords)
+
+        for (float y = cullingBounds.TopLeft.Y; y < cullingBounds.BottomRight.Y + 1; y++)
         {
-            RenderTile(spriteBatch, CoordToWorldPoint(coord), tilemap[coord], lightMap.GetRenderedLight(coord));
+            for (float x = cullingBounds.TopLeft.X; x < cullingBounds.BottomRight.X + 1; x++)
+            {
+                Coord coord = (Coord)new Vector2(x, y);
+                if (!tilemap.IsInBounds(coord)) continue;
+                RenderTile(spriteBatch, CoordToWorldPoint(coord), tilemap[coord], lightMap.GetRenderedLight(coord));
+            }
         }
         
         spriteBatch.End();
@@ -44,12 +56,23 @@ public class TilemapRenderer : Renderer
 
         foreach (TileEntity entity in tilemap.TileEntities)
         {
+            if (!cullingBounds.PointInside((Vector2)entity.Position)) continue;
+            
             RenderTile(spriteBatch, CoordToWorldPoint(entity.Position), entity.Tile, lightMap.GetRenderedLight(entity.Position));
         }
 
         spriteBatch.End();
     }
-    
+
+    private Bounds? GetCullingBounds()
+    {
+        Bounds cameraBounds = camera.ViewingWindow;
+        Bounds tilemapBounds =
+            new Bounds(CoordToWorldPoint(Coord.Zero), new Vector2(tilemap.MapWidth, tilemap.MapHeight));
+        Bounds? overlap = Bounds.Overlap(cameraBounds, tilemapBounds);
+        return overlap;
+    }
+
     public Vector2 CoordToWorldPoint(Coord coord)
     {
         return (Vector2)coord + transform.Position + CalculateCenterOffset();

@@ -84,13 +84,18 @@ public class LightMap : Component
         return new Color(lightAtPoint);
     }
 
-    public void RenderLightMap()
+    public void RenderLightMap(Bounds cullingBounds)
     {
         // TODO: Parallelization eats 100% of CPU, offload this to the GPU (compute shaders?)
         // Parallel.ForEach(tilemap.Coords, coord => map[coord.X, coord.Y] = GetLight(coord));
-        foreach (Coord coord in tilemap.Coords)
+        for (float y = cullingBounds.TopLeft.Y; y < cullingBounds.BottomRight.Y + 1; y++)
         {
-            map[coord.X, coord.Y] = GetLight(coord);
+            for (float x = cullingBounds.TopLeft.X; x < cullingBounds.BottomRight.X + 1; x++)
+            {
+                Coord coord = (Coord)new Vector2(x, y);
+                if (!tilemap.IsInBounds(coord)) continue;
+                map[coord.X, coord.Y] = GetLight(coord);
+            }
         }
     }
 

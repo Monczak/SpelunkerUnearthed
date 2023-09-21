@@ -1,13 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SpelunkerUnearthed.Engine;
-using SpelunkerUnearthed.Engine.Collision;
-using SpelunkerUnearthed.Engine.Components;
-using SpelunkerUnearthed.Engine.Light;
-using SpelunkerUnearthed.Engine.Logging;
-using SpelunkerUnearthed.Engine.Rendering;
-using SpelunkerUnearthed.Engine.Services;
-using SpelunkerUnearthed.Engine.Tiles;
+using MariEngine;
+using MariEngine.Collision;
+using MariEngine.Components;
+using MariEngine.Light;
+using MariEngine.Logging;
+using MariEngine.Rendering;
+using MariEngine.Services;
+using MariEngine.Tiles;
 using SpelunkerUnearthed.Scripts.Components;
 using SpelunkerUnearthed.Scripts.MapGeneration;
 using SpelunkerUnearthed.Scripts.TileEntities;
@@ -44,8 +44,8 @@ public class TestScene : Scene
         tilemapEntity.AttachComponent(tilemap);
         tilemapEntity.AttachComponent(new LightMap
         {
-            AmbientLight = new Color(20, 15, 17),
-            // AmbientLight = Color.Black,
+            // AmbientLight = new Color(20, 15, 17),
+            AmbientLight = Color.Black,
         });
 
         tilemapRenderer = new TilemapRenderer(graphics.GraphicsDevice, Camera);

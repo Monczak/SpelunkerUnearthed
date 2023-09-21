@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spelunker Unearthed", "Spelunker Unearthed\Spelunker Unearthed.csproj", "{D29566FD-C242-4890-AA07-4D92BE43DE75}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MariEngine", "MariEngine\MariEngine.csproj", "{0950342C-710C-4454-BB6D-7BB21E3BB80C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{D29566FD-C242-4890-AA07-4D92BE43DE75}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D29566FD-C242-4890-AA07-4D92BE43DE75}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D29566FD-C242-4890-AA07-4D92BE43DE75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0950342C-710C-4454-BB6D-7BB21E3BB80C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0950342C-710C-4454-BB6D-7BB21E3BB80C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0950342C-710C-4454-BB6D-7BB21E3BB80C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0950342C-710C-4454-BB6D-7BB21E3BB80C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

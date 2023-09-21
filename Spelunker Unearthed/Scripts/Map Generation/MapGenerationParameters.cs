@@ -1,4 +1,4 @@
-﻿using SpelunkerUnearthed.Engine.Tiles;
+﻿using MariEngine.Tiles;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration;
 

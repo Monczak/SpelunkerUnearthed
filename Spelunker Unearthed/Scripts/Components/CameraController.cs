@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
-using SpelunkerUnearthed.Engine.Components;
-using SpelunkerUnearthed.Engine.Rendering;
-using SpelunkerUnearthed.Engine.Tiles;
+using MariEngine.Components;
+using MariEngine.Rendering;
+using MariEngine.Tiles;
 
 namespace SpelunkerUnearthed.Scripts.Components;
 

@@ -1,11 +1,11 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
-using SpelunkerUnearthed.Engine;
-using SpelunkerUnearthed.Engine.Components;
-using SpelunkerUnearthed.Engine.Logging;
-using SpelunkerUnearthed.Engine.Services;
-using SpelunkerUnearthed.Engine.Tiles;
-using SpelunkerUnearthed.Engine.Utils;
+using MariEngine;
+using MariEngine.Components;
+using MariEngine.Logging;
+using MariEngine.Services;
+using MariEngine.Tiles;
+using MariEngine.Utils;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration;
 

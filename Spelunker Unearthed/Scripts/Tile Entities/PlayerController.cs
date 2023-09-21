@@ -1,13 +1,13 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using SpelunkerUnearthed.Engine;
-using SpelunkerUnearthed.Engine.Collision;
-using SpelunkerUnearthed.Engine.Components;
-using SpelunkerUnearthed.Engine.Input;
-using SpelunkerUnearthed.Engine.Logging;
-using SpelunkerUnearthed.Engine.Services;
-using SpelunkerUnearthed.Engine.Tiles;
+using MariEngine;
+using MariEngine.Collision;
+using MariEngine.Components;
+using MariEngine.Input;
+using MariEngine.Logging;
+using MariEngine.Services;
+using MariEngine.Tiles;
 
 namespace SpelunkerUnearthed.Scripts.TileEntities;
 

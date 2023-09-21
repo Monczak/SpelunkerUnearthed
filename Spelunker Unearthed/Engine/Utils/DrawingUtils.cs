@@ -7,13 +7,12 @@ public static class DrawingUtils
 {
     private static readonly List<Coord> Coords = new();
     
-    public static List<Coord> BresenhamLine(Coord start, Coord end, bool endPreemptively = false)
+    public static void BresenhamLine(List<Coord> coordList, Coord start, Coord end, bool endPreemptively = false)
     {
         int dx = Math.Abs(end.X - start.X);
         int dy = Math.Abs(end.Y - start.Y);
         
-        Coords.Clear();
-        // List<Coord> coords = new();
+        coordList.Clear();
 
         Coord step = new(start.X < end.X ? 1 : -1, start.Y < end.Y ? 1 : -1);
 
@@ -25,8 +24,7 @@ public static class DrawingUtils
             if (pos == end && endPreemptively)
                 break;
 
-            Coords.Add(pos);
-            // coords.Add(pos);
+            coordList.Add(pos);
 
             if (pos == end)
                 break;
@@ -43,8 +41,11 @@ public static class DrawingUtils
                 pos.Y += step.Y;
             }
         }
-
+    } 
+    
+    public static List<Coord> BresenhamLine(Coord start, Coord end, bool endPreemptively = false)
+    {
+        BresenhamLine(Coords, start, end, endPreemptively);
         return Coords;
-        // return coords;
     }
 }

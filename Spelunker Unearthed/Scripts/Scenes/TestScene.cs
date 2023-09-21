@@ -4,9 +4,11 @@ using SpelunkerUnearthed.Engine;
 using SpelunkerUnearthed.Engine.Collision;
 using SpelunkerUnearthed.Engine.Components;
 using SpelunkerUnearthed.Engine.Light;
+using SpelunkerUnearthed.Engine.Logging;
 using SpelunkerUnearthed.Engine.Rendering;
 using SpelunkerUnearthed.Engine.Services;
 using SpelunkerUnearthed.Engine.Tiles;
+using SpelunkerUnearthed.Scripts.Components;
 using SpelunkerUnearthed.Scripts.MapGeneration;
 using SpelunkerUnearthed.Scripts.TileEntities;
 
@@ -15,20 +17,26 @@ namespace SpelunkerUnearthed.Scripts.Scenes;
 public class TestScene : Scene
 {
     private Tilemap tilemap;
+    private TilemapRenderer tilemapRenderer;
     private PlayerController playerController;
     
-    public TestScene(GameWindow window, GraphicsDevice graphicsDevice) : base(window, graphicsDevice)
+    public TestScene(GameWindow window, GraphicsDeviceManager graphics) : base(window, graphics)
     {
     }
 
     public override void Load()
     {
-        MakeTilemap();
+        LoadEntities();
         GenerateMap();
     }
 
-    private void MakeTilemap()
+    private void LoadEntities()
     {
+        Entity cameraControllerEntity = new("Camera Controller");
+        CameraController cameraController = new(Camera) { Smoothing = 10.0f };
+        cameraControllerEntity.AttachComponent(cameraController);
+        AddEntity(cameraControllerEntity);
+        
         Entity tilemapEntity = new("Tilemap");
         tilemap = new Tilemap(64, 64);
         
@@ -39,7 +47,9 @@ public class TestScene : Scene
             // AmbientLight = new Color(20, 15, 17),
             AmbientLight = Color.Black,
         });
-        tilemapEntity.AttachComponent(new TilemapRenderer(graphicsDevice));
+
+        tilemapRenderer = new TilemapRenderer(graphics.GraphicsDevice, Camera);
+        tilemapEntity.AttachComponent(tilemapRenderer);
         tilemapEntity.AttachComponent(new TilemapCollider());
         
         tilemapEntity.AttachComponent(new MapGenerator());
@@ -60,6 +70,8 @@ public class TestScene : Scene
         player.AttachComponent(new LightEmitter { Light = new PointLight { Color = new Color(237, 222, 138), Radius = 30 } });
 
         AddEntity(tilemapEntity);
+        
+        cameraController.TrackTileEntity(player);
     }
 
     private void GenerateMap()

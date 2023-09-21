@@ -12,14 +12,14 @@ public abstract class Scene
     public List<Entity> Entities { get; } = new();
     public Camera Camera { get; }
 
-    protected GraphicsDevice graphicsDevice;
+    protected GraphicsDeviceManager graphics;
 
     public abstract void Load();
 
-    public Scene(GameWindow window, GraphicsDevice graphicsDevice)
+    public Scene(GameWindow window, GraphicsDeviceManager graphics)
     {
-        Camera = new Camera(window);
-        this.graphicsDevice = graphicsDevice;
+        Camera = new Camera(window, graphics);
+        this.graphics = graphics;
     }    
 
     public void AddEntity(Entity entity)
@@ -41,7 +41,7 @@ public abstract class Scene
     {
         foreach (Entity entity in Entities.Where(e => e.HasComponent<Renderer>()))
         {
-            entity.GetComponent<Renderer>().Render(spriteBatch, Camera);
+            entity.GetComponent<Renderer>().Render(spriteBatch);
         }
     }
 }

@@ -20,6 +20,7 @@ public struct Coord
     }
 
     public static explicit operator Vector2(Coord coord) => new(coord.X, coord.Y);
+    public static explicit operator Coord(Vector2 v) => new((int)MathF.Floor(v.X), (int)MathF.Floor(v.Y));
 
     public static Coord operator +(Coord coord1, Coord coord2) => new(coord1.X + coord2.X, coord1.Y + coord2.Y);
     public static Coord operator -(Coord coord1, Coord coord2) => new(coord1.X - coord2.X, coord1.Y - coord2.Y);

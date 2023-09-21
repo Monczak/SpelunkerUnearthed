@@ -7,7 +7,14 @@ namespace SpelunkerUnearthed.Engine.Rendering;
 [Exclusive]
 public abstract class Renderer : Component
 {
-    public abstract void Render(SpriteBatch spriteBatch, Camera camera);
+    protected Camera camera;
 
-    protected abstract Vector2 CalculateCenterOffset(Camera camera);
+    protected Renderer(Camera camera)
+    {
+        this.camera = camera;
+    }
+    
+    public abstract void Render(SpriteBatch spriteBatch);
+
+    protected abstract Vector2 CalculateCenterOffset();
 }

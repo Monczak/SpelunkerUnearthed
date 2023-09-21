@@ -44,7 +44,7 @@ public class SpelunkerUnearthedGame : Game
 
         InitializeInputs();
 
-        scene = new TestScene(Window, GraphicsDevice);
+        scene = new TestScene(Window, graphics);
         
         base.Initialize();
     }

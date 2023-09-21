@@ -19,6 +19,8 @@ public class LightMap : Component
 
     private Color[,] map;
 
+    public int RenderThreads { get; set; } = 4;
+
     public override void OnAttach()
     {
         tilemap = GetComponent<Tilemap>();

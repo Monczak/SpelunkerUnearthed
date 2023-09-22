@@ -17,6 +17,8 @@ public class Tilemap : Component
     public int MapWidth { get; }
     public int MapHeight { get; }
 
+    public Bounds Bounds => new(Vector2.Zero, new Vector2(MapWidth, MapHeight));
+
     public Tilemap(int width, int height)
     {
         map = new Tile[height, width];
@@ -53,15 +55,16 @@ public class Tilemap : Component
     {
         if (this[coord] is not null && this[coord].LightSource is not null)
             GetComponent<LightMap>()?.RemoveEmittingTile(this[coord]);
-        
-        this[coord] = tile;
-        tile.OwnerTilemap = this;
-        tile.OnPlaced();
 
-        if (tile.LightSource is not null)
+        Tile newTile = new Tile(tile);
+        this[coord] = newTile;
+        newTile.OwnerTilemap = this;
+        newTile.OnPlaced();
+
+        if (newTile.LightSource is not null)
         {
-            tile.LightSource.AttachTilemap(this);
-            GetComponent<LightMap>()?.AddEmittingTile(tile, coord);
+            newTile.LightSource.AttachTilemap(this);
+            GetComponent<LightMap>()?.AddEmittingTile(newTile, coord);
         }
     }
     

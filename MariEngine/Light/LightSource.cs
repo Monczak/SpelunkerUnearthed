@@ -18,8 +18,8 @@ public abstract class LightSource : ICloneable
 
     protected abstract Color CalculateLight(Coord sourcePosition, Coord receiverPosition);
     protected abstract float CalculateAttenuation(Coord sourcePosition, Coord receiverPosition);
-    
-    public abstract bool IsInRange(Coord sourcePosition, Coord receiverPosition);
+
+    public abstract Bounds? GetBounds(Coord sourcePosition);
 
     public Color GetLight(Coord sourcePosition, Coord receiverPosition)
     {

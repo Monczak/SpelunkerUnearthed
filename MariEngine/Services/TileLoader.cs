@@ -59,5 +59,5 @@ public class TileLoader : Service
         return Tiles;
     }
 
-    public Tile GetTile(string id) => new(Tiles[id]);
+    public Tile GetTile(string id) => Tiles[id];
 }

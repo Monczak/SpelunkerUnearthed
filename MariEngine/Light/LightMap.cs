@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using MariEngine.Components;
+using MariEngine.Logging;
 using MariEngine.Services;
 using MariEngine.Tiles;
 using Microsoft.Xna.Framework;
@@ -18,7 +19,7 @@ public class LightMap : Component
     private HashSet<LightEmitter> lightEmitters;
     private Dictionary<Tile, Coord> lightEmittingTiles;
 
-    private Color[,] map;
+    private Vector3[,] map;
 
     public int RenderThreads { get; set; } = 4;
 
@@ -28,7 +29,7 @@ public class LightMap : Component
         lightEmitters = new HashSet<LightEmitter>();
         lightEmittingTiles = new Dictionary<Tile, Coord>();
 
-        map = new Color[tilemap.MapWidth, tilemap.MapHeight];
+        map = new Vector3[tilemap.MapWidth, tilemap.MapHeight];
     }
 
     public void AddEmittingTile(Tile tile, Coord position)
@@ -53,59 +54,62 @@ public class LightMap : Component
             lightEmitters.Remove(emitter);
     }
 
-    public Color GetLight(Coord position)
+    public void RenderLightMap(Bounds cullingBounds)
     {
-        Vector3 lightAtPoint = AmbientLight.ToVector3();
-        
-        // TODO: Use quadtrees to take into account only light emitters in range?
+        for (int i = 0; i < tilemap.MapHeight; i++)
+        {
+            for (int j = 0; j < tilemap.MapWidth; j++)
+            {
+                map[j, i] = AmbientLight.ToVector3();
+            }
+        }
 
         foreach (LightEmitter emitter in lightEmitters)
         {
-            LightSource lightSource = emitter.Light;
-            if (lightSource is null) continue;
-            if (!lightSource.IsInRange(emitter.OwnerEntity.Position, position)) continue;
+            Bounds? lightBounds = emitter.Light.GetBounds(emitter.OwnerEntity.Position);
+            Bounds? renderBounds;
+            if (lightBounds is null)
+                renderBounds = cullingBounds;
+            else
+                renderBounds = Bounds.Overlap(cullingBounds, lightBounds.Value);
+            if (renderBounds is null) continue;
             
-            Vector3 light = lightSource.GetLight(emitter.OwnerEntity.Position, position).ToVector3();
-            lightAtPoint += light;
+            RenderLight(emitter.Light, emitter.OwnerEntity.Position, renderBounds.Value);
         }
         
         foreach (var pair in lightEmittingTiles)
         {
-            LightSource lightSource = pair.Key.LightSource;
-            if (lightSource is null) continue;
-            if (!lightSource.IsInRange(pair.Value, position)) continue;
+            Bounds? lightBounds = pair.Key.LightSource.GetBounds(pair.Value);
+            Bounds? renderBounds;
+            if (lightBounds is null)
+                renderBounds = cullingBounds;
+            else
+                renderBounds = Bounds.Overlap(cullingBounds, lightBounds.Value);
+            if (renderBounds is null) continue;
             
-            Vector3 light = lightSource.GetLight(pair.Value, position).ToVector3();
-            lightAtPoint += light;
+            RenderLight(pair.Key.LightSource, pair.Value, renderBounds.Value);
         }
-
-        float max = Math.Max(lightAtPoint.X, Math.Max(lightAtPoint.Y, lightAtPoint.Z));
-        if (max >= 1)
-            lightAtPoint /= max;
-
-        return new Color(lightAtPoint);
     }
 
-    public void RenderLightMap(Bounds cullingBounds)
+    private void RenderLight(LightSource source, Coord position, Bounds renderBounds)
     {
-        // TODO: Parallelization eats 100% of CPU, offload this to the GPU (compute shaders?)
-        // Parallel.ForEach(tilemap.Coords, coord => map[coord.X, coord.Y] = GetLight(coord));
-                
-        // TODO: Prepare data and send it to a compute shader to calculate light instead of the code below
-        // Tilemap -> array of light attenuation values
-        // Light sources -> position and needed data
-        
-        // TODO: This will only compute lighting in the culling bounds, what if it changes somewhere not visible on the screen and it affects some mechanics?
-        for (float y = cullingBounds.TopLeft.Y; y < cullingBounds.BottomRight.Y + 1; y++)
+        for (float x = renderBounds.TopLeft.X; x < renderBounds.BottomRight.X + 1; x++)
         {
-            for (float x = cullingBounds.TopLeft.X; x < cullingBounds.BottomRight.X + 1; x++)
+            for (float y = renderBounds.TopLeft.Y; y < renderBounds.BottomRight.Y + 1; y++)
             {
                 Coord coord = (Coord)new Vector2(x, y);
                 if (!tilemap.IsInBounds(coord)) continue;
-                map[coord.X, coord.Y] = GetLight(coord);
+                map[coord.X, coord.Y] += source.GetLight(position, coord).ToVector3();
             }
         }
     }
 
-    public Color GetRenderedLight(Coord position) => map[position.X, position.Y];
+    public Color GetRenderedLight(Coord position)
+    {
+        Vector3 color = map[position.X, position.Y];
+        float max = MathF.Max(color.X, MathF.Max(color.Y, color.Z));
+        if (max > 1)
+            color /= max;
+        return new Color(color);
+    }
 }

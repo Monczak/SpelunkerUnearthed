@@ -26,7 +26,8 @@ public class PointLight : LightSource
 
         float tileAttenuation = 1;
         
-        // TODO: Improve the line generating algo (something different from Bresenham?)
+        // TODO: There is a lot of unnecessary calculation going on here, since we could be drawing lines over something we've calculated already with another line
+        // Precomputing attenuation with lines towards edges of bounds will make this faster
         foreach (Coord coord in DrawingUtils.BresenhamLine(sourcePosition, receiverPosition, endPreemptively: true))
         {
             Tile tile = Tilemap[coord];
@@ -36,8 +37,10 @@ public class PointLight : LightSource
         return distanceAttenuation * tileAttenuation;
     }
 
-    public override bool IsInRange(Coord sourcePosition, Coord receiverPosition) =>
-        (receiverPosition - sourcePosition).Magnitude <= Radius;
+    public override Bounds? GetBounds(Coord sourcePosition)
+    {
+        return new Bounds((Vector2)(sourcePosition - Coord.One * Radius), Vector2.One * (Radius * 2 + 1));
+    }
 
     protected override LightSource MakeClone() => new PointLight { Color = Color, Radius = Radius, Tilemap = Tilemap };
 }

@@ -39,7 +39,7 @@ public class MapGenerator : Component
     {
         foreach (Coord coord in tilemap.Coords)
         {
-            tilemap[coord] = random.NextSingle() < fillAmount ? positiveTile : negativeTile;
+            tilemap.Place(random.NextSingle() < fillAmount ? positiveTile : negativeTile, coord);
         }
     }
 
@@ -48,7 +48,7 @@ public class MapGenerator : Component
         foreach (Coord coord in tilemap.Coords)
         {
             if (IsInRing(coord, 0, size))
-                tilemap[coord] = borderTile;
+                tilemap.Place(borderTile, coord);
         }
     }
 
@@ -65,7 +65,7 @@ public class MapGenerator : Component
             if (IsInRing(coord, borderSize, gradientSize))
             {
                 if (random.NextSingle() < fillPercent)
-                    tilemap[coord] = tile;
+                    tilemap.Place(tile, coord);
             }
         }
     }

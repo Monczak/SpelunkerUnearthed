@@ -45,13 +45,13 @@ public class InputManager : Service
 
     public void UnbindOnPressed(string inputName, InputHandler handler)
     {
-        Logger.Log($"Unbound pressed from {inputName}");
+        // Logger.Log($"Unbound pressed from {inputName}");
         pressedHandlers[inputEvents[inputName]].Remove(handler);
     }
     
     public void UnbindOnReleased(string inputName, InputHandler handler)
     {
-        Logger.Log($"Unbound released from {inputName}");
+        // Logger.Log($"Unbound released from {inputName}");
         releasedHandlers[inputEvents[inputName]].Remove(handler);
     }
 

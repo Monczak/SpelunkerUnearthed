@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using MariEngine.Components;
+using MariEngine.Services;
 using MariEngine.Tiles;
 using Microsoft.Xna.Framework;
 
@@ -57,6 +58,7 @@ public class LightMap : Component
         Vector3 lightAtPoint = AmbientLight.ToVector3();
         
         // TODO: Use quadtrees to take into account only light emitters in range?
+
         foreach (LightEmitter emitter in lightEmitters)
         {
             LightSource lightSource = emitter.Light;
@@ -66,7 +68,7 @@ public class LightMap : Component
             Vector3 light = lightSource.GetLight(emitter.OwnerEntity.Position, position).ToVector3();
             lightAtPoint += light;
         }
-
+        
         foreach (var pair in lightEmittingTiles)
         {
             LightSource lightSource = pair.Key.LightSource;
@@ -88,6 +90,10 @@ public class LightMap : Component
     {
         // TODO: Parallelization eats 100% of CPU, offload this to the GPU (compute shaders?)
         // Parallel.ForEach(tilemap.Coords, coord => map[coord.X, coord.Y] = GetLight(coord));
+                
+        // TODO: Prepare data and send it to a compute shader to calculate light instead of the code below
+        // Tilemap -> array of light attenuation values
+        // Light sources -> position and needed data
         
         // TODO: This will only compute lighting in the culling bounds, what if it changes somewhere not visible on the screen and it affects some mechanics?
         for (float y = cullingBounds.TopLeft.Y; y < cullingBounds.BottomRight.Y + 1; y++)

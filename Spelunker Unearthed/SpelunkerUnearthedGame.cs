@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MariEngine;
 using MariEngine.Components;
-using MariEngine.Debug;
+using MariEngine.Debugging;
 using MariEngine.Input;
 using MariEngine.Logging;
 using MariEngine.Rendering;

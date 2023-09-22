@@ -6,6 +6,6 @@ tags:
 collisionGroups:
   - Group1
 lightAttenuation: 0.3
-light:
-  color: "#ffffff"
-  radius: 3
+# light:
+#   color: "#ffffff"
+#   radius: 3

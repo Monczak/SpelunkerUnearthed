@@ -4,16 +4,23 @@ namespace MariEngine.Light;
 
 public class LightEmitter : TileEntityComponent
 {
-    public LightSource Light { get; init; }
+    public LightSource LightSource { get; init; }
+    private LightMap lightMap;
 
     protected override void OnAttach()
     {
-        Light.AttachTilemap(OwnerEntity.Tilemap);
-        OwnerEntity.Tilemap.GetComponent<LightMap>().AddEmitter(this);
+        LightSource.AttachTilemap(OwnerEntity.Tilemap);
+        lightMap = OwnerEntity.Tilemap.GetComponent<LightMap>();
+        lightMap.AddEmitter(this);
     }
 
     protected override void OnDestroy()
     {
-        OwnerEntity.Tilemap.GetComponent<LightMap>().RemoveEmitter(this);
+        lightMap.RemoveEmitter(this);
+    }
+
+    protected internal override void OnPositionUpdate()
+    {
+        lightMap.UpdatePosition(LightSource, OwnerEntity.Position);
     }
 }

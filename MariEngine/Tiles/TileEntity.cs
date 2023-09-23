@@ -11,8 +11,19 @@ namespace MariEngine.Tiles;
 public class TileEntity
 {
     public string Name { get; set; }
-    
-    public Coord Position { get; set; }
+
+    private Coord position;
+
+    public Coord Position
+    {
+        get => position;
+        set
+        {
+            position = value;
+            foreach (TileEntityComponent component in components.Values)
+                component.OnPositionUpdate();
+        }
+    }
     public Tile Tile { get; set; }
     
     public Tilemap Tilemap { get; private set; }

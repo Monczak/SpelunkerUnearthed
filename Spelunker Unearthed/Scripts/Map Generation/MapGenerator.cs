@@ -25,7 +25,7 @@ public class MapGenerator : Component
         random = new Random(parameters.Seed);
         
         FillRandom(parameters.RandomFillAmount, parameters.WallTile, parameters.NothingTile);
-        
+
         MakeBorder(parameters.BorderSize, parameters.WallTile);
         SmoothBorder(parameters.BorderSize, parameters.BorderGradientSize, parameters.BorderGradientFillAmount, parameters.WallTile);
 
@@ -33,6 +33,8 @@ public class MapGenerator : Component
         {
             Smooth(parameters.WallTile, parameters.NothingTile);
         }
+        
+        // FillRandom(1, parameters.WallTile, parameters.NothingTile);
     }
 
     private void FillRandom(float fillAmount, Tile positiveTile, Tile negativeTile)

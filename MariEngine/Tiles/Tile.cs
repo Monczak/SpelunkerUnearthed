@@ -49,13 +49,8 @@ public class Tile
 
         if (data.Light is not null)
         {
-            LightSource = new PointLight
-            {
-                Color = ColorUtils.FromHex(data.Light.Value.Color),
-                Radius = data.Light.Value.Radius
-            };
+            LightSource = new PointLight(ColorUtils.FromHex(data.Light.Value.Color), data.Light.Value.Radius);
         }
-            
         
         Behaviors = new HashSet<TileBehavior>();
     }

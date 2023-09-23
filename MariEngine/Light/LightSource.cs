@@ -8,8 +8,26 @@ namespace MariEngine.Light;
 
 public abstract class LightSource : ICloneable
 {
-    public Color Color { get; set; }
+    private readonly Deferred<Color> color;
+
+    public Color Color
+    {
+        get => color.Get();
+        set
+        {
+            color.Set(value);
+            Dirty = true;
+        }
+    }
+
     protected Tilemap Tilemap;
+    
+    internal bool Dirty { get; set; }
+
+    protected LightSource(Color color)
+    {
+        this.color = new Deferred<Color>(color);
+    }
 
     public void AttachTilemap(Tilemap tilemap)
     {
@@ -32,4 +50,11 @@ public abstract class LightSource : ICloneable
     }
 
     protected abstract LightSource MakeClone();
+
+    public void UpdateAllProperties()
+    {
+        color.Update();
+        UpdateProperties();
+    }
+    protected abstract void UpdateProperties();
 }

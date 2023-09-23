@@ -31,19 +31,14 @@ public class TilemapRenderer : Renderer
 
     public override void Render(SpriteBatch spriteBatch)
     {
-        var cullingBoundsTest = GetCullingBounds();
-        if (cullingBoundsTest is null) return;
-
-        Bounds cullingBounds = Bounds.MakeCorners((Vector2)WorldPointToCoord(cullingBoundsTest.Value.TopLeft),
-            (Vector2)WorldPointToCoord(cullingBoundsTest.Value.BottomRight));
-        
-        lightMap.RenderLightMap(cullingBounds);
+        var cullingBounds = GetCullingBounds();
+        if (cullingBounds is null) return;
         
         spriteBatch.Begin(SpriteSortMode.Texture, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: camera.TransformMatrix);
 
-        for (float y = cullingBounds.TopLeft.Y; y < cullingBounds.BottomRight.Y + 1; y++)
+        for (float y = cullingBounds.Value.TopLeft.Y; y < cullingBounds.Value.BottomRight.Y + 1; y++)
         {
-            for (float x = cullingBounds.TopLeft.X; x < cullingBounds.BottomRight.X + 1; x++)
+            for (float x = cullingBounds.Value.TopLeft.X; x < cullingBounds.Value.BottomRight.X + 1; x++)
             {
                 Coord coord = (Coord)new Vector2(x, y); // TODO: This is ugly, how can we make this better?
                 if (!tilemap.IsInBounds(coord)) continue;
@@ -57,7 +52,7 @@ public class TilemapRenderer : Renderer
 
         foreach (TileEntity entity in tilemap.TileEntities)
         {
-            if (!cullingBounds.PointInside((Vector2)entity.Position)) continue;
+            if (!cullingBounds.Value.PointInside((Vector2)entity.Position)) continue;
             
             RenderTile(spriteBatch, CoordToWorldPoint(entity.Position), entity.Tile, lightMap.GetRenderedLight(entity.Position));
         }
@@ -65,7 +60,17 @@ public class TilemapRenderer : Renderer
         spriteBatch.End();
     }
 
-    private Bounds? GetCullingBounds()
+    internal Bounds? GetCullingBounds()
+    {
+        var cullingBoundsTest = GetWorldCullingBounds();
+        if (cullingBoundsTest is null) return null;
+        
+        Bounds cullingBounds = Bounds.MakeCorners((Vector2)WorldPointToCoord(cullingBoundsTest.Value.TopLeft),
+            (Vector2)WorldPointToCoord(cullingBoundsTest.Value.BottomRight));
+        return cullingBounds;
+    }
+
+    internal Bounds? GetWorldCullingBounds()
     {
         Bounds cameraBounds = camera.ViewingWindow;
         Bounds tilemapBounds =

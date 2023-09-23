@@ -5,7 +5,7 @@ tags:
   - Wall
 collisionGroups:
   - Group1
-lightAttenuation: 0.3
+lightAttenuation: 0.5
 # light:
-#   color: "#ffffff"
+#   color: "#0f0f0f"
 #   radius: 3

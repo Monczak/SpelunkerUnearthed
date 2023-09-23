@@ -9,18 +9,33 @@ namespace MariEngine.Light;
 
 public class PointLight : LightSource
 {
-    public int Radius { get; set; }
+    private readonly Deferred<int> radius;
+
+    public int Radius
+    {
+        get => radius.Get();
+        set
+        {
+            radius.Set(value);
+            Dirty = true;
+        }
+    }
+
+    public PointLight(Color color, int radius) : base(color)
+    {
+        this.radius = new Deferred<int>(radius);
+    }
 
     protected override Color CalculateLight(Coord sourcePosition, Coord receiverPosition)
     {
-        return Color * CalculateAttenuation(sourcePosition, receiverPosition);
+        return Color;
     }
     
     // TODO: Work out a way to optimize this, if necessary
     protected override float CalculateAttenuation(Coord sourcePosition, Coord receiverPosition)
     {
         float distance = (receiverPosition - sourcePosition).Magnitude;
-        float normDistance = distance / Radius;
+        float normDistance = distance / radius.Get();
         
         float distanceAttenuation = 1 - MathF.Pow(normDistance, 3);
 
@@ -39,8 +54,13 @@ public class PointLight : LightSource
 
     public override Bounds? GetBounds(Coord sourcePosition)
     {
-        return new Bounds((Vector2)(sourcePosition - Coord.One * Radius), Vector2.One * (Radius * 2 + 1));
+        return new Bounds((Vector2)(sourcePosition - Coord.One * radius.Get()), Vector2.One * (radius.Get() * 2 + 1));
     }
 
-    protected override LightSource MakeClone() => new PointLight { Color = Color, Radius = Radius, Tilemap = Tilemap };
+    protected override LightSource MakeClone() => new PointLight(Color, Radius) { Tilemap = Tilemap };
+
+    protected override void UpdateProperties()
+    {
+        radius.Update();
+    }
 }

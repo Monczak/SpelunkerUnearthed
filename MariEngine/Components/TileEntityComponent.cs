@@ -34,6 +34,11 @@ public class TileEntityComponent
         
     }
 
+    protected internal virtual void OnPositionUpdate()
+    {
+        
+    }
+
     public void Destroy()
     {
         OwnerEntity.RemoveComponent(this);

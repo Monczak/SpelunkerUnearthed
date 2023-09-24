@@ -56,8 +56,8 @@ public class TestScene : Scene
         lightMap.AttachTilemapRenderer(tilemapRenderer);
         
         tilemapEntity.AttachComponent(new TilemapCollider());
-        
         tilemapEntity.AttachComponent(new MapGenerator());
+        tilemapEntity.AttachComponent(new TilemapCameraBounds());
 
         // TODO: Place player in an appropriate spot (randomly, ensuring there is no wall where the player is supposed to spawn)
         // or next to a ladder that was taken to get to this level
@@ -77,6 +77,7 @@ public class TestScene : Scene
         AddEntity(tilemapEntity);
         
         cameraController.TrackTileEntity(player);
+        cameraController.SetBounds(tilemapEntity.GetComponent<CameraBounds>());
     }
 
     private void GenerateMap()

@@ -65,6 +65,20 @@ public class LightMap : Component
     {
         base.Update(gameTime);
         
+        UpdateDirtyLights();
+        RemoveLights();
+    }
+
+    private void RemoveLights()
+    {
+        foreach (LightSource source in toRemove)
+        {
+            lightSources.Remove(source);
+        }
+    }
+
+    private void UpdateDirtyLights()
+    {
         foreach (LightSource source in lightSources.Keys)
         {
             if (source.Dirty)
@@ -77,11 +91,10 @@ public class LightMap : Component
                 {
                     toRemove.Remove(source);
                 }
-                
+
                 lightSources[source].Position.Update();
                 source.UpdateAllProperties();
                 
-                // Render the light source
                 if (!lightSources[source].Old)
                 {
                     RenderLight(source, lightSources[source].Position.Get());
@@ -94,11 +107,6 @@ public class LightMap : Component
                 lightSources[source].New = false;
                 source.Dirty = false;
             }
-        }
-
-        foreach (LightSource source in toRemove)
-        {
-            lightSources.Remove(source);
         }
     }
 

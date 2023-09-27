@@ -10,6 +10,8 @@ public abstract class Renderer : Component
     protected Camera camera;
     protected GraphicsDevice graphicsDevice;
 
+    public int Layer { get; set; } = 0;
+
     protected Renderer(GraphicsDevice graphicsDevice, Camera camera)
     {
         this.graphicsDevice = graphicsDevice;

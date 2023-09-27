@@ -32,13 +32,19 @@ public class TestScene : Scene
         LoadEntities();
         GenerateMap();
         
-        gizmos.DrawRectangle(new Vector2(0, 0), new Vector2(0, 0), Color.Green);
-        gizmos.DrawRectangle(new Vector2(1, 0), new Vector2(0, 0), Color.Green);
-        gizmos.DrawLine(new Vector2(0.5f, 0.5f), new Vector2(1.5f, 0.5f), Color.Pink);
+        gizmos.DrawRectangle(new Vector2(0, 0), Vector2.One, Color.Green);
+        gizmos.DrawRectangle(new Vector2(1, 0), Vector2.One, Color.Red);
+        gizmos.DrawLine(new Vector2(0, 0), new Vector2(1, 0), Color.Pink);
     }
 
     private void LoadEntities()
     {
+        Entity debugEntity = new Entity("Debug");
+        gizmos = new Gizmos();
+        debugEntity.AttachComponent(gizmos);
+        debugEntity.AttachComponent(new GizmoRenderer(graphics.GraphicsDevice, Camera) { Layer = 100 });
+        AddEntity(debugEntity);
+        
         Entity cameraControllerEntity = new("Camera Controller");
         CameraController cameraController = new(Camera) { Smoothing = 10.0f };
         cameraControllerEntity.AttachComponent(cameraController);
@@ -83,12 +89,6 @@ public class TestScene : Scene
         player.AttachComponent(new LightEmitter { LightSource = new PointLight(new Color(237, 222, 138), 30) });
 
         AddEntity(tilemapEntity);
-        
-        Entity debugEntity = new Entity("Debug");
-        gizmos = new Gizmos();
-        debugEntity.AttachComponent(gizmos);
-        debugEntity.AttachComponent(new GizmoRenderer(graphics.GraphicsDevice, Camera));
-        AddEntity(debugEntity);
         
         cameraController.TrackTileEntity(player);
         cameraController.SetBounds(tilemapEntity.GetComponent<CameraBounds>());

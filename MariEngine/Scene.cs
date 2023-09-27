@@ -12,6 +12,8 @@ public abstract class Scene
     public List<Entity> Entities { get; } = new();
     public Camera Camera { get; }
 
+    private PriorityQueue<Renderer, int> rendererQueue;
+
     protected GraphicsDeviceManager graphics;
 
     public abstract void Load();
@@ -20,6 +22,8 @@ public abstract class Scene
     {
         Camera = new Camera(window, graphics);
         this.graphics = graphics;
+
+        rendererQueue = new PriorityQueue<Renderer, int>();
     }    
 
     public void AddEntity(Entity entity)
@@ -39,10 +43,16 @@ public abstract class Scene
 
     public void Render(SpriteBatch spriteBatch)
     {
-        // TODO: Add sorting layers
-        foreach (Entity entity in Entities.Where(e => e.HasComponent<Renderer>()))
+        // TODO: Check if this needs to be optimized for memory
+        rendererQueue.Clear(); 
+        rendererQueue.EnqueueRange(Entities
+            .Select(e => e.GetComponent<Renderer>())
+            .Where(renderer => renderer is not null)
+            .Select(renderer => (renderer, renderer.Layer)));
+
+        while (rendererQueue.TryDequeue(out Renderer renderer, out _))
         {
-            entity.GetComponent<Renderer>().Render(spriteBatch);
+            renderer.Render(spriteBatch);
         }
     }
 }

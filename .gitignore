@@ -414,6 +414,7 @@ FodyWeavers.xsd
 .idea/**/encodings.xml
 .idea/**/indexLayout.xml
 .idea/**/vcs.xml
+.idea/**/.name
 
 # AWS User-specific
 .idea/**/aws.xml

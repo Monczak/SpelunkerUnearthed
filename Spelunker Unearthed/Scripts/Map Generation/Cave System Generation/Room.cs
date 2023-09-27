@@ -15,21 +15,21 @@ public class Room
     public IEnumerable<Coord> RoomCoords => SubRooms.Keys;
     public CoordBounds Bounds => new(Position, Size);
 
-    public IEnumerable<Coord> NeighborCoords
+    public IEnumerable<AttachNode> AttachNodes
     {
         get
         {
             for (int x = Position.X; x < Position.X + Size.X; x++)
-                yield return new Coord(x, Position.Y - 1);
+                yield return new AttachNode { Position = new Coord(x, Position.Y - 1), Direction = Direction.Up };
             
             for (int y = Position.Y; y < Position.Y + Size.Y; y++)
-                yield return new Coord(Position.X + Size.X, y);
+                yield return new AttachNode { Position = new Coord(Position.X + Size.X, y), Direction = Direction.Right };
             
             for (int x = Position.X + Size.X - 1; x >= Position.X; x--)
-                yield return new Coord(x, Position.Y + Size.Y);
-            
+                yield return new AttachNode { Position = new Coord(x, Position.Y + Size.Y), Direction = Direction.Down };
+
             for (int y = Position.Y + Size.Y - 1; y >= Position.Y; y--)
-                yield return new Coord(Position.X - 1, y);
+                yield return new AttachNode { Position = new Coord(Position.X - 1, y), Direction = Direction.Left };
         }
     }
 

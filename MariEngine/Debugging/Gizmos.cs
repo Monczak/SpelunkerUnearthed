@@ -13,6 +13,11 @@ public class Gizmos : Component
         Shapes.Add(new RectangleGizmo(position, size, color, lifetime));
     }
 
+    public void DrawLine(Vector2 begin, Vector2 end, Color color, int width = 3, float? lifetime = null)
+    {
+        Shapes.Add(new LineGizmo(begin, end, color, width, lifetime));
+    }
+
     public override void Update(GameTime gameTime)
     {
         foreach (var shape in Shapes)

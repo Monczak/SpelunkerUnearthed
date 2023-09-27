@@ -32,7 +32,9 @@ public class TestScene : Scene
         LoadEntities();
         GenerateMap();
         
-        gizmos.DrawRectangle(Vector2.Zero, new Vector2(30, 10), Color.Green, 3f);
+        gizmos.DrawRectangle(new Vector2(0, 0), new Vector2(0, 0), Color.Green);
+        gizmos.DrawRectangle(new Vector2(1, 0), new Vector2(0, 0), Color.Green);
+        gizmos.DrawLine(new Vector2(0.5f, 0.5f), new Vector2(1.5f, 0.5f), Color.Pink);
     }
 
     private void LoadEntities()

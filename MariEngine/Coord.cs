@@ -58,6 +58,8 @@ public struct Coord
 
     public static Coord Zero => new(0, 0);
     public static Coord One => new(1, 1);
+    public static Coord UnitX => new(1, 0);
+    public static Coord UnitY => new(0, 1);
 
     public int SqrMagnitude => X * X + Y * Y;
     public float Magnitude => (float)Math.Sqrt(SqrMagnitude);

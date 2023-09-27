@@ -17,7 +17,7 @@ public class Tilemap : Component
     public int MapWidth { get; }
     public int MapHeight { get; }
 
-    public Bounds Bounds => new(Vector2.Zero, new Vector2(MapWidth, MapHeight));
+    public CoordBounds Bounds => new(Coord.Zero, new Coord(MapWidth, MapHeight));
 
     public Tilemap(int width, int height)
     {

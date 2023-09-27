@@ -8,8 +8,9 @@ using MariEngine.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MariEngine.Logging;
+using MariEngine.Rendering;
 
-namespace MariEngine.Rendering;
+namespace MariEngine.Tiles;
 
 public class TilemapRenderer : Renderer
 {
@@ -17,7 +18,7 @@ public class TilemapRenderer : Renderer
     private LightMap lightMap;
     private Transform transform;
     
-    public TilemapRenderer(GraphicsDevice graphicsDevice, Camera camera) : base(camera)
+    public TilemapRenderer(GraphicsDevice graphicsDevice, Camera camera) : base(graphicsDevice, camera)
     {
         
     }

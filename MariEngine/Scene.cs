@@ -39,6 +39,7 @@ public abstract class Scene
 
     public void Render(SpriteBatch spriteBatch)
     {
+        // TODO: Add sorting layers
         foreach (Entity entity in Entities.Where(e => e.HasComponent<Renderer>()))
         {
             entity.GetComponent<Renderer>().Render(spriteBatch);

@@ -8,9 +8,9 @@ public struct Bounds
     public Vector2 TopLeft { get; set; }
     public Vector2 Size { get; set; }
 
-    public Vector2 TopRight => TopLeft + Vector2.UnitX * (Size - Vector2.One);
-    public Vector2 BottomLeft => TopLeft + Vector2.UnitY * (Size - Vector2.One);
-    public Vector2 BottomRight => TopLeft + Vector2.One * (Size - Vector2.One);
+    public Vector2 TopRight => TopLeft + Vector2.UnitX * Size;
+    public Vector2 BottomLeft => TopLeft + Vector2.UnitY * Size;
+    public Vector2 BottomRight => TopLeft + Vector2.One * Size;
 
     public Bounds(Vector2 topLeft, Vector2 size)
     {
@@ -23,7 +23,7 @@ public struct Bounds
         Bounds bounds = new()
         {
             TopLeft = topLeft,
-            Size = bottomRight - topLeft + Vector2.One
+            Size = bottomRight - topLeft
         };
         return bounds;
     }
@@ -43,4 +43,6 @@ public struct Bounds
             return MakeCorners(topLeft, bottomRight);
         return null;
     }
+
+    public static explicit operator Bounds(CoordBounds bounds) => new((Vector2)bounds.TopLeft, (Vector2)bounds.Size);
 }

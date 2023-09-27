@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MariEngine;
 using MariEngine.Collision;
 using MariEngine.Components;
+using MariEngine.Debugging;
 using MariEngine.Light;
 using MariEngine.Logging;
 using MariEngine.Rendering;
@@ -19,6 +20,8 @@ public class TestScene : Scene
     private Tilemap tilemap;
     private TilemapRenderer tilemapRenderer;
     private PlayerController playerController;
+
+    private Gizmos gizmos;
     
     public TestScene(GameWindow window, GraphicsDeviceManager graphics) : base(window, graphics)
     {
@@ -28,6 +31,8 @@ public class TestScene : Scene
     {
         LoadEntities();
         GenerateMap();
+        
+        gizmos.DrawRectangle(Vector2.Zero, new Vector2(30, 10), Color.Green, 3f);
     }
 
     private void LoadEntities()
@@ -45,6 +50,7 @@ public class TestScene : Scene
 
         LightMap lightMap = new()
         {
+            // AmbientLight = Color.White,
             AmbientLight = new Color(20, 15, 17),
             // AmbientLight = Color.Black,
         };
@@ -75,6 +81,12 @@ public class TestScene : Scene
         player.AttachComponent(new LightEmitter { LightSource = new PointLight(new Color(237, 222, 138), 30) });
 
         AddEntity(tilemapEntity);
+        
+        Entity debugEntity = new Entity("Debug");
+        gizmos = new Gizmos();
+        debugEntity.AttachComponent(gizmos);
+        debugEntity.AttachComponent(new GizmoRenderer(graphics.GraphicsDevice, Camera));
+        AddEntity(debugEntity);
         
         cameraController.TrackTileEntity(player);
         cameraController.SetBounds(tilemapEntity.GetComponent<CameraBounds>());

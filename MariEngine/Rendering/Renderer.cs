@@ -8,9 +8,11 @@ namespace MariEngine.Rendering;
 public abstract class Renderer : Component
 {
     protected Camera camera;
+    protected GraphicsDevice graphicsDevice;
 
-    protected Renderer(Camera camera)
+    protected Renderer(GraphicsDevice graphicsDevice, Camera camera)
     {
+        this.graphicsDevice = graphicsDevice;
         this.camera = camera;
     }
     

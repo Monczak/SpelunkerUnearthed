@@ -148,7 +148,7 @@ public class LightMap : Component
 
     private void RenderLight(LightSource source, Coord position, bool derender = false)
     {
-        Bounds? lightBounds = source.GetBounds(position);
+        CoordBounds? lightBounds = source.GetBounds(position);
         if (lightBounds is null) return;    // TODO: Support unbounded (global) lights
         
         if (!derender)

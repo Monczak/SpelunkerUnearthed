@@ -52,9 +52,9 @@ public class PointLight : LightSource
         return distanceAttenuation * tileAttenuation;
     }
 
-    public override Bounds? GetBounds(Coord sourcePosition)
+    public override CoordBounds? GetBounds(Coord sourcePosition)
     {
-        return new Bounds((Vector2)(sourcePosition - Coord.One * radius.Get()), Vector2.One * (radius.Get() * 2 + 1));
+        return new CoordBounds(sourcePosition - Coord.One * radius.Get(), Coord.One * (radius.Get() * 2 + 1));
     }
 
     protected override LightSource MakeClone() => new PointLight(Color, Radius) { Tilemap = Tilemap };

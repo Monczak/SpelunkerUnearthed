@@ -43,8 +43,8 @@ public class CameraController : Component
         Bounds viewingWindow = camera.ViewingWindow;
         Bounds restrictBounds = bounds.GetBounds();
 
-        Vector2 topLeft = restrictBounds.TopLeft + viewingWindow.Size / 2 - Vector2.One / 2;
-        Vector2 bottomRight = restrictBounds.BottomRight - viewingWindow.Size / 2 + Vector2.One / 2 + Vector2.One;
+        Vector2 topLeft = restrictBounds.TopLeft + viewingWindow.Size / 2;
+        Vector2 bottomRight = restrictBounds.BottomRight - viewingWindow.Size / 2 + Vector2.One;
         if (viewingWindow.Size.X >= restrictBounds.Size.X)
         {
             topLeft.X = bottomRight.X = restrictBounds.TopLeft.X + restrictBounds.Size.X / 2;

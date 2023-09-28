@@ -22,6 +22,20 @@ public struct Coord
     public static explicit operator Vector2(Coord coord) => new(coord.X, coord.Y);
     public static explicit operator Coord(Vector2 v) => new((int)MathF.Floor(v.X), (int)MathF.Floor(v.Y));
 
+    public static explicit operator Coord(Direction direction)
+    {
+        Coord result = Zero;
+        if ((direction & Direction.Up) != 0)
+            result += new Coord(0, -1);
+        if ((direction & Direction.Right) != 0)
+            result += new Coord(1, 0);
+        if ((direction & Direction.Down) != 0)
+            result += new Coord(0, 1);
+        if ((direction & Direction.Left) != 0)
+            result += new Coord(-1, 0);
+        return result;
+    }
+
     public static Coord operator +(Coord coord1, Coord coord2) => new(coord1.X + coord2.X, coord1.Y + coord2.Y);
     public static Coord operator -(Coord coord1, Coord coord2) => new(coord1.X - coord2.X, coord1.Y - coord2.Y);
 

@@ -11,7 +11,7 @@ public class RectangleGizmo : GizmoShape
     
     internal override void Render(SpriteBatch spriteBatch, Camera camera, Texture2D texture)
     {
-        Point position = ((Position - Size / 2) * camera.TileSize).ToPoint();
+        Point position = (Position * camera.TileSize).ToPoint();
         Point size = (Size * camera.TileSize).ToPoint();
         
         spriteBatch.Draw(texture, new Rectangle(position, size), Color);

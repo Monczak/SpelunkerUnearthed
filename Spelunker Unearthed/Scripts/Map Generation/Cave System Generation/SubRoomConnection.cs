@@ -9,7 +9,13 @@ public class SubRoomConnection
     public SubRoom From { get; private set; }
     public SubRoom To { get; private set; }
 
-    public SubRoomConnection Reversed => new() { From = To, To = From };
+    public SubRoomConnection Reversed => new(To, From);
+
+    public SubRoomConnection(SubRoom from, SubRoom to)
+    {
+        From = from;
+        To = to;
+    }
     
     public static SubRoomConnection MakeConnection(Room room1, Room room2)
     {
@@ -27,7 +33,7 @@ public class SubRoomConnection
         
         var (subRoom1, subRoom2) =
             connectionCandidates[ServiceRegistry.Get<RandomNumberGenerator>().Next(connectionCandidates.Count)];
-        SubRoomConnection connection = new() { From = subRoom1, To = subRoom2 };
+        SubRoomConnection connection = new(subRoom1, subRoom2);
         subRoom1.Room.Connections.Add(connection);
         subRoom2.Room.Connections.Add(connection.Reversed);
 

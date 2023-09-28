@@ -8,6 +8,8 @@ public class Room
     public Coord Position { get; private set; }
     public Coord Size { get; private set; }
     
+    public int Distance { get; private set; }
+    
     public Dictionary<Coord, SubRoom> SubRooms { get; private set; }
     
     public List<SubRoomConnection> Connections { get; private set; }
@@ -33,10 +35,11 @@ public class Room
         }
     }
 
-    public Room(Coord position, Coord size)
+    public Room(Coord position, Coord size, int distance)
     {
         Position = position;
         Size = size;
+        Distance = distance;
 
         Connections = new List<SubRoomConnection>();
         SubRooms = new Dictionary<Coord, SubRoom>();

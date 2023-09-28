@@ -21,6 +21,8 @@ public class TestScene : Scene
     private TilemapRenderer tilemapRenderer;
     private PlayerController playerController;
 
+    private CaveSystemManager caveSystemManager;
+
     private Gizmos gizmos;
     
     public TestScene(GameWindow window, GraphicsDeviceManager graphics) : base(window, graphics)
@@ -32,18 +34,26 @@ public class TestScene : Scene
         LoadEntities();
         GenerateMap();
         
-        gizmos.DrawRectangle(new Vector2(0, 0), Vector2.One, Color.Green);
-        gizmos.DrawRectangle(new Vector2(1, 0), Vector2.One, Color.Red);
-        gizmos.DrawLine(new Vector2(0, 0), new Vector2(1, 0), Color.Pink);
+        caveSystemManager.Generate();
+    }
+
+    public override void Update(GameTime gameTime)
+    {
+        base.Update(gameTime);
+        caveSystemManager.DrawLevel(0);
     }
 
     private void LoadEntities()
     {
-        Entity debugEntity = new Entity("Debug");
+        Entity debugEntity = new("Debug");
         gizmos = new Gizmos();
         debugEntity.AttachComponent(gizmos);
         debugEntity.AttachComponent(new GizmoRenderer(graphics.GraphicsDevice, Camera) { Layer = 100 });
         AddEntity(debugEntity);
+
+        Entity managersEntity = new("Managers");
+        caveSystemManager = new CaveSystemManager(gizmos);
+        managersEntity.AttachComponent(caveSystemManager);
         
         Entity cameraControllerEntity = new("Camera Controller");
         CameraController cameraController = new(Camera) { Smoothing = 10.0f };

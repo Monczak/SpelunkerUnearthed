@@ -48,9 +48,9 @@ public struct CoordBounds
     {
         get
         {
-            for (int y = TopLeft.Y; y < BottomRight.Y; y++)
+            for (int y = TopLeft.Y; y <= BottomRight.Y; y++)
             {
-                for (int x = TopLeft.X; x < BottomRight.X; x++)
+                for (int x = TopLeft.X; x <= BottomRight.X; x++)
                 {
                     yield return new Coord(x, y);
                 }

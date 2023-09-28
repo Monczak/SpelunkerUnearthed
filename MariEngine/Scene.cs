@@ -12,7 +12,7 @@ public abstract class Scene
     public List<Entity> Entities { get; } = new();
     public Camera Camera { get; }
 
-    private PriorityQueue<Renderer, int> rendererQueue;
+    private readonly PriorityQueue<Renderer, int> rendererQueue;
 
     protected GraphicsDeviceManager graphics;
 
@@ -43,10 +43,10 @@ public abstract class Scene
 
     public void Render(SpriteBatch spriteBatch)
     {
-        // TODO: Check if this needs to be optimized for memory
+        // TODO: Check if this needs to be optimized for memory / GC
         rendererQueue.Clear(); 
         rendererQueue.EnqueueRange(Entities
-            .Select(e => e.GetComponent<Renderer>())
+            .Select(entity => entity.GetComponent<Renderer>())
             .Where(renderer => renderer is not null)
             .Select(renderer => (renderer, renderer.Layer)));
 

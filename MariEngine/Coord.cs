@@ -80,4 +80,6 @@ public struct Coord
 
     public static Coord Abs(Coord coord) => new(Math.Abs(coord.X), Math.Abs(coord.Y));
     public static Coord Orthogonal(Coord coord) => new(-coord.Y, coord.X);
+
+    public static int Dot(Coord coord1, Coord coord2) => coord1.X * coord2.X + coord1.Y * coord2.Y;
 }

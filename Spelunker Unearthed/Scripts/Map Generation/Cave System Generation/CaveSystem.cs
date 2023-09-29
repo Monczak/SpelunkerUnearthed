@@ -6,12 +6,15 @@ public class CaveSystem
 {
     public List<CaveSystemLevel> Levels { get; private set; } = new();
 
+    public RoomDecisionEngine DecisionEngine { get; set; } = new TestDecisionEngine();  // TODO: Remove this assignment
+
     public void Generate()
     {
+        Levels.Clear();
         Levels.Add(new CaveSystemLevel());
         foreach (var level in Levels)
         {
-            level.Generate();
+            level.Generate(DecisionEngine);
         }
     }
 }

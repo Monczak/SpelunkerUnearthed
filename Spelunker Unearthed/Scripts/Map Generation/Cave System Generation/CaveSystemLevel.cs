@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using MariEngine;
 using MariEngine.Debugging;
@@ -12,41 +13,54 @@ public class CaveSystemLevel
 
     private Dictionary<Coord, Room> map = new();
 
-    private Queue<Room> roomQueue = new();
+    private readonly Queue<Room> roomQueue = new();
 
-    private int distanceLimit = 7;     // TODO: Get this from a properties struct
-    private int connectionLimit = 2;    // TODO: Get this from a properties struct
-
-    public void Generate()
+    // FIXME: This takes longer to finish every time it's run?
+    public void Generate(RoomDecisionEngine decisionEngine)
     {
+        Rooms.Clear();
+        map.Clear();
         roomQueue.Clear();
         
         Room starterRoom = new Room(new Coord(0, 0), new Coord(3, 3), 0);
-        AddRoom(starterRoom);
+        AddRoom(starterRoom, decisionEngine);
         
-        /*while (roomQueue.Count > 0)
+        while (roomQueue.Count > 0)
         {
-            GenerateRoom();
-        }*/
+            GenerateRoom(decisionEngine);
+        }
     }
 
-    public void GenerateRoom()
+    public void GenerateRoom(RoomDecisionEngine decisionEngine)
     {
         if (roomQueue.Count == 0) return;
         Room room = roomQueue.Dequeue();
+        
+        // Pick a new room size
+        Coord newRoomSize = decisionEngine.PickRoomSize(room);
 
-        // TODO: Sample room size from a distribution from a properties struct
-        Coord newRoomSize = new(ServiceRegistry.Get<RandomNumberGenerator>().Next(1, 4), ServiceRegistry.Get<RandomNumberGenerator>().Next(1, 4));
-
-        var newRoomPositions = GetNewRoomPositions(room, newRoomSize);
-        ServiceRegistry.Get<RandomNumberGenerator>().Shuffle(newRoomPositions);
-        foreach ((Coord position, AttachNode node) in newRoomPositions)
+        // Get all possible placements for the new room
+        var newRoomPlacements = GetNewRoomPlacements(room, newRoomSize);
+        
+        // Rank potential room placements
+        HashSet<((Coord pos, AttachNode node), float weight)> placements = new();
+        foreach (var placement in newRoomPlacements)
+            placements.Add((placement, decisionEngine.GetPlacementWeight(room, placement, newRoomSize, Rooms)));
+        
+        while (placements.Count > 0)
         {
+            // Pick a random placement and remove it from the set
+            var (position, node) = ServiceRegistry.Get<RandomNumberGenerator>().PickWeighted(placements, out bool picked, remove: true);
+            if (!picked)
+            {
+                break;
+            }
+            
             CoordBounds newRoomBounds = new(position, newRoomSize);
             if (OverlapsRoom(newRoomBounds)) continue;
 
             Room newRoom = new(position, newRoomSize, room.Distance + 1);
-            AddRoom(newRoom);
+            AddRoom(newRoom, decisionEngine);
 
             Coord subRoomPos = node.Position - (Coord)node.Direction;
             SubRoom subRoom = room.SubRooms[subRoomPos];
@@ -55,13 +69,13 @@ public class CaveSystemLevel
             SubRoomConnection connection = new(subRoom, newSubRoom);
             room.Connections.Add(connection);
             newRoom.Connections.Add(connection.Reversed);
-            
-            if (room.Connections.Count >= connectionLimit)
+
+            if (ServiceRegistry.Get<RandomNumberGenerator>().NextFloat() > decisionEngine.GetBranchingProbability(room))
                 break;
         }
     }
 
-    private List<(Coord pos, AttachNode node)> GetNewRoomPositions(Room room, Coord newRoomSize)
+    private List<(Coord pos, AttachNode node)> GetNewRoomPlacements(Room room, Coord newRoomSize)
     {
         List<(Coord pos, AttachNode node)> positions = new();
         foreach (AttachNode node in room.AttachNodes)
@@ -75,11 +89,11 @@ public class CaveSystemLevel
         return positions;
     }
 
-    private void AddRoom(Room room)
+    private void AddRoom(Room room, RoomDecisionEngine decisionEngine)
     {
         Rooms.Add(room);
         
-        if (room.Distance <= distanceLimit)
+        if (ServiceRegistry.Get<RandomNumberGenerator>().NextFloat() < decisionEngine.GetContinueProbability(room))
             roomQueue.Enqueue(room);
 
         foreach (Coord coord in room.RoomCoords)
@@ -90,12 +104,11 @@ public class CaveSystemLevel
 
     private bool OverlapsRoom(CoordBounds bounds)
     {
-        foreach (Coord coord in bounds.Coords)
+        foreach (Room room in Rooms)
         {
-            if (map.ContainsKey(coord))
+            if (room.Bounds.Overlaps(bounds)) 
                 return true;
         }
-
         return false;
     }
 }

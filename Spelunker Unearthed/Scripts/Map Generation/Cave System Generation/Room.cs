@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using MariEngine;
+using Microsoft.Xna.Framework;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 
@@ -7,6 +8,8 @@ public class Room
 {
     public Coord Position { get; private set; }
     public Coord Size { get; private set; }
+
+    public Vector2 Center => (Vector2)Position + (Vector2)Size / 2;
     
     public int Distance { get; private set; }
     

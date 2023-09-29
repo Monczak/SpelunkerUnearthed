@@ -32,14 +32,19 @@ public struct CoordBounds
     {
         return point.X >= TopLeft.X && point.X <= TopRight.X && point.Y >= TopLeft.Y && point.Y <= BottomLeft.Y;
     }
+
+    public bool Overlaps(CoordBounds bounds)
+    {
+        return GetOverlap(this, bounds) is not null;
+    }
     
-    public static CoordBounds? Overlap(CoordBounds bounds1, CoordBounds bounds2)
+    public static CoordBounds? GetOverlap(CoordBounds bounds1, CoordBounds bounds2)
     {
         Coord topLeft = new((int)MathF.Max(bounds1.TopLeft.X, bounds2.TopLeft.X), (int)MathF.Max(bounds1.TopLeft.Y, bounds2.TopLeft.Y));
         Coord bottomRight = new((int)MathF.Min(bounds1.BottomRight.X, bounds2.BottomRight.X),
             (int)MathF.Min(bounds1.BottomRight.Y, bounds2.BottomRight.Y));
 
-        if (topLeft.X < bottomRight.X && topLeft.Y < bottomRight.Y)
+        if (topLeft.X <= bottomRight.X && topLeft.Y <= bottomRight.Y)
             return MakeCorners(topLeft, bottomRight);
         return null;
     }

@@ -18,12 +18,13 @@ public class CaveSystemManager : Component
     {
         this.gizmos = gizmos;
         
-        ServiceRegistry.Get<InputManager>().OnPressed("Mine", () => caveSystem.Levels[0].GenerateRoom());
+        // TODO: Remove the TestDecisionEngine business
+        ServiceRegistry.Get<InputManager>().OnPressed("Mine", () => Generate());
     }
 
     public void Generate()
     {
-        ServiceRegistry.Get<RandomNumberGenerator>().Seed(0);
+        // ServiceRegistry.Get<RandomNumberGenerator>().Seed(1337);
         caveSystem.Generate();
     }
 
@@ -31,7 +32,7 @@ public class CaveSystemManager : Component
     {
         foreach (Room room in caveSystem.Levels[level].Rooms)
         {
-            gizmos.DrawRectangle((Vector2)room.Position, (Vector2)room.Size,
+            gizmos.DrawRectangle((Vector2)room.Position + Vector2.One * 0.05f, (Vector2)room.Size - Vector2.One * 0.1f,
                 Color.Aqua * MathUtils.InverseLerp(20, 0, room.Distance), 0);
             foreach (SubRoomConnection connection in room.Connections)
             {

@@ -4,6 +4,7 @@ using MariEngine;
 using MariEngine.Debugging;
 using MariEngine.Logging;
 using MariEngine.Services;
+using Random = MariEngine.Utils.Random;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 
@@ -14,15 +15,17 @@ public class CaveSystemLevel
     private Dictionary<Coord, Room> map = new();
 
     private readonly Queue<Room> roomQueue = new();
-
-    // FIXME: This takes longer to finish every time it's run?
+    private Random random;
+    
     public void Generate(RoomDecisionEngine decisionEngine)
     {
         Rooms.Clear();
         map.Clear();
         roomQueue.Clear();
+
+        random = ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGen);
         
-        Room starterRoom = new Room(new Coord(0, 0), new Coord(3, 3), 0);
+        Room starterRoom = new Room(new Coord(0, 0), new Coord(3, 3), 0, RoomFlags.Entrance);
         AddRoom(starterRoom, decisionEngine);
         
         while (roomQueue.Count > 0)
@@ -36,24 +39,17 @@ public class CaveSystemLevel
         if (roomQueue.Count == 0) return;
         Room room = roomQueue.Dequeue();
         
-        // Pick a new room size
-        Coord newRoomSize = decisionEngine.PickRoomSize(room);
-
-        // Get all possible placements for the new room
-        var newRoomPlacements = GetNewRoomPlacements(room, newRoomSize);
-        
-        // Rank potential room placements
         HashSet<((Coord pos, AttachNode node), float weight)> placements = new();
-        foreach (var placement in newRoomPlacements)
-            placements.Add((placement, decisionEngine.GetPlacementWeight(room, placement, newRoomSize, Rooms)));
-        
+
+        var newRoomSize = PickRoomSize();
+
         while (placements.Count > 0)
         {
             // Pick a random placement and remove it from the set
-            var (position, node) = ServiceRegistry.Get<RandomNumberGenerator>().PickWeighted(placements, out bool picked, remove: true);
+            var (position, node) = random.PickWeighted(placements, out bool picked, remove: true);
             if (!picked)
             {
-                break;
+                return;
             }
             
             CoordBounds newRoomBounds = new(position, newRoomSize);
@@ -70,8 +66,26 @@ public class CaveSystemLevel
             room.Connections.Add(connection);
             newRoom.Connections.Add(connection.Reversed);
 
-            if (ServiceRegistry.Get<RandomNumberGenerator>().NextFloat() > decisionEngine.GetBranchingProbability(room))
-                break;
+            if (random.NextFloat() < decisionEngine.GetBranchingProbability(room))
+                newRoomSize = PickRoomSize();
+            else
+                return;
+        }
+
+        Coord PickRoomSize()
+        {
+            placements.Clear();
+            
+            // Pick a new room size
+            Coord size = decisionEngine.PickRoomSize(room);
+
+            // Get all possible placements for the new room
+            var newRoomPlacements = GetNewRoomPlacements(room, size);
+
+            // Rank potential room placements
+            foreach (var placement in newRoomPlacements)
+                placements.Add((placement, decisionEngine.GetPlacementWeight(room, placement, size, Rooms)));
+            return size;
         }
     }
 
@@ -89,15 +103,15 @@ public class CaveSystemLevel
         return positions;
     }
 
-    private void AddRoom(Room room, RoomDecisionEngine decisionEngine)
+    private void AddRoom(Room newRoom, RoomDecisionEngine decisionEngine)
     {
-        Rooms.Add(room);
+        Rooms.Add(newRoom);
         
-        if (ServiceRegistry.Get<RandomNumberGenerator>().NextFloat() < decisionEngine.GetContinueProbability(room))
-            roomQueue.Enqueue(room);
+        if (random.NextFloat() < decisionEngine.GetContinueProbability(newRoom))
+            roomQueue.Enqueue(newRoom);
 
-        foreach (Coord coord in room.RoomCoords)
-            map[coord] = room;
+        foreach (Coord coord in newRoom.RoomCoords)
+            map[coord] = newRoom;
     }
 
     private bool OverlapsRoom(Room room) => OverlapsRoom(room.Bounds);

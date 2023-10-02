@@ -56,7 +56,7 @@ public class SpelunkerUnearthedGame : Game
         
         ServiceRegistry.RegisterService(new TileLoader());
         ServiceRegistry.RegisterService(new InputManager());
-        ServiceRegistry.RegisterService(new RandomNumberGenerator());
+        ServiceRegistry.RegisterService(new RandomProvider());
         
         debugScreen = new DebugScreen();
         ServiceRegistry.RegisterService(debugScreen);

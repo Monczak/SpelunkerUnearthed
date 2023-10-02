@@ -7,11 +7,14 @@ using MariEngine.Services;
 using MariEngine.Tiles;
 using MariEngine.Utils;
 
+using Random = MariEngine.Utils.Random;
+
 namespace SpelunkerUnearthed.Scripts.MapGeneration;
 
 public class MapGenerator : Component
 {
     private Tilemap tilemap;
+    private TileBuffer buffer;
 
     private Random random;
 
@@ -22,7 +25,8 @@ public class MapGenerator : Component
 
     public void GenerateMap(MapGenerationParameters parameters)
     {
-        random = new Random(parameters.Seed);
+        random = ServiceRegistry.Get<RandomProvider>().Request(Constants.MapGen).Seed(0);
+        buffer = new TileBuffer(tilemap.MapWidth, tilemap.MapHeight);
         
         FillRandom(parameters.RandomFillAmount, parameters.WallTile, parameters.NothingTile);
 
@@ -34,40 +38,40 @@ public class MapGenerator : Component
             Smooth(parameters.WallTile, parameters.NothingTile);
         }
         
-        // FillRandom(1, parameters.WallTile, parameters.NothingTile);
+        tilemap.CopyFrom(buffer);
     }
 
     private void FillRandom(float fillAmount, Tile positiveTile, Tile negativeTile)
     {
-        foreach (Coord coord in tilemap.Coords)
+        foreach (Coord coord in buffer.Coords)
         {
-            tilemap.Place(random.NextSingle() < fillAmount ? positiveTile : negativeTile, coord);
+            buffer[coord] = random.NextFloat() < fillAmount ? positiveTile : negativeTile;
         }
     }
 
     private void MakeBorder(int size, Tile borderTile)
     {
-        foreach (Coord coord in tilemap.Coords)
+        foreach (Coord coord in buffer.Coords)
         {
             if (IsInRing(coord, 0, size))
-                tilemap.Place(borderTile, coord);
+                buffer[coord] = borderTile;
         }
     }
 
     private bool IsInRing(Coord coord, int outerMargin, int size)
     {
-        return (coord.X >= outerMargin && coord.X < outerMargin + size) || (coord.X > tilemap.MapWidth - outerMargin - size && coord.X <= tilemap.MapWidth - outerMargin)
-            || (coord.Y >= outerMargin && coord.Y < outerMargin + size) || (coord.Y > tilemap.MapHeight - outerMargin - size && coord.Y <= tilemap.MapHeight - outerMargin);
+        return (coord.X >= outerMargin && coord.X < outerMargin + size) || (coord.X > buffer.Width - outerMargin - size && coord.X <= buffer.Width - outerMargin)
+            || (coord.Y >= outerMargin && coord.Y < outerMargin + size) || (coord.Y > buffer.Height - outerMargin - size && coord.Y <= buffer.Height - outerMargin);
     }
 
     private void SmoothBorder(int borderSize, int gradientSize, float fillPercent, Tile tile)
     {
-        foreach (Coord coord in tilemap.Coords)
+        foreach (Coord coord in buffer.Coords)
         {
             if (IsInRing(coord, borderSize, gradientSize))
             {
-                if (random.NextSingle() < fillPercent)
-                    tilemap.Place(tile, coord);
+                if (random.NextFloat() < fillPercent)
+                    buffer[coord] = tile;
             }
         }
     }
@@ -75,7 +79,7 @@ public class MapGenerator : Component
     private void Smooth(Tile positiveTile, Tile negativeTile)
     {
         // TODO: Use double buffering if this ends up too slow
-        tilemap.CopyTo(out var newMap);
+        buffer.CopyTo(out var newMap);
 
         for (int y = 0; y < tilemap.MapHeight; y++)
         {
@@ -91,7 +95,7 @@ public class MapGenerator : Component
             }
         }
         
-        tilemap.CopyFrom(newMap);
+        buffer.CopyFrom(newMap);
     }
 
     private int CountNeighbors(Coord coord, string tag)
@@ -104,9 +108,9 @@ public class MapGenerator : Component
                 if (x == y) continue;
                 
                 Coord neighborCoord = new(x, y);
-                if (!tilemap.IsInBounds(neighborCoord)) 
+                if (!buffer.IsInBounds(neighborCoord)) 
                     count++;
-                else if (tilemap[neighborCoord].Tags.Contains(tag))
+                else if (buffer[neighborCoord].Tags.Contains(tag))
                     count++;
             }
         }

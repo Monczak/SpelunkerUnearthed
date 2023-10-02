@@ -8,10 +8,11 @@ public class Room
 {
     public Coord Position { get; private set; }
     public Coord Size { get; private set; }
+    public int Distance { get; private set; }
+    public RoomFlags Flags { get; private set; }
 
     public Vector2 Center => (Vector2)Position + (Vector2)Size / 2;
     
-    public int Distance { get; private set; }
     
     public Dictionary<Coord, SubRoom> SubRooms { get; private set; }
     
@@ -38,11 +39,12 @@ public class Room
         }
     }
 
-    public Room(Coord position, Coord size, int distance)
+    public Room(Coord position, Coord size, int distance, RoomFlags flags = RoomFlags.None)
     {
         Position = position;
         Size = size;
         Distance = distance;
+        Flags = flags;
 
         Connections = new List<SubRoomConnection>();
         SubRooms = new Dictionary<Coord, SubRoom>();

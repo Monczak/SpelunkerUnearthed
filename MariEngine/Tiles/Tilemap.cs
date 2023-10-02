@@ -10,7 +10,7 @@ namespace MariEngine.Tiles;
 
 public class Tilemap : Component
 {
-    private Tile[,] map;
+    private TileBuffer map;
     
     public HashSet<TileEntity> TileEntities { get; }
     
@@ -21,7 +21,7 @@ public class Tilemap : Component
 
     public Tilemap(int width, int height)
     {
-        map = new Tile[height, width];
+        map = new TileBuffer(width, height);
         MapHeight = height;
         MapWidth = width;
 
@@ -91,52 +91,23 @@ public class Tilemap : Component
         }
     }
 
-    public void CopyFrom(Tile[,] tiles)
+    public void CopyFrom(TileBuffer tiles)
     {
-        if (tiles.GetLength(0) != map.GetLength(0) || tiles.GetLength(1) != map.GetLength(1))
-            throw new ArgumentException($"Tilemaps must be same size");
-        
-        for (int y = 0; y < MapHeight; y++)
-        {
-            for (int x = 0; x < MapWidth; x++)
-            {
-                Place(new Tile(tiles[x, y]), new Coord(x, y));
-            }
-        }
+        map.CopyFrom(tiles);
     }
 
-    public void CopyTo(out Tile[,] tiles)
+    public void CopyTo(out TileBuffer tiles)
     {
-        tiles = new Tile[MapWidth, MapHeight];
-        for (int y = 0; y < MapHeight; y++)
-        {
-            for (int x = 0; x < MapWidth; x++)
-            {
-                tiles[x, y] = map[x, y];
-            }
-        }
+        map.CopyTo(out tiles);
     }
 
     public Tile this[Coord coord]
     {
-        get
-        {
-            if (!IsInBounds(coord))
-                throw new OutOfBoundsException(coord);
-            return map[coord.Y, coord.X];
-        }
-        set
-        {
-            if (!IsInBounds(coord))
-                throw new OutOfBoundsException(coord);
-            map[coord.Y, coord.X] = value;
-        }
+        get => map[coord];
+        private set => map[coord] = value;
     }
 
-    public bool IsInBounds(Coord coord)
-    {
-        return coord.X >= 0 && coord.X < MapWidth && coord.Y >= 0 && coord.Y < MapHeight;
-    }
+    public bool IsInBounds(Coord coord) => map.IsInBounds(coord);
 
     public Tile this[int x, int y]
     {
@@ -162,19 +133,7 @@ public class Tilemap : Component
         tileEntity.AttachToTilemap(this);
     }
 
-    public IEnumerable<Coord> Coords
-    {
-        get
-        {
-            for (int y = 0; y < MapHeight; y++)
-            {
-                for (int x = 0; x < MapWidth; x++)
-                {
-                    yield return new Coord(x, y);
-                }
-            }
-        }
-    }
+    public IEnumerable<Coord> Coords => map.Coords;
 
     protected override void OnDestroy()
     {

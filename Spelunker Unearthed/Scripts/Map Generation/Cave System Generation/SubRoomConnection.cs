@@ -32,7 +32,7 @@ public class SubRoomConnection
             return null;
         
         var (subRoom1, subRoom2) =
-            connectionCandidates[ServiceRegistry.Get<RandomNumberGenerator>().Next(connectionCandidates.Count)];
+            connectionCandidates[ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGen).Next(connectionCandidates.Count)];
         SubRoomConnection connection = new(subRoom1, subRoom2);
         subRoom1.Room.Connections.Add(connection);
         subRoom2.Room.Connections.Add(connection.Reversed);

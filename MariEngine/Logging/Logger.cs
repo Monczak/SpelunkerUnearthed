@@ -23,6 +23,11 @@ public static class Logger
     {
         Log(message, LogSeverity.Fatal);
     }
+    
+    public static void LogDebug(object message)
+    {
+        Log(message, LogSeverity.Debug);
+    }
 
     private static void Log(object message, string severity)
     {

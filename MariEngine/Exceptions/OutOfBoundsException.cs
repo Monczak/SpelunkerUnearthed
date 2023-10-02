@@ -8,4 +8,9 @@ public class OutOfBoundsException : Exception
     {
         
     }
+    
+    public OutOfBoundsException(int x, int y) : this(new Coord(x, y))
+    {
+        
+    }
 }

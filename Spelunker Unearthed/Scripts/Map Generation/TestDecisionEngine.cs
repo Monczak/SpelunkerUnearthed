@@ -12,7 +12,7 @@ public class TestDecisionEngine : RoomDecisionEngine
 {
     protected override Coord MinRoomSize => new(1, 1);
     protected override Coord MaxRoomSize => new(4, 4);
-
+    
     private bool IsHallway(Room room)
     {
         int larger = Math.Max(room.Size.X, room.Size.Y);
@@ -56,7 +56,7 @@ public class TestDecisionEngine : RoomDecisionEngine
             {
                 if (room == sourceRoom) continue;
 
-                float length = ((Vector2)placement.pos - room.Center).LengthSquared();
+                float length = ((Vector2)placement.node.Position - room.Center).LengthSquared();
                 minDistance = length < minDistance ? length : minDistance;
             }
 
@@ -68,17 +68,17 @@ public class TestDecisionEngine : RoomDecisionEngine
         float hallwayPlacementScore = 1;
         if (IsHallway(sourceRoom))
         {
-            if (MathF.Abs(MathUtils.AngleCosine((Vector2)(Coord)GetDirection((Vector2)sourceRoom.Size),
-                    (Vector2)(Coord)placement.node.Direction)) < 1)
+            float angleCos = MathUtils.AngleCosine((Vector2)(Coord)GetDirection((Vector2)sourceRoom.Size),
+                (Vector2)(Coord)placement.node.Direction);
+            // Logger.LogDebug($"Source size: {sourceRoom.Size} Placement dir: {placement.node.Direction} Cos: {angleCos}");
+            if (angleCos == 0)
                 hallwayPlacementScore = 0;
         }
         
-        float angleScore;
-        if (newRoomSize == Coord.One)
-            angleScore = 1;
-        else
+        float angleScore = 1;
+        if (newRoomSize != Coord.One)
         {
-            float angle = MathF.Abs(MathUtils.AngleCosine((Vector2)newRoomSize - Vector2.One, (Vector2)(Coord)placement.node.Direction));
+            float angle = MathF.Abs(MathUtils.AngleCosine((Vector2)newRoomSize, (Vector2)(Coord)placement.node.Direction));
             angleScore = 1 / (angle * angle + 1);
             angleScore = angleScore * angleScore * angleScore;
         }
@@ -90,11 +90,13 @@ public class TestDecisionEngine : RoomDecisionEngine
 
     public override float GetBranchingProbability(Room sourceRoom)
     {
+        if ((sourceRoom.Flags & RoomFlags.Entrance) != 0)
+            return 0.7f;
         return IsHallway(sourceRoom) ? 0.4f : 0;
     }
 
     public override float GetContinueProbability(Room newRoom)
     {
-        return newRoom.Distance < 15 ? 1 : 0;
+        return newRoom.Distance < 6 ? 1 : 0;
     }
 }

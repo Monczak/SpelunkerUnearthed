@@ -1,18 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using MariEngine.Logging;
-using MariEngine.Utils;
 
-namespace MariEngine.Services;
+namespace MariEngine.Utils;
 
-public class RandomNumberGenerator : Service
+public class Random
 {
-    private Random random = new();
+    private System.Random random;
 
-    public void Seed(int seed)
+    public Random()
     {
-        random = new Random(seed);
+        random = new System.Random();
+    }
+
+    public Random(int seed)
+    {
+        random = new System.Random(seed);
+    }
+
+    public Random Seed(int seed)
+    {
+        random = new System.Random(seed);
+        return this;
     }
     
     public int Next() => random.Next();
@@ -38,19 +46,10 @@ public class RandomNumberGenerator : Service
     // TODO: What to do with negative weights?
     public TItem PickWeighted<TItem>(ICollection<(TItem item, float weight)> items, out bool picked, bool remove = false)
     {
-        float minWeight = float.PositiveInfinity, maxWeight = float.NegativeInfinity;
-        
-        foreach (var (item, weight) in items)
-        {
-            if (weight < 0) Logger.LogWarning($"Weight lower than 0! {item} - {weight}");
-            
-            minWeight = weight < minWeight ? weight : minWeight;
-            maxWeight = weight > maxWeight ? weight : maxWeight;
-        }
-        
         float weightSum = 0;
         foreach (var (item, weight) in items)
         {
+            if (weight < 0) Logger.LogWarning($"Weight lower than 0! {item} - {weight}");
             weightSum += weight;
         }
 
@@ -69,12 +68,6 @@ public class RandomNumberGenerator : Service
         }
 
         picked = false;
-        return default; // Should never get here
-
-        float NormalizeWeight(float weight)
-        {
-            // return weight;
-            return MathUtils.InverseLerp(minWeight, maxWeight, weight);
-        }
+        return default;
     }
 }

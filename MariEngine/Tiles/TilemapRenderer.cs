@@ -41,7 +41,7 @@ public class TilemapRenderer : Renderer
         {
             for (float x = cullingBounds.Value.TopLeft.X; x < cullingBounds.Value.BottomRight.X + 1; x++)
             {
-                Coord coord = (Coord)new Vector2(x, y); // TODO: This is ugly, how can we make this better?
+                Coord coord = new(x, y);
                 if (!tilemap.IsInBounds(coord)) continue;
                 RenderTile(spriteBatch, CoordToWorldPoint(coord), tilemap[coord], lightMap.GetRenderedLight(coord));
             }

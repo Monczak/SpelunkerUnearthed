@@ -13,14 +13,24 @@ public struct Coord
         X = x;
         Y = y;
     }
+    
+    public Coord(Vector2 v)
+    {
+        X = (int)MathF.Floor(v.X);
+        Y = (int)MathF.Floor(v.Y);
+    }
 
+    public Coord(float x, float y) : this(new Vector2(x, y))
+    {
+    }
+    
     public override string ToString()
     {
         return $"({X}, {Y})";
     }
 
     public static explicit operator Vector2(Coord coord) => new(coord.X, coord.Y);
-    public static explicit operator Coord(Vector2 v) => new((int)MathF.Floor(v.X), (int)MathF.Floor(v.Y));
+    public static explicit operator Coord(Vector2 v) => new(v);
 
     public static explicit operator Coord(Direction direction)
     {
@@ -82,4 +92,20 @@ public struct Coord
     public static Coord Orthogonal(Coord coord) => new(-coord.Y, coord.X);
 
     public static int Dot(Coord coord1, Coord coord2) => coord1.X * coord2.X + coord1.Y * coord2.Y;
+
+    public Direction Direction
+    {
+        get
+        {
+            if (this == Zero) return Direction.None;
+        
+            Vector2 absC = new(MathF.Abs(X), MathF.Abs(Y));
+            if (absC.X > absC.Y)
+            {
+                return X > 0 ? Direction.Right : Direction.Left;
+            }
+
+            return Y > 0 ? Direction.Down : Direction.Up;
+        }
+    }
 }

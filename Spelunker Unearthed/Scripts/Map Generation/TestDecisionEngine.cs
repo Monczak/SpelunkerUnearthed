@@ -20,18 +20,6 @@ public class TestDecisionEngine : RoomDecisionEngine
         return (float)larger / smaller >= 2;
     }
 
-    private Direction GetDirection(Vector2 v)
-    {
-        if (v == Vector2.Zero) return Direction.None;
-        
-        Vector2 absV = new(MathF.Abs(v.X), MathF.Abs(v.Y));
-        if (absV.X > absV.Y)
-        {
-            return v.X > 0 ? Direction.Right : Direction.Left;
-        }
-
-        return v.Y > 0 ? Direction.Down : Direction.Up;
-    }
     
     protected override float GetSizeWeight(Room sourceRoom, Coord newRoomSize)
     {
@@ -68,8 +56,8 @@ public class TestDecisionEngine : RoomDecisionEngine
         float hallwayPlacementScore = 1;
         if (IsHallway(sourceRoom))
         {
-            float angleCos = MathUtils.AngleCosine((Vector2)(Coord)GetDirection((Vector2)sourceRoom.Size),
-                (Vector2)(Coord)placement.node.Direction);
+            float angleCos = MathUtils.AngleCosine(sourceRoom.Size.Direction.ToVector2(),
+                placement.node.Direction.ToVector2());
             // Logger.LogDebug($"Source size: {sourceRoom.Size} Placement dir: {placement.node.Direction} Cos: {angleCos}");
             if (angleCos == 0)
                 hallwayPlacementScore = 0;
@@ -78,7 +66,7 @@ public class TestDecisionEngine : RoomDecisionEngine
         float angleScore = 1;
         if (newRoomSize != Coord.One)
         {
-            float angle = MathF.Abs(MathUtils.AngleCosine((Vector2)newRoomSize, (Vector2)(Coord)placement.node.Direction));
+            float angle = MathF.Abs(MathUtils.AngleCosine((Vector2)newRoomSize, placement.node.Direction.ToVector2()));
             angleScore = 1 / (angle * angle + 1);
             angleScore = angleScore * angleScore * angleScore;
         }

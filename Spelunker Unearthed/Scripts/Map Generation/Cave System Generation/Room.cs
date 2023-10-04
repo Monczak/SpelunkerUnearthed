@@ -58,8 +58,7 @@ public class Room
             }
         }
     }
-
-    // TODO: Check if this doesn't duplicate connections
+    
     public void Connect(AttachNode node, Room otherRoom)
     {
         Coord subRoomPos = node.Position - (Coord)node.Direction;

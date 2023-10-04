@@ -57,21 +57,19 @@ public class CaveSystemLevel
             AddRoom(newRoom, decisionEngine);
 
             room.Connect(pickedNode, newRoom);
+            foreach (AttachNode node in newRoom.AttachNodes)
+            {
+                if (map.ContainsKey(node.Position) 
+                    && random.NextFloat() < decisionEngine.GetNeighborConnectionProbability(newRoom, map[node.Position]))
+                {
+                    newRoom.Connect(node, map[node.Position]);
+                }
+            }
 
             if (random.NextFloat() < decisionEngine.GetBranchingProbability(room))
                 newRoomSize = PickRoomSize();
             else
                 break;
-        }
-        
-        // FIXME: Rooms generated last don't seem to connect to neighbors
-        foreach (AttachNode node in room.AttachNodes)
-        {
-            if (map.ContainsKey(node.Position) 
-                && random.NextFloat() < decisionEngine.GetNeighborConnectionProbability(room, map[node.Position]))
-            {
-                room.Connect(node, map[node.Position]);
-            }
         }
 
         Coord PickRoomSize()

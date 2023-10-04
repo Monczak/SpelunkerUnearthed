@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using MariEngine;
+using MariEngine.Logging;
 using Microsoft.Xna.Framework;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
@@ -66,7 +67,11 @@ public class Room
         SubRoom newSubRoom = otherRoom.SubRooms[node.Position];
 
         SubRoomConnection connection = new(subRoom, newSubRoom);
+
+        int count = Connections.Count;
         Connections.Add(connection);
+        if (count == Connections.Count)
+            Logger.LogDebug("Duplicate connection added");
         otherRoom.Connections.Add(connection.Reversed);
     }
 }

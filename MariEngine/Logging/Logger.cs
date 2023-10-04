@@ -1,4 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.CompilerServices;
+using System.Text;
+using Pastel;
 
 namespace MariEngine.Logging;
 
@@ -24,9 +29,10 @@ public static class Logger
         Log(message, LogSeverity.Fatal);
     }
     
-    public static void LogDebug(object message)
+    public static void LogDebug(object message, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
-        Log(message, LogSeverity.Debug);
+        string codeInfo = $"{Path.GetFileName(path)}:{line} {caller}".Pastel(ConsoleColor.Gray);
+        Log($"[{codeInfo}] {message}", LogSeverity.Debug);
     }
 
     private static void Log(object message, string severity)

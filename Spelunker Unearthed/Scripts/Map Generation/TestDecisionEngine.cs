@@ -30,7 +30,9 @@ public class TestDecisionEngine : RoomDecisionEngine
             if (!IsHallway(sourceRoom))
                 weight *= 0.1f;
         }
-        if (newRoomSize == Coord.One) weight *= 0.5f;
+        else 
+            weight *= 0.5f;
+        
         return weight;
     }
 
@@ -86,5 +88,10 @@ public class TestDecisionEngine : RoomDecisionEngine
     public override float GetContinueProbability(Room newRoom)
     {
         return newRoom.Distance < 6 ? 1 : 0;
+    }
+
+    public override bool ShouldRegenerate(CaveSystemLevel level)
+    {
+        return level.Rooms.Count is < 15 or > 50;
     }
 }

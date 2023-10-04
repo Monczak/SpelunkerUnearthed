@@ -18,8 +18,8 @@ public class CaveSystemManager : Component
     {
         this.gizmos = gizmos;
         
-        // TODO: Remove the TestDecisionEngine business
-        ServiceRegistry.Get<InputManager>().OnPressed("Mine", () => Generate());
+        // TODO: Remove this, this is for testing only
+        ServiceRegistry.Get<InputManager>().OnPressed("Mine", Generate);
     }
 
     public void Generate()

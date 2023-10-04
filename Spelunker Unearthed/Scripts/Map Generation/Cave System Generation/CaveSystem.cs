@@ -14,7 +14,11 @@ public class CaveSystem
         Levels.Add(new CaveSystemLevel());
         foreach (var level in Levels)
         {
-            level.Generate(DecisionEngine);
+            do
+            {
+                level.Generate(DecisionEngine);
+            } 
+            while (DecisionEngine.ShouldRegenerate(level));
         }
     }
 }

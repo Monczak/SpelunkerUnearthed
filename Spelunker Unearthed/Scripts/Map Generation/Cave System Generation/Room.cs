@@ -16,7 +16,7 @@ public class Room
     
     public Dictionary<Coord, SubRoom> SubRooms { get; private set; }
     
-    public List<SubRoomConnection> Connections { get; private set; }
+    public HashSet<SubRoomConnection> Connections { get; private set; }
 
     public IEnumerable<Coord> RoomCoords => SubRooms.Keys;
     public CoordBounds Bounds => new(Position, Size);
@@ -46,7 +46,7 @@ public class Room
         Distance = distance;
         Flags = flags;
 
-        Connections = new List<SubRoomConnection>();
+        Connections = new HashSet<SubRoomConnection>();
         SubRooms = new Dictionary<Coord, SubRoom>();
         for (int y = position.Y; y < position.Y + size.Y; y++)
         {
@@ -56,5 +56,17 @@ public class Room
                 SubRooms.Add(subRoomPos, new SubRoom(this, subRoomPos));
             }
         }
+    }
+
+    // TODO: Check if this doesn't duplicate connections
+    public void Connect(AttachNode node, Room otherRoom)
+    {
+        Coord subRoomPos = node.Position - (Coord)node.Direction;
+        SubRoom subRoom = SubRooms[subRoomPos];
+        SubRoom newSubRoom = otherRoom.SubRooms[node.Position];
+
+        SubRoomConnection connection = new(subRoom, newSubRoom);
+        Connections.Add(connection);
+        otherRoom.Connections.Add(connection.Reversed);
     }
 }

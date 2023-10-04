@@ -16,6 +16,8 @@ public abstract class RoomDecisionEngine
     public abstract float GetBranchingProbability(Room sourceRoom);
     public abstract float GetContinueProbability(Room newRoom);
 
+    public abstract float GetNeighborConnectionProbability(Room sourceRoom, Room neighborRoom);
+
     public abstract bool ShouldRegenerate(CaveSystemLevel level);
 
     public Coord PickRoomSize(Room sourceRoom)

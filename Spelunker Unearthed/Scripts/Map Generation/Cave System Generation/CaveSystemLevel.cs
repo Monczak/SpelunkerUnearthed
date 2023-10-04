@@ -46,30 +46,32 @@ public class CaveSystemLevel
         while (placements.Count > 0)
         {
             // Pick a random placement and remove it from the set
-            var (position, node) = random.PickWeighted(placements, out bool picked, remove: true);
+            var (pickedPosition, pickedNode) = random.PickWeighted(placements, out bool picked, remove: true);
             if (!picked)
-            {
-                return;
-            }
-            
-            CoordBounds newRoomBounds = new(position, newRoomSize);
+                break;
+
+            CoordBounds newRoomBounds = new(pickedPosition, newRoomSize);
             if (OverlapsRoom(newRoomBounds)) continue;
 
-            Room newRoom = new(position, newRoomSize, room.Distance + 1);
+            Room newRoom = new(pickedPosition, newRoomSize, room.Distance + 1);
             AddRoom(newRoom, decisionEngine);
 
-            Coord subRoomPos = node.Position - (Coord)node.Direction;
-            SubRoom subRoom = room.SubRooms[subRoomPos];
-            SubRoom newSubRoom = newRoom.SubRooms[node.Position];
-
-            SubRoomConnection connection = new(subRoom, newSubRoom);
-            room.Connections.Add(connection);
-            newRoom.Connections.Add(connection.Reversed);
+            room.Connect(pickedNode, newRoom);
 
             if (random.NextFloat() < decisionEngine.GetBranchingProbability(room))
                 newRoomSize = PickRoomSize();
             else
-                return;
+                break;
+        }
+        
+        // FIXME: Rooms generated last don't seem to connect to neighbors
+        foreach (AttachNode node in room.AttachNodes)
+        {
+            if (map.ContainsKey(node.Position) 
+                && random.NextFloat() < decisionEngine.GetNeighborConnectionProbability(room, map[node.Position]))
+            {
+                room.Connect(node, map[node.Position]);
+            }
         }
 
         Coord PickRoomSize()

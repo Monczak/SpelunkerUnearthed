@@ -12,6 +12,11 @@ public class TestDecisionEngine : RoomDecisionEngine
 {
     protected override Coord MinRoomSize => new(1, 1);
     protected override Coord MaxRoomSize => new(4, 4);
+
+    private const int MaxDistance = 10;
+    private const int RoomConnectionDistanceThreshold = 2;
+    private const float RoomConnectionMinProbability = 0.5f;
+    private const float RoomConnectionMaxProbability = 0.8f;
     
     private bool IsHallway(Room room)
     {
@@ -87,11 +92,19 @@ public class TestDecisionEngine : RoomDecisionEngine
 
     public override float GetContinueProbability(Room newRoom)
     {
-        return newRoom.Distance < 6 ? 1 : 0;
+        return newRoom.Distance < MaxDistance ? 1 : 0;
+    }
+
+    public override float GetNeighborConnectionProbability(Room sourceRoom, Room neighborRoom)
+    {
+        float distanceDelta = Math.Abs(sourceRoom.Distance - neighborRoom.Distance);
+        if (distanceDelta < RoomConnectionDistanceThreshold) return 0;
+        
+        return MathF.Max(0, MathUtils.Lerp(RoomConnectionMinProbability, RoomConnectionMaxProbability, (distanceDelta - RoomConnectionDistanceThreshold) / MaxDistance));
     }
 
     public override bool ShouldRegenerate(CaveSystemLevel level)
     {
-        return level.Rooms.Count is < 15 or > 50;
+        return level.Rooms.Count is < 30 or > 50;
     }
 }

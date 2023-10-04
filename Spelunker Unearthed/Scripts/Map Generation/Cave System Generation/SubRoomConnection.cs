@@ -6,8 +6,8 @@ namespace SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 
 public class SubRoomConnection
 {
-    public SubRoom From { get; private set; }
-    public SubRoom To { get; private set; }
+    public SubRoom From { get; }
+    public SubRoom To { get; }
 
     public SubRoomConnection Reversed => new(To, From);
 
@@ -38,5 +38,19 @@ public class SubRoomConnection
         subRoom2.Room.Connections.Add(connection.Reversed);
 
         return connection;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is null || obj.GetType() != GetType())
+            return false;
+        return Equals((SubRoomConnection)obj);
+    }
+    
+    private bool Equals(SubRoomConnection other) => From == other.From && To == other.To;
+
+    public override int GetHashCode()
+    {
+        return From.GetHashCode() ^ To.GetHashCode();
     }
 }

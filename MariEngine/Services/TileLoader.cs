@@ -13,7 +13,7 @@ namespace MariEngine.Services;
 
 public class TileLoader : Service
 {
-    private readonly string TilePath = "Content/Tiles";
+    private readonly string tilePath = ContentPaths.Tiles;
 
     public Dictionary<string, Tile> Tiles { get; private set; }
 
@@ -36,7 +36,7 @@ public class TileLoader : Service
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .Build();
         
-        foreach (var file in Directory.GetFiles(TilePath))
+        foreach (var file in Directory.GetFiles(tilePath))
         {
             string tileId = Path.GetFileNameWithoutExtension(file);
             try

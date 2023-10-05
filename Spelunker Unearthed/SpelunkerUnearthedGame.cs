@@ -54,9 +54,16 @@ public class SpelunkerUnearthedGame : Game
         updateTimeStopwatch = new Stopwatch();
         drawTimeStopwatch = new Stopwatch();
         
+        ServiceRegistry.RegisterService(new FontProvider());
+        ServiceRegistry.RegisterService(new RandomProvider());
         ServiceRegistry.RegisterService(new TileLoader());
         ServiceRegistry.RegisterService(new InputManager());
-        ServiceRegistry.RegisterService(new RandomProvider());
+        
+        // TODO: Load this from a config file
+        ServiceRegistry.Get<FontProvider>().AddFont("Tiles", "Hack-Regular");
+        ServiceRegistry.Get<FontProvider>().AddFont("Tiles", "Monospace");
+        ServiceRegistry.Get<FontProvider>().AddFont("Monospace", "Hack-Regular");
+        ServiceRegistry.Get<FontProvider>().AddFont("Monospace", "Monospace");
         
         debugScreen = new DebugScreen();
         ServiceRegistry.RegisterService(debugScreen);

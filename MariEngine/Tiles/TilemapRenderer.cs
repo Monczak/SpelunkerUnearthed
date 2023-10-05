@@ -74,8 +74,7 @@ public class TilemapRenderer : Renderer
     internal Bounds? GetWorldCullingBounds()
     {
         Bounds cameraBounds = camera.ViewingWindow;
-        Bounds tilemapBounds =
-            new Bounds(CoordToWorldPoint(Coord.Zero), new Vector2(tilemap.MapWidth, tilemap.MapHeight));
+        Bounds tilemapBounds = new(CoordToWorldPoint(Coord.Zero), new Vector2(tilemap.MapWidth, tilemap.MapHeight));
         Bounds? overlap = Bounds.Overlap(cameraBounds, tilemapBounds);
         return overlap;
     }

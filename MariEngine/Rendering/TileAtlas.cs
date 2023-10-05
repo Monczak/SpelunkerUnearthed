@@ -13,8 +13,7 @@ namespace MariEngine.Rendering;
 public class TileAtlas : Service
 {
     private RenderTarget2D backgroundRenderTarget, foregroundRenderTarget;
-    
-    private FontSystem fontSystem;
+
     private SpriteFontBase font;
 
     private GraphicsDevice graphicsDevice;
@@ -35,17 +34,6 @@ public class TileAtlas : Service
         
         backgroundTexture = new Texture2D(graphicsDevice, 1, 1);
         backgroundTexture.SetData(new[] { Color.White });
-        
-        fontSystem = new FontSystem();
-        
-        AddFont("Hack-Regular");
-        AddFont("Monospace");
-    }
-    
-    public void AddFont(string fontName)
-    {
-        // TODO: Don't use hardcoded paths
-        fontSystem.AddFont(File.ReadAllBytes($"Content/Fonts/{fontName}.ttf"));
     }
     
     public Vector2 CalculateTextOffset(char character)
@@ -124,7 +112,7 @@ public class TileAtlas : Service
 
     private void DrawForegrounds(IEnumerable<Tile> tiles)
     {
-        font = fontSystem.GetFont(tileSize);
+        font = ServiceRegistry.Get<FontProvider>().GetFont("Tiles", tileSize);
         
         graphicsDevice.SetRenderTarget(foregroundRenderTarget);
         graphicsDevice.Clear(Color.Transparent);

@@ -6,7 +6,7 @@ public class TilemapCollider : Collider
 {
     private Tilemap tilemap;
 
-    public override void OnAttach()
+    protected override void OnAttach()
     {
         tilemap = GetComponent<Tilemap>();
     }

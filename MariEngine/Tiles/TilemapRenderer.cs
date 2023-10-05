@@ -23,14 +23,14 @@ public class TilemapRenderer : Renderer
         
     }
 
-    public override void OnAttach()
+    protected override void OnAttach()
     {
         tilemap = GetComponent<Tilemap>();
         lightMap = GetComponent<LightMap>();
         transform = GetComponent<Transform>();
     }
 
-    public override void Render(SpriteBatch spriteBatch)
+    protected override void Render(SpriteBatch spriteBatch)
     {
         var cullingBounds = GetCullingBounds();
         if (cullingBounds is null) return;

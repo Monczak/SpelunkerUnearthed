@@ -32,7 +32,7 @@ public class Random
     public float NextFloat(float minInclusive, float maxExclusive) =>
         NextFloat(maxExclusive - minInclusive) + minInclusive;
     
-    public void Shuffle<T>(IList<T> list)
+    public IList<T> Shuffle<T>(IList<T> list)
     {
         int n = list.Count;  
         while (n > 1) 
@@ -41,6 +41,8 @@ public class Random
             int k = Next(n + 1);  
             (list[k], list[n]) = (list[n], list[k]);
         }
+
+        return list;
     }
     
     // TODO: What to do with negative weights?

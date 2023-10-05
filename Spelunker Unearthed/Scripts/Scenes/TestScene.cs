@@ -11,6 +11,8 @@ using MariEngine.Services;
 using MariEngine.Tiles;
 using SpelunkerUnearthed.Scripts.Components;
 using SpelunkerUnearthed.Scripts.MapGeneration;
+using SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
+using SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
 using SpelunkerUnearthed.Scripts.TileEntities;
 
 namespace SpelunkerUnearthed.Scripts.Scenes;
@@ -32,9 +34,12 @@ public class TestScene : Scene
     public override void Load()
     {
         LoadEntities();
-        GenerateMap();
+        GenerateCaveSystem();
+
+        caveSystemManager.SetCurrentLevel(0);
+        caveSystemManager.SetCurrentRoomToEntrance();
         
-        caveSystemManager.Generate();
+        GenerateMap(caveSystemManager.CurrentRoom);
     }
 
     public override void Update(GameTime gameTime)
@@ -80,16 +85,15 @@ public class TestScene : Scene
         lightMap.AttachTilemapRenderer(tilemapRenderer);
         
         tilemapEntity.AttachComponent(new TilemapCollider());
-        tilemapEntity.AttachComponent(new MapGenerator());
-        tilemapEntity.AttachComponent(new TilemapCameraBounds());
 
-        // TODO: Place player in an appropriate spot (randomly, ensuring there is no wall where the player is supposed to spawn)
-        // or next to a ladder that was taken to get to this level
+        MapGenerator mapGenerator = new();
+        mapGenerator.AddProcessor(new PlayerSpawnPointProcessor()); // TODO: Load all processors using reflection
+        tilemapEntity.AttachComponent(mapGenerator);
+        tilemapEntity.AttachComponent(new TilemapCameraBounds());
 
         TileEntity player = new TileEntity("Player")
         {
-            Tile = ServiceRegistry.Get<TileLoader>().GetTile("Player"),
-            Position = new Coord(32, 32)
+            Tile = ServiceRegistry.Get<TileLoader>().GetTile("Player")
         };
         tilemap.AddTileEntity(player);
         
@@ -104,7 +108,12 @@ public class TestScene : Scene
         cameraController.SetBounds(tilemapEntity.GetComponent<CameraBounds>());
     }
 
-    private void GenerateMap()
+    private void GenerateCaveSystem()
+    {
+        caveSystemManager.Generate();
+    }
+
+    private void GenerateMap(Room room)
     {
         var mapGenerator = tilemap.GetComponent<MapGenerator>();
 
@@ -113,12 +122,14 @@ public class TestScene : Scene
             Seed = 0,
             NothingTile = ServiceRegistry.Get<TileLoader>().GetTile("Nothing"),
             WallTile = ServiceRegistry.Get<TileLoader>().GetTile("Stone"),
-            RandomFillAmount = 0.45f,
+            RandomFillAmount = 0.4f,
             SmoothIterations = 3,
             BorderSize = 1,
             BorderGradientSize = 2,
             BorderGradientFillAmount = 0.6f,
         };
-        mapGenerator.GenerateMap(parameters);
+        mapGenerator.GenerateMap(room, parameters);
+
+        playerController.OwnerEntity.Position = room.PointsOfInterest[PointOfInterestType.PlayerSpawnPoint][0].Position;
     }
 }

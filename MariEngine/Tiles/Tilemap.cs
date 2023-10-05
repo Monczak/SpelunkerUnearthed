@@ -14,8 +14,8 @@ public class Tilemap : Component
     
     public HashSet<TileEntity> TileEntities { get; }
     
-    public int MapWidth { get; }
-    public int MapHeight { get; }
+    public int MapWidth { get; private set; }
+    public int MapHeight { get; private set; }
 
     public CoordBounds Bounds => new(Coord.Zero, new Coord(MapWidth, MapHeight));
 
@@ -28,12 +28,12 @@ public class Tilemap : Component
         TileEntities = new HashSet<TileEntity>();
     }
 
-    public override void OnAttach()
+    protected override void OnAttach()
     {
         Fill(ServiceRegistry.Get<TileLoader>().GetTile("Nothing"));
     }
 
-    public override void Update(GameTime gameTime)
+    protected override void Update(GameTime gameTime)
     {
         // TODO: Optimize this to build a set of behaviors to update
         foreach (Tile tile in map)
@@ -49,6 +49,12 @@ public class Tilemap : Component
         {
             tileEntity.Update(gameTime);
         }
+    }
+
+    public void Resize(Coord newSize)
+    {
+        (MapWidth, MapHeight) = newSize;
+        map = new TileBuffer(MapWidth, MapHeight);
     }
 
     public void Place(Tile tile, Coord coord)

@@ -47,7 +47,7 @@ public class LightMap : Component
         }
     }
 
-    public override void OnAttach()
+    protected override void OnAttach()
     {
         tilemap = GetComponent<Tilemap>();
         lightSources = new Dictionary<LightSource, LightSourceData>();
@@ -61,7 +61,7 @@ public class LightMap : Component
         tilemapRenderer = renderer;
     }
 
-    public override void Update(GameTime gameTime)
+    protected override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
         

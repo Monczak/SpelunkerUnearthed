@@ -1,4 +1,6 @@
+using MariEngine.Input;
 using MariEngine.Rendering;
+using MariEngine.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -14,14 +16,21 @@ public class GizmoRenderer : Renderer
     {
         gizmoTexture = new Texture2D(graphicsDevice, 1, 1, false, SurfaceFormat.Color);
         gizmoTexture.SetData(new[] { Color.White });
+        
+        ServiceRegistry.Get<InputManager>().OnPressed("ToggleGizmos", ToggleEnabled);
     }
 
-    public override void OnAttach()
+    private void ToggleEnabled()
+    {
+        Enabled ^= true;
+    }
+
+    protected override void OnAttach()
     {
         gizmos = GetComponent<Gizmos>();
     }
 
-    public override void Render(SpriteBatch spriteBatch)
+    protected override void Render(SpriteBatch spriteBatch)
     {
         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: camera.TransformMatrix);
         
@@ -36,5 +45,10 @@ public class GizmoRenderer : Renderer
     protected override Vector2 CalculateCenterOffset()
     {
         throw new System.NotImplementedException();
+    }
+
+    protected override void OnDestroy()
+    {
+        ServiceRegistry.Get<InputManager>().UnbindOnPressed("ToggleGizmos", ToggleEnabled);
     }
 }

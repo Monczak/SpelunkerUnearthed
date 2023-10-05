@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using MariEngine.Components;
+using MariEngine.Input;
+using MariEngine.Services;
 using Microsoft.Xna.Framework;
 
 namespace MariEngine.Debugging;
@@ -18,7 +20,7 @@ public class Gizmos : Component
         Shapes.Add(new LineGizmo(begin, end, color, width, lifetime));
     }
 
-    public override void Update(GameTime gameTime)
+    protected override void Update(GameTime gameTime)
     {
         foreach (var shape in Shapes)
         {

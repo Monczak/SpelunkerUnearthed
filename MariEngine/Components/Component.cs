@@ -4,6 +4,8 @@ namespace MariEngine.Components;
 
 public abstract class Component
 {
+    public bool Enabled { get; set; } = true;
+    
     protected Entity OwnerEntity;
 
     public Component()
@@ -13,7 +15,7 @@ public abstract class Component
 
     public void SetOwner(Entity ownerEntity)
     {
-        this.OwnerEntity = ownerEntity;
+        OwnerEntity = ownerEntity;
         OnAttach();
     }
 
@@ -27,12 +29,18 @@ public abstract class Component
         return OwnerEntity.GetComponent<T>();
     }
 
-    public virtual void Update(GameTime gameTime)
+    internal void DoUpdate(GameTime gameTime)
+    {
+        if (Enabled)
+            Update(gameTime);
+    }
+
+    protected virtual void Update(GameTime gameTime)
     {
         
     }
 
-    public virtual void OnAttach()
+    protected virtual void OnAttach()
     {
         
     }

@@ -24,7 +24,7 @@ public class CameraController : Component
         this.camera = camera;
     }
 
-    public override void Update(GameTime gameTime)
+    protected override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
 

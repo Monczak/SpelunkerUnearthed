@@ -12,6 +12,8 @@ public class Room
     public int Distance { get; private set; }
     public RoomFlags Flags { get; private set; }
 
+    public Dictionary<PointOfInterestType, List<PointOfInterest>> PointsOfInterest { get; }
+    
     public Vector2 Center => (Vector2)Position + (Vector2)Size / 2;
     
     
@@ -57,6 +59,8 @@ public class Room
                 SubRooms.Add(subRoomPos, new SubRoom(this, subRoomPos));
             }
         }
+
+        PointsOfInterest = new Dictionary<PointOfInterestType, List<PointOfInterest>>();
     }
     
     public void Connect(AttachNode node, Room otherRoom)
@@ -73,4 +77,14 @@ public class Room
             Logger.LogDebug("Duplicate connection added");
         otherRoom.Connections.Add(connection.Reversed);
     }
+
+    public void AddPointOfInterest(PointOfInterest poi)
+    {
+        if (!PointsOfInterest.ContainsKey(poi.PoiType))
+            PointsOfInterest[poi.PoiType] = new List<PointOfInterest>();
+        PointsOfInterest[poi.PoiType].Add(poi);
+    }
+
+    public void AddPointOfInterest(PointOfInterestType type, Coord coord) =>
+        AddPointOfInterest(new PointOfInterest(type, coord));
 }

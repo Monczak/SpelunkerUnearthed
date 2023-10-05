@@ -17,8 +17,14 @@ public abstract class Renderer : Component
         this.graphicsDevice = graphicsDevice;
         this.camera = camera;
     }
-    
-    public abstract void Render(SpriteBatch spriteBatch);
+
+    internal void DoRender(SpriteBatch spriteBatch)
+    {
+        if (Enabled)
+            Render(spriteBatch);
+    }
+
+    protected abstract void Render(SpriteBatch spriteBatch);
 
     protected abstract Vector2 CalculateCenterOffset();
 }

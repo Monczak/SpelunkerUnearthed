@@ -83,7 +83,7 @@ public class Entity
     {
         foreach (Component component in components.Values)
         {
-            component.Update(gameTime);
+            component.DoUpdate(gameTime);
         }
     }
 

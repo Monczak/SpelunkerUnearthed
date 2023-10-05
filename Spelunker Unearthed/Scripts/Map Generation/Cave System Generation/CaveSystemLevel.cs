@@ -16,6 +16,8 @@ public class CaveSystemLevel
 
     private readonly Queue<Room> roomQueue = new();
     private Random random;
+
+    public Room EntranceRoom => Rooms.Find(r => (r.Flags & RoomFlags.Entrance) != 0);
     
     public void Generate(RoomDecisionEngine decisionEngine)
     {
@@ -25,8 +27,9 @@ public class CaveSystemLevel
 
         random = ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGen);
         
-        Room starterRoom = new Room(new Coord(0, 0), new Coord(3, 3), 0, RoomFlags.Entrance);
-        AddRoom(starterRoom, decisionEngine);
+        // TODO: Get entrance room properties from a properties struct
+        Room entranceRoom = new Room(new Coord(0, 0), new Coord(3, 3), 0, RoomFlags.Entrance);
+        AddRoom(entranceRoom, decisionEngine);
         
         while (roomQueue.Count > 0)
         {

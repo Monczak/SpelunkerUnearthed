@@ -94,6 +94,7 @@ public class SpelunkerUnearthedGame : Game
         InputManager inputManager = ServiceRegistry.Get<InputManager>();
         
         inputManager.RegisterEvent(new InputEvent("ToggleDebugScreen", Keys.F3));
+        inputManager.RegisterEvent(new InputEvent("ToggleGizmos", Keys.F4));
         
         inputManager.RegisterEvent(new InputEvent("Up", Keys.Up));
         inputManager.RegisterEvent(new InputEvent("Down", Keys.Down));

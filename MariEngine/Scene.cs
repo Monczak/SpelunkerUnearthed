@@ -52,7 +52,7 @@ public abstract class Scene
 
         while (rendererQueue.TryDequeue(out Renderer renderer, out _))
         {
-            renderer.Render(spriteBatch);
+            renderer.DoRender(spriteBatch);
         }
     }
 }

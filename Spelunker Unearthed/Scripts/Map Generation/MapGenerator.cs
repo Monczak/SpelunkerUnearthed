@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using MariEngine;
 using MariEngine.Components;
@@ -6,7 +7,8 @@ using MariEngine.Logging;
 using MariEngine.Services;
 using MariEngine.Tiles;
 using MariEngine.Utils;
-
+using SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
+using SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
 using Random = MariEngine.Utils.Random;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration;
@@ -18,26 +20,48 @@ public class MapGenerator : Component
 
     private Random random;
 
-    public override void OnAttach()
+    private List<MapProcessor> processors = new();
+
+    public int BaseTilemapSize { get; private set; } = 16;
+
+    protected override void OnAttach()
     {
         tilemap = GetComponent<Tilemap>();
     }
 
-    public void GenerateMap(MapGenerationParameters parameters)
+    public void AddProcessor<T>(T processor) where T : MapProcessor
     {
-        random = ServiceRegistry.Get<RandomProvider>().Request(Constants.MapGen).Seed(0);
+        processors.Add(processor);
+    }   
+    
+    public void GenerateMap(Room room, MapGenerationParameters parameters)
+    {
+        random = ServiceRegistry.Get<RandomProvider>().Request(Constants.MapGen).Seed(parameters.Seed);
+
+        BuildMap(room, parameters);
+    }
+
+    private void BuildMap(Room room, MapGenerationParameters parameters)
+    {
+        tilemap.Resize(room.Size * BaseTilemapSize);
         buffer = new TileBuffer(tilemap.MapWidth, tilemap.MapHeight);
-        
+
         FillRandom(parameters.RandomFillAmount, parameters.WallTile, parameters.NothingTile);
 
         MakeBorder(parameters.BorderSize, parameters.WallTile);
-        SmoothBorder(parameters.BorderSize, parameters.BorderGradientSize, parameters.BorderGradientFillAmount, parameters.WallTile);
+        SmoothBorder(parameters.BorderSize, parameters.BorderGradientSize, parameters.BorderGradientFillAmount,
+            parameters.WallTile);
 
         for (int i = 0; i < parameters.SmoothIterations; i++)
         {
             Smooth(parameters.WallTile, parameters.NothingTile);
         }
-        
+
+        foreach (var processor in processors)
+        {
+            processor.ProcessMap(buffer, room);
+        }
+
         tilemap.CopyFrom(buffer);
     }
 

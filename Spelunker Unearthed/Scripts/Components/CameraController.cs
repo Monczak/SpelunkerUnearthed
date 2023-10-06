@@ -34,7 +34,7 @@ public class CameraController : Component
         if (bounds is not null)
             RestrictToBounds();
 
-        camera.WorldPosition = Vector2.Lerp(camera.WorldPosition, TargetPosition,
+        camera.WorldPosition = Vector2.Lerp(camera.WorldPosition, TargetPosition + Vector2.One * 0.5f,
             Smoothing * (float)gameTime.ElapsedGameTime.TotalSeconds);
     }
 

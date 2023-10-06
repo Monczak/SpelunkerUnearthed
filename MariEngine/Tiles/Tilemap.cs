@@ -55,10 +55,12 @@ public class Tilemap : Component
     {
         (MapWidth, MapHeight) = newSize;
         map = new TileBuffer(MapWidth, MapHeight);
+        GetComponent<LightMap>()?.Resize(newSize);
     }
 
     public void Place(Tile tile, Coord coord)
     {
+        // TODO: Update light map for all tile entity light emitters that affect this tile when tilemap is changed
         if (this[coord] is not null && this[coord].LightSource is not null)
             GetComponent<LightMap>()?.RemoveEmittingTile(this[coord]);
 
@@ -76,6 +78,7 @@ public class Tilemap : Component
     
     public void Mine(Coord tileCoord)
     {
+        // TODO: Update light map for all tile entity light emitters that affect this tile when tilemap is changed
         this[tileCoord].OnMined();
         
         Place(ServiceRegistry.Get<TileLoader>().GetTile("Nothing"), tileCoord);

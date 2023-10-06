@@ -22,6 +22,7 @@ public class TileEntity
             position = value;
             foreach (TileEntityComponent component in components.Values)
                 component.OnPositionUpdate();
+            Tilemap.StepOn(this, position);
         }
     }
     public Tile Tile { get; set; }

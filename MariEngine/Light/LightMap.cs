@@ -56,6 +56,11 @@ public class LightMap : Component
         map = new Vector3[tilemap.MapWidth, tilemap.MapHeight];
     }
 
+    public void Resize(Coord newSize)
+    {
+        map = new Vector3[newSize.X, newSize.Y];
+    }
+
     public void AttachTilemapRenderer(TilemapRenderer renderer)
     {
         tilemapRenderer = renderer;
@@ -154,9 +159,9 @@ public class LightMap : Component
         if (!derender)
             lightSources[source].RenderedLight.Clear();
         
-        for (int x = (int)lightBounds.Value.TopLeft.X; x <= (int)lightBounds.Value.BottomRight.X; x++)
+        for (int x = lightBounds.Value.TopLeft.X; x <= lightBounds.Value.BottomRight.X; x++)
         {
-            for (int y = (int)lightBounds.Value.TopLeft.Y; y <= (int)lightBounds.Value.BottomRight.Y; y++)
+            for (int y = lightBounds.Value.TopLeft.Y; y <= lightBounds.Value.BottomRight.Y; y++)
             {
                 Coord coord = (Coord)new Vector2(x, y);
                 if (!tilemap.IsInBounds(coord)) continue;

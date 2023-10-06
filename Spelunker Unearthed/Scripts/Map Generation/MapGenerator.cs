@@ -22,7 +22,7 @@ public class MapGenerator : Component
 
     private List<MapProcessor> processors = new();
 
-    public int BaseTilemapSize { get; private set; } = 16;
+    public int BaseTilemapSize { get; private set; } = 160;
 
     protected override void OnAttach()
     {

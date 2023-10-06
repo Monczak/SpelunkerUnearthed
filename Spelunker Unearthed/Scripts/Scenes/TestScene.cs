@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Diagnostics;
+using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MariEngine;
 using MariEngine.Collision;
@@ -34,18 +36,36 @@ public class TestScene : Scene
     public override void Load()
     {
         LoadEntities();
-        GenerateCaveSystem();
-
-        caveSystemManager.SetCurrentLevel(0);
-        caveSystemManager.SetCurrentRoomToEntrance();
         
-        GenerateMap(caveSystemManager.CurrentRoom);
+        // TODO: Refactor this out to a separate class
+        Task.Run(() =>
+        {
+            Logger.Log($"Cave generation started");
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
+            
+            tilemapRenderer.Enabled = false;
+            GenerateCaveSystem();
+
+            caveSystemManager.SetCurrentLevel(0);
+            caveSystemManager.SetCurrentRoomToEntrance();
+        
+            GenerateMap(caveSystemManager.CurrentRoom);
+            
+            stopwatch.Stop();
+            tilemapRenderer.Enabled = true;
+
+            return stopwatch;
+        }).ContinueWith(task =>
+        {
+            Logger.Log($"Cave generation completed in {task.Result.Elapsed.TotalSeconds:F3} seconds");
+        });
     }
 
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
-        caveSystemManager.DrawLevel(0);
+        // caveSystemManager.DrawLevel(0);
     }
 
     private void LoadEntities()

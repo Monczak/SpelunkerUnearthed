@@ -11,7 +11,7 @@ public class TilemapCameraBounds : CameraBounds
     private TilemapRenderer tilemapRenderer;
 
     public override Bounds GetBounds() => Bounds.MakeCorners(tilemapRenderer.CoordToWorldPoint(tilemap.Bounds.TopLeft) - Vector2.One * 0.5f,
-        tilemapRenderer.CoordToWorldPoint(tilemap.Bounds.BottomRight) + Vector2.One * 0.5f);
+        tilemapRenderer.CoordToWorldPoint(tilemap.Bounds.BottomRight) - Vector2.One * 0.5f);
 
     protected override void OnAttach()
     {

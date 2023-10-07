@@ -19,6 +19,11 @@ public class TileBuffer : IEnumerable<Tile>
         Height = height;
     }
 
+    public TileBuffer(Coord size) : this(size.X, size.Y)
+    {
+        
+    }
+
     public Tile this[int x, int y]
     {
         get

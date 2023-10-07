@@ -34,7 +34,7 @@ public class CameraController : Component
         if (bounds is not null)
             RestrictToBounds();
 
-        camera.WorldPosition = Vector2.Lerp(camera.WorldPosition, TargetPosition + Vector2.One * 0.5f,
+        camera.WorldPosition = Vector2.Lerp(camera.WorldPosition, TargetPosition,
             Smoothing * (float)gameTime.ElapsedGameTime.TotalSeconds);
     }
 
@@ -44,7 +44,7 @@ public class CameraController : Component
         Bounds restrictBounds = bounds.GetBounds();
 
         Vector2 topLeft = restrictBounds.TopLeft + viewingWindow.Size / 2;
-        Vector2 bottomRight = restrictBounds.BottomRight - viewingWindow.Size / 2 + Vector2.One;
+        Vector2 bottomRight = restrictBounds.BottomRight - viewingWindow.Size / 2;
         if (viewingWindow.Size.X >= restrictBounds.Size.X)
         {
             topLeft.X = bottomRight.X = restrictBounds.TopLeft.X + restrictBounds.Size.X / 2;

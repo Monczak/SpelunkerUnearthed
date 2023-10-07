@@ -12,6 +12,7 @@ using MariEngine.Rendering;
 using MariEngine.Services;
 using MariEngine.Tiles;
 using SpelunkerUnearthed.Scripts.Components;
+using SpelunkerUnearthed.Scripts.Managers;
 using SpelunkerUnearthed.Scripts.MapGeneration;
 using SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 using SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
@@ -23,9 +24,12 @@ public class TestScene : Scene
 {
     private Tilemap tilemap;
     private TilemapRenderer tilemapRenderer;
+    private LightMap lightMap;
     private PlayerController playerController;
 
     private CaveSystemManager caveSystemManager;
+
+    private WorldManager worldManager;
 
     private Gizmos gizmos;
     
@@ -37,35 +41,18 @@ public class TestScene : Scene
     {
         LoadEntities();
         
-        // TODO: Refactor this out to a separate class
-        Task.Run(() =>
-        {
-            Logger.Log($"Cave generation started");
-            Stopwatch stopwatch = new();
-            stopwatch.Start();
-            
-            tilemapRenderer.Enabled = false;
-            GenerateCaveSystem();
-
-            caveSystemManager.SetCurrentLevel(0);
-            caveSystemManager.SetCurrentRoomToEntrance();
-        
-            GenerateMap(caveSystemManager.CurrentRoom);
-            
-            stopwatch.Stop();
-            tilemapRenderer.Enabled = true;
-
-            return stopwatch;
-        }).ContinueWith(task =>
-        {
-            Logger.Log($"Cave generation completed in {task.Result.Elapsed.TotalSeconds:F3} seconds");
-        });
+        worldManager.StartCaveSystemLevelGenerationTask();
     }
 
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
-        // caveSystemManager.DrawLevel(0);
+
+        tilemapRenderer.Enabled = !worldManager.IsGenerating;
+        lightMap.Enabled = !worldManager.IsGenerating;
+        
+        if (!worldManager.IsGenerating)
+            caveSystemManager.DrawLevel(0);
     }
 
     private void LoadEntities()
@@ -91,7 +78,7 @@ public class TestScene : Scene
         tilemapEntity.AttachComponent(new Transform());
         tilemapEntity.AttachComponent(tilemap);
 
-        LightMap lightMap = new()
+        lightMap = new LightMap
         {
             // AmbientLight = Color.White,
             AmbientLight = new Color(20, 15, 17),
@@ -124,32 +111,10 @@ public class TestScene : Scene
 
         AddEntity(tilemapEntity);
         
+        worldManager = new WorldManager(caveSystemManager, tilemap, playerController);
+        managersEntity.AttachComponent(worldManager);
+        
         cameraController.TrackTileEntity(player);
         cameraController.SetBounds(tilemapEntity.GetComponent<CameraBounds>());
-    }
-
-    private void GenerateCaveSystem()
-    {
-        caveSystemManager.Generate();
-    }
-
-    private void GenerateMap(Room room)
-    {
-        var mapGenerator = tilemap.GetComponent<MapGenerator>();
-
-        MapGenerationParameters parameters = new MapGenerationParameters
-        {
-            Seed = 0,
-            NothingTile = ServiceRegistry.Get<TileLoader>().GetTile("Nothing"),
-            WallTile = ServiceRegistry.Get<TileLoader>().GetTile("Stone"),
-            RandomFillAmount = 0.4f,
-            SmoothIterations = 3,
-            BorderSize = 1,
-            BorderGradientSize = 2,
-            BorderGradientFillAmount = 0.6f,
-        };
-        mapGenerator.GenerateMap(room, parameters);
-
-        playerController.OwnerEntity.Position = room.PointsOfInterest[PointOfInterestType.PlayerSpawnPoint][0].Position;
     }
 }

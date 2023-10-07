@@ -45,7 +45,11 @@ public class PointLight : LightSource
         // Precomputing attenuation with lines towards edges of bounds will make this faster
         foreach (Coord coord in DrawingUtils.BresenhamLine(sourcePosition, receiverPosition, endPreemptively: true))
         {
+            if (!Tilemap.IsInBounds(coord)) continue;
+            
             Tile tile = Tilemap[coord];
+            if (tile is null) continue;
+            
             tileAttenuation *= 1 - tile.LightAttenuation;
         }
 

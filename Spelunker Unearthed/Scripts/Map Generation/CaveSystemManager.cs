@@ -18,7 +18,6 @@ public class CaveSystemManager : Component
     private Gizmos gizmos;
 
     public CaveSystemLevel CurrentLevel { get; set; }
-    public Room CurrentRoom { get; set; }
 
     public CaveSystemManager(Gizmos gizmos)
     {
@@ -56,15 +55,4 @@ public class CaveSystemManager : Component
         else
             CurrentLevel = CaveSystem.Levels[level];
     }
-
-    public void SetCurrentRoom(Room room)
-    {
-        CurrentRoom = room;
-    }
-
-    public void SetCurrentRoomToEntrance()
-    {
-        SetCurrentRoom(CurrentLevel.EntranceRoom);
-    }
-    
 }

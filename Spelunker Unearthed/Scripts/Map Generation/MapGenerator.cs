@@ -22,8 +22,6 @@ public class MapGenerator : Component
 
     private List<MapProcessor> processors = new();
 
-    public int BaseTilemapSize { get; private set; } = 160;
-
     protected override void OnAttach()
     {
         tilemap = GetComponent<Tilemap>();
@@ -34,17 +32,16 @@ public class MapGenerator : Component
         processors.Add(processor);
     }   
     
-    public void GenerateMap(Room room, MapGenerationParameters parameters)
+    public void GenerateMap(Room room, MapGenerationParameters parameters, Coord pastePosition, int baseTilemapSize = 16)
     {
         random = ServiceRegistry.Get<RandomProvider>().Request(Constants.MapGen).Seed(parameters.Seed);
 
-        BuildMap(room, parameters);
+        BuildMap(room, parameters, pastePosition, baseTilemapSize);
     }
 
-    private void BuildMap(Room room, MapGenerationParameters parameters)
+    private void BuildMap(Room room, MapGenerationParameters parameters, Coord pastePosition, int baseTilemapSize)
     {
-        tilemap.Resize(room.Size * BaseTilemapSize);
-        buffer = new TileBuffer(tilemap.MapWidth, tilemap.MapHeight);
+        buffer = new TileBuffer(room.Size * baseTilemapSize);
 
         FillRandom(parameters.RandomFillAmount, parameters.WallTile, parameters.NothingTile);
 
@@ -61,8 +58,8 @@ public class MapGenerator : Component
         {
             processor.ProcessMap(buffer, room);
         }
-
-        tilemap.CopyFrom(buffer);
+        
+        tilemap.PasteAt(buffer, pastePosition);
     }
 
     private void FillRandom(float fillAmount, Tile positiveTile, Tile negativeTile)
@@ -105,18 +102,14 @@ public class MapGenerator : Component
         // TODO: Use double buffering if this ends up too slow
         buffer.CopyTo(out var newMap);
 
-        for (int y = 0; y < tilemap.MapHeight; y++)
+        foreach (Coord coord in newMap.Coords)
         {
-            for (int x = 0; x < tilemap.MapWidth; x++)
-            {
-                Coord coord = new(x, y);
-                int neighborWalls = CountNeighbors(coord, "Wall");
+            int neighborWalls = CountNeighbors(coord, "Wall");
 
-                if (neighborWalls > 4)
-                    newMap[x, y] = positiveTile;
-                else if (neighborWalls < 4)
-                    newMap[x, y] = negativeTile;
-            }
+            if (neighborWalls > 4)
+                newMap[coord] = positiveTile;
+            else if (neighborWalls < 4)
+                newMap[coord] = negativeTile;
         }
         
         buffer.CopyFrom(newMap);

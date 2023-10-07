@@ -12,13 +12,15 @@ public struct CoordBounds
     public Coord BottomLeft => TopLeft + Coord.UnitY * (Size - Coord.One);
     public Coord BottomRight => TopLeft + Coord.One * (Size - Coord.One);
 
+    public Coord Center => TopLeft + (Size - Coord.One) / 2;
+
     public CoordBounds(Coord topLeft, Coord size)
     {
         TopLeft = topLeft;
         Size = size;
     }
 
-    public static CoordBounds MakeCorners(Coord topLeft, Coord bottomRight)
+    public static CoordBounds MakeCorners(Coord topLeft, Coord bottomRight) 
     {
         CoordBounds bounds = new()
         {

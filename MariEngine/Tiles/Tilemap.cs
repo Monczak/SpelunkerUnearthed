@@ -110,6 +110,16 @@ public class Tilemap : Component
         map.CopyTo(out tiles);
     }
 
+    public void PasteAt(TileBuffer buffer, Coord position)
+    {
+        foreach (Coord coord in buffer.Coords)
+        {
+            Coord actualCoord = coord + position;
+            if (!IsInBounds(actualCoord)) continue;
+            Place(buffer[coord], actualCoord);
+        }
+    }
+
     public Tile this[Coord coord]
     {
         get => map[coord];

@@ -128,4 +128,24 @@ public class CaveSystemLevel
         }
         return false;
     }
+
+    public CoordBounds CalculateBoundingBox()
+    {
+        Coord topLeft = Coord.Zero, bottomRight = Coord.Zero;
+
+        foreach (Room room in Rooms)
+        {
+            if (room.Bounds.TopLeft.X < topLeft.X)
+                topLeft.X = room.Bounds.TopLeft.X;
+            if (room.Bounds.TopLeft.Y < topLeft.Y)
+                topLeft.Y = room.Bounds.TopLeft.Y;
+            
+            if (room.Bounds.BottomRight.X > bottomRight.X)
+                bottomRight.X = room.Bounds.BottomRight.X;
+            if (room.Bounds.BottomRight.Y > bottomRight.Y)
+                bottomRight.Y = room.Bounds.BottomRight.Y;
+        }
+        
+        return CoordBounds.MakeCorners(topLeft, bottomRight);
+    }
 }

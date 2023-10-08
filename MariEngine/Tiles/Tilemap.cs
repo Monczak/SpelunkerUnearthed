@@ -38,13 +38,13 @@ public class Tilemap : Component
 
     protected override void Update(GameTime gameTime)
     {
-        // TODO: Optimize this to build a set of behaviors to update
         foreach (var behavior in BehaviorsToUpdate)
         {
+            // TODO: Check if the behavior is in the update range (decide how it will be implemented)
             behavior.Update(gameTime);
         }
 
-        foreach (TileEntity tileEntity in TileEntities)
+        foreach (var tileEntity in TileEntities)
         {
             tileEntity.Update(gameTime);
         }

@@ -58,8 +58,6 @@ public class WorldManager : Component
         tilemap.Resize(bounds.Size * BaseTilemapSize);
         tilemap.GetComponent<Transform>().Position = (Vector2)(bounds.Center * BaseTilemapSize);
         
-        Logger.Log($"{bounds.TopLeft} {bounds.BottomRight}");
-        
         GenerateMap();
             
         stopwatch.Stop();

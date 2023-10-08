@@ -14,6 +14,8 @@ public class Tilemap : Component
     
     public HashSet<TileEntity> TileEntities { get; }
     
+    private HashSet<TileBehavior> BehaviorsToUpdate { get; }
+    
     public int MapWidth { get; private set; }
     public int MapHeight { get; private set; }
 
@@ -26,6 +28,7 @@ public class Tilemap : Component
         MapWidth = width;
 
         TileEntities = new HashSet<TileEntity>();
+        BehaviorsToUpdate = new HashSet<TileBehavior>();
     }
 
     protected override void OnAttach()
@@ -36,13 +39,9 @@ public class Tilemap : Component
     protected override void Update(GameTime gameTime)
     {
         // TODO: Optimize this to build a set of behaviors to update
-        foreach (Tile tile in map)
+        foreach (var behavior in BehaviorsToUpdate)
         {
-            if (tile is null) continue;
-            foreach (var behavior in tile.Behaviors)
-            {
-                behavior.Update(gameTime);
-            }
+            behavior.Update(gameTime);
         }
 
         foreach (TileEntity tileEntity in TileEntities)
@@ -61,13 +60,19 @@ public class Tilemap : Component
     public void Place(Tile tile, Coord coord)
     {
         // TODO: Update light map for all tile entity light emitters that affect this tile when tilemap is changed
-        if (this[coord] is not null && this[coord].LightSource is not null)
-            GetComponent<LightMap>()?.RemoveEmittingTile(this[coord]);
+        if (this[coord] is not null)
+        {
+            foreach (var behavior in this[coord].Behaviors) BehaviorsToUpdate.Remove(behavior);
+            if (this[coord].LightSource is not null)
+                GetComponent<LightMap>()?.RemoveEmittingTile(this[coord]);
+        }
 
         Tile newTile = new Tile(tile);
         this[coord] = newTile;
         newTile.OwnerTilemap = this;
         newTile.OnPlaced();
+        
+        foreach (var behavior in this[coord].Behaviors) BehaviorsToUpdate.Add(behavior);
 
         if (newTile.LightSource is not null)
         {
@@ -98,16 +103,6 @@ public class Tilemap : Component
                 Place(tile, new Coord(x, y));
             }
         }
-    }
-
-    public void CopyFrom(TileBuffer tiles)
-    {
-        map.CopyFrom(tiles);
-    }
-
-    public void CopyTo(out TileBuffer tiles)
-    {
-        map.CopyTo(out tiles);
     }
 
     public void PasteAt(TileBuffer buffer, Coord position)

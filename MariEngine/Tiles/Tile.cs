@@ -12,9 +12,9 @@ public class Tile
 {
     public string Id { get; }
     
-    public Color ForegroundColor { get; }
-    public Color BackgroundColor { get; }
-    public char Character { get; }
+    public Color ForegroundColor { get; set; }
+    public Color BackgroundColor { get; set; }
+    public char Character { get; set; }
     
     public LightSource LightSource { get; }
     public float LightAttenuation { get; }

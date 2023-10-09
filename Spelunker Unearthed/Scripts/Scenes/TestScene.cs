@@ -28,8 +28,9 @@ public class TestScene : Scene
     private PlayerController playerController;
 
     private CaveSystemManager caveSystemManager;
-
     private WorldManager worldManager;
+
+    private CameraController cameraController;
 
     private Gizmos gizmos;
     
@@ -50,9 +51,13 @@ public class TestScene : Scene
 
         tilemapRenderer.Enabled = !worldManager.IsGenerating;
         lightMap.Enabled = !worldManager.IsGenerating;
-        
+
         if (!worldManager.IsGenerating)
+        {
             caveSystemManager.DrawLevel(0, worldManager.BaseTilemapSize);
+            // TODO: Maybe set this as a toggle? This needs to be refined anyway, I think
+            cameraController.SetBounds(worldManager.GetCameraBounds(playerController.OwnerEntity.Position));
+        }
     }
 
     private void LoadEntities()
@@ -68,7 +73,7 @@ public class TestScene : Scene
         managersEntity.AttachComponent(caveSystemManager);
         
         Entity cameraControllerEntity = new("Camera Controller");
-        CameraController cameraController = new(Camera) { Smoothing = 10.0f };
+        cameraController = new(Camera) { Smoothing = 10.0f };
         cameraControllerEntity.AttachComponent(cameraController);
         AddEntity(cameraControllerEntity);
         

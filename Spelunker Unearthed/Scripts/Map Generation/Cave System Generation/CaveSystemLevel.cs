@@ -19,6 +19,8 @@ public class CaveSystemLevel
 
     public Room EntranceRoom => Rooms.Find(r => (r.Flags & RoomFlags.Entrance) != 0);
     
+    public CoordBounds BoundingBox { get; private set; }
+    
     public void Generate(RoomDecisionEngine decisionEngine)
     {
         Rooms.Clear();
@@ -35,6 +37,8 @@ public class CaveSystemLevel
         {
             GenerateRoom(decisionEngine);
         }
+
+        BoundingBox = CalculateBoundingBox();
     }
 
     public void GenerateRoom(RoomDecisionEngine decisionEngine)
@@ -129,7 +133,7 @@ public class CaveSystemLevel
         return false;
     }
 
-    public CoordBounds CalculateBoundingBox()
+    private CoordBounds CalculateBoundingBox()
     {
         Coord topLeft = Coord.Zero, bottomRight = Coord.Zero;
 

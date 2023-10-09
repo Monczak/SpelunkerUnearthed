@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using MariEngine;
 using MariEngine.Collision;
 using MariEngine.Components;
+using MariEngine.Debugging;
 using MariEngine.Input;
 using MariEngine.Light;
 using MariEngine.Logging;
@@ -25,6 +26,8 @@ public class PlayerController : TileEntityComponent
 
     private Coord facingDirection;
 
+    private DebugScreenLine<(Coord, Vector2)> playerPosDebugLine;
+    
     protected override void OnAttach()
     {
         tilemapCollider = OwnerEntity.Tilemap.GetComponent<TilemapCollider>(); 
@@ -41,6 +44,9 @@ public class PlayerController : TileEntityComponent
         inputManager.OnReleased("Right", ReadInput);
         
         inputManager.OnPressed("Mine", Mine);
+
+        playerPosDebugLine = new DebugScreenLine<(Coord, Vector2)>(tuple => $"Position: {tuple.Item1} World: ({tuple.Item2.X}, {tuple.Item2.Y})");
+        ServiceRegistry.Get<DebugScreen>().AddLine(playerPosDebugLine);
     }
 
     private void Mine()
@@ -107,6 +113,8 @@ public class PlayerController : TileEntityComponent
         moveCooldown.Y = moveCooldown.Y < 0 ? 0 : moveCooldown.Y;
 
         previousInput = input;
+        
+        playerPosDebugLine.SetParams((OwnerEntity.Position, OwnerEntity.Tilemap.GetComponent<TilemapRenderer>().CoordToWorldPoint(OwnerEntity.Position)));
     }
 
     private void ReadInput()

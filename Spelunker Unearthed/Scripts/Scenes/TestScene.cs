@@ -52,7 +52,7 @@ public class TestScene : Scene
         lightMap.Enabled = !worldManager.IsGenerating;
         
         if (!worldManager.IsGenerating)
-            caveSystemManager.DrawLevel(0);
+            caveSystemManager.DrawLevel(0, worldManager.BaseTilemapSize);
     }
 
     private void LoadEntities()

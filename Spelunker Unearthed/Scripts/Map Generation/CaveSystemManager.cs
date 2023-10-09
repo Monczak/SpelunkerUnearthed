@@ -34,15 +34,15 @@ public class CaveSystemManager : Component
         CaveSystem.Generate();
     }
 
-    public void DrawLevel(int level)
+    public void DrawLevel(int level, int scale)
     {
         foreach (Room room in CaveSystem.Levels[level].Rooms)
         {
-            gizmos.DrawRectangle((Vector2)room.Position + Vector2.One * 0.05f, (Vector2)room.Size - Vector2.One * 0.1f,
+            gizmos.DrawRectangle((Vector2)room.Position * scale + Vector2.One * 0.05f, (Vector2)room.Size * scale - Vector2.One * 0.1f,
                 Color.Aqua * MathUtils.InverseLerp(20, 0, room.Distance), 0);
             foreach (SubRoomConnection connection in room.Connections)
             {
-                gizmos.DrawLine((Vector2)connection.From.Position + Vector2.One * 0.5f, (Vector2)connection.To.Position + Vector2.One * 0.5f, Color.Red, lifetime: 0);
+                gizmos.DrawLine(((Vector2)connection.From.Position + Vector2.One * 0.5f) * scale, ((Vector2)connection.To.Position + Vector2.One * 0.5f) * scale, Color.Red, lifetime: 0);
             }
         }
     }

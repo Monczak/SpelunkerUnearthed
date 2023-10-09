@@ -56,7 +56,8 @@ public class WorldManager : Component
 
         CoordBounds bounds = caveSystemManager.CurrentLevel.CalculateBoundingBox();
         tilemap.Resize(bounds.Size * BaseTilemapSize);
-        tilemap.GetComponent<Transform>().Position = (Vector2)(bounds.Center * BaseTilemapSize);
+        Logger.Log($"Size: {bounds.Size} Center: {bounds.ExactCenter}");
+        tilemap.GetComponent<Transform>().Position = bounds.ExactCenter * BaseTilemapSize;
         
         GenerateMap();
             

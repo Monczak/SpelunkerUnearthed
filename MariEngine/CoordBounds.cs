@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 
 namespace MariEngine;
 
@@ -13,7 +14,8 @@ public struct CoordBounds
     public Coord BottomRight => TopLeft + Coord.One * (Size - Coord.One);
 
     public Coord Center => TopLeft + (Size - Coord.One) / 2;
-
+    public Vector2 ExactCenter => (Vector2)TopLeft + (Vector2)Size / 2;
+    
     public CoordBounds(Coord topLeft, Coord size)
     {
         TopLeft = topLeft;

@@ -41,24 +41,32 @@ public class CameraController : Component
 
     private void RestrictToBounds(Bounds restrictBounds)
     {
+        // TODO: Add support for multiple bounds (superbounds) - hard restrict to tilemap
         Bounds viewingWindow = camera.ViewingWindow;
 
+        var (topLeft, bottomRight) = ProcessBounds(restrictBounds, viewingWindow);
+        Bounds centerRestrictBounds = Bounds.MakeCorners(topLeft, bottomRight);
+
+        float x = MathUtils.Clamp(TargetPosition.X, centerRestrictBounds.TopLeft.X, centerRestrictBounds.BottomRight.X);
+        float y = MathUtils.Clamp(TargetPosition.Y, centerRestrictBounds.TopLeft.Y, centerRestrictBounds.BottomRight.Y);
+        TargetPosition = new Vector2(x, y);
+    }
+
+    private static (Vector2 topLeft, Vector2 bottomRight) ProcessBounds(Bounds restrictBounds, Bounds viewingWindow)
+    {
         Vector2 topLeft = restrictBounds.TopLeft + viewingWindow.Size / 2;
         Vector2 bottomRight = restrictBounds.BottomRight - viewingWindow.Size / 2 + Vector2.One;
         if (viewingWindow.Size.X >= restrictBounds.Size.X)
         {
             topLeft.X = bottomRight.X = restrictBounds.TopLeft.X + restrictBounds.Size.X / 2;
         }
+
         if (viewingWindow.Size.Y >= restrictBounds.Size.Y)
         {
             topLeft.Y = bottomRight.Y = restrictBounds.TopLeft.Y + restrictBounds.Size.Y / 2;
         }
-        
-        Bounds centerRestrictBounds = Bounds.MakeCorners(topLeft, bottomRight);
 
-        float x = MathUtils.Clamp(TargetPosition.X, centerRestrictBounds.TopLeft.X, centerRestrictBounds.BottomRight.X);
-        float y = MathUtils.Clamp(TargetPosition.Y, centerRestrictBounds.TopLeft.Y, centerRestrictBounds.BottomRight.Y);
-        TargetPosition = new Vector2(x, y);
+        return (topLeft, bottomRight);
     }
 
     public void TrackTileEntity(TileEntity entity)

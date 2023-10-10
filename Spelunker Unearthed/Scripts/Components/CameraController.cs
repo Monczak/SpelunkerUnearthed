@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using MariEngine;
 using Microsoft.Xna.Framework;
 using MariEngine.Components;
@@ -17,7 +18,7 @@ public class CameraController : Component
     private Camera camera;
     private TileEntity trackedTileEntity;
 
-    private CameraBounds bounds;
+    private SortedDictionary<int, CameraBounds> boundsDict = new();
 
     public CameraController(Camera camera)
     {
@@ -31,17 +32,16 @@ public class CameraController : Component
         if (trackedTileEntity is not null)
             TargetPosition = trackedTileEntity.Tilemap.GetComponent<TilemapRenderer>().CoordToWorldPoint(trackedTileEntity.Position);
         
-        if (bounds is not null)
-            RestrictToBounds();
+        foreach (CameraBounds bounds in boundsDict.Values)
+            RestrictToBounds(bounds.GetBounds());
 
         camera.WorldPosition = Vector2.Lerp(camera.WorldPosition, TargetPosition,
             Smoothing * (float)gameTime.ElapsedGameTime.TotalSeconds);
     }
 
-    private void RestrictToBounds()
+    private void RestrictToBounds(Bounds restrictBounds)
     {
         Bounds viewingWindow = camera.ViewingWindow;
-        Bounds restrictBounds = bounds.GetBounds();
 
         Vector2 topLeft = restrictBounds.TopLeft + viewingWindow.Size / 2;
         Vector2 bottomRight = restrictBounds.BottomRight - viewingWindow.Size / 2 + Vector2.One;
@@ -71,13 +71,16 @@ public class CameraController : Component
         trackedTileEntity = null;
     }
 
-    public void SetBounds(CameraBounds bounds)
+    public void SetBounds(int priority, CameraBounds bounds)
     {
-        this.bounds = bounds;
+        if (bounds is null)
+            boundsDict.Remove(priority);
+        else
+            boundsDict[priority] = bounds;
     }
 
-    public void UnsetBounds()
+    public void UnsetBounds(int priority)
     {
-        bounds = null;
+        boundsDict.Remove(priority);
     }
 }

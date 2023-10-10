@@ -55,8 +55,9 @@ public class TestScene : Scene
         if (!worldManager.IsGenerating)
         {
             caveSystemManager.DrawLevel(0, worldManager.BaseTilemapSize);
-            // TODO: Maybe set this as a toggle? This needs to be refined anyway, I think
-            cameraController.SetBounds(worldManager.GetCameraBounds(playerController.OwnerEntity.Position));
+            
+            // TODO: Maybe set this as a toggle?
+            cameraController.SetBounds(0, worldManager.GetRoomCameraBounds(playerController.OwnerEntity.Position));
         }
     }
 
@@ -85,8 +86,8 @@ public class TestScene : Scene
 
         lightMap = new LightMap
         {
-            // AmbientLight = Color.White,
-            AmbientLight = new Color(20, 15, 17),
+            AmbientLight = Color.White,
+            // AmbientLight = new Color(20, 15, 17),
             // AmbientLight = Color.Black,
         };
         tilemapEntity.AttachComponent(lightMap);
@@ -120,6 +121,6 @@ public class TestScene : Scene
         managersEntity.AttachComponent(worldManager);
         
         cameraController.TrackTileEntity(player);
-        cameraController.SetBounds(tilemapEntity.GetComponent<CameraBounds>());
+        cameraController.SetBounds(100, tilemapEntity.GetComponent<CameraBounds>());
     }
 }

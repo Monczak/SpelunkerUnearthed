@@ -152,5 +152,7 @@ public class PlayerController : TileEntityComponent
         inputManager.UnbindOnReleased("Down", ReadInput);
         inputManager.UnbindOnReleased("Left", ReadInput);
         inputManager.UnbindOnReleased("Right", ReadInput);
+        
+        inputManager.UnbindOnPressed("Mine", Mine);
     }
 }

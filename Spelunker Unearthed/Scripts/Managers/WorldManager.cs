@@ -151,7 +151,7 @@ public class WorldManager : Component
             RoomPosToTilemapPos(room, room.Size * BaseTilemapSize - Coord.One));
     }
     
-    public CameraBounds GetCameraBounds(Coord tilemapPos)
+    public CameraBounds GetRoomCameraBounds(Coord tilemapPos)
     {
         Room room = GetRoom(tilemapPos);
         if (room is null) return null;

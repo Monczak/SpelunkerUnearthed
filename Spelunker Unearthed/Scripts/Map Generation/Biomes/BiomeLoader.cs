@@ -1,5 +1,6 @@
 using MariEngine;
 using MariEngine.Services;
+using ContentPaths = SpelunkerUnearthed.Scripts.ContentPaths;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
 

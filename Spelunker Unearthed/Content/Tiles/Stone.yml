@@ -1,11 +1,11 @@
-﻿foregroundColor: "#a69c9c"
-backgroundColor: "#332f2f"
-character: '#'
-tags:
+﻿ForegroundColor: "#a69c9c"
+BackgroundColor: "#332f2f"
+Character: '#'
+Tags:
   - Wall
-collisionGroups:
+CollisionGroups:
   - Group1
-lightAttenuation: 0.5
+LightAttenuation: 0.5
 # light:
 #   color: "#0f0f0f"
 #   radius: 3

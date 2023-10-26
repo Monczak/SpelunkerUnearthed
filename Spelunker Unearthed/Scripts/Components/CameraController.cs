@@ -41,7 +41,6 @@ public class CameraController : Component
 
     private void RestrictToBounds(Bounds restrictBounds)
     {
-        // TODO: Add support for multiple bounds (superbounds) - hard restrict to tilemap
         Bounds viewingWindow = camera.ViewingWindow;
 
         var (topLeft, bottomRight) = ProcessBounds(restrictBounds, viewingWindow);
@@ -56,15 +55,11 @@ public class CameraController : Component
     {
         Vector2 topLeft = restrictBounds.TopLeft + viewingWindow.Size / 2;
         Vector2 bottomRight = restrictBounds.BottomRight - viewingWindow.Size / 2 + Vector2.One;
+        
         if (viewingWindow.Size.X >= restrictBounds.Size.X)
-        {
             topLeft.X = bottomRight.X = restrictBounds.TopLeft.X + restrictBounds.Size.X / 2;
-        }
-
         if (viewingWindow.Size.Y >= restrictBounds.Size.Y)
-        {
             topLeft.Y = bottomRight.Y = restrictBounds.TopLeft.Y + restrictBounds.Size.Y / 2;
-        }
 
         return (topLeft, bottomRight);
     }
@@ -85,6 +80,11 @@ public class CameraController : Component
             boundsDict.Remove(priority);
         else
             boundsDict[priority] = bounds;
+    }
+
+    public void UnsetBounds()
+    {
+        boundsDict.Clear();
     }
 
     public void UnsetBounds(int priority)

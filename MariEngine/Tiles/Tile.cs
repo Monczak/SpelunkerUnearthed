@@ -2,59 +2,39 @@
 using System.Collections.Generic;
 using MariEngine.Collision;
 using MariEngine.Light;
+using MariEngine.Loading;
 using MariEngine.Services;
 using MariEngine.Utils;
 using Microsoft.Xna.Framework;
 
 namespace MariEngine.Tiles;
 
-public class Tile
+public class Tile : LoadableObject<TileData>
 {
-    public string Id { get; }
-    
     public Color ForegroundColor { get; set; }
     public Color BackgroundColor { get; set; }
     public char Character { get; set; }
     
-    public LightSource LightSource { get; }
-    public float LightAttenuation { get; }
+    public LightSource LightSource { get; private set; }
+    public float LightAttenuation { get; private set; }
     
-    public HashSet<string> Tags { get; }
+    public HashSet<string> Tags { get; private set; }
     
     public Tilemap OwnerTilemap { get; set; }
-    public HashSet<TileBehavior> Behaviors { get; }
+    public HashSet<TileBehavior> Behaviors { get; private set; }
 
-    public CollisionGroup CollisionGroup { get; }
-    
-    public Tile(string id, TileData data)
+    public CollisionGroup CollisionGroup { get; private set; }
+
+    public Tile()
     {
-        Id = id;
-        ForegroundColor = ColorUtils.FromHex(data.ForegroundColor);
-        BackgroundColor = ColorUtils.FromHex(data.BackgroundColor);
-        Character = data.Character;
-
-        Tags = data.Tags is null ? new HashSet<string>() : new HashSet<string>(data.Tags);
-
-        CollisionGroup = CollisionGroup.None;
-        if (data.CollisionGroups is not null)
-        {
-            foreach (string groupStr in data.CollisionGroups)
-            {
-                CollisionGroup group = (CollisionGroup)Enum.Parse(typeof(CollisionGroup), groupStr, true);
-                CollisionGroup |= group;
-            }
-        }
-
-        LightAttenuation = data.LightAttenuation;
-
-        if (data.Light is not null)
-        {
-            LightSource = new PointLight(ColorUtils.FromHex(data.Light.Value.Color), data.Light.Value.Radius);
-        }
         
-        Behaviors = new HashSet<TileBehavior>();
     }
-
+    
+    public Tile(string id) : base(id)
+    {
+        
+    }
+    
     public Tile(Tile tile)
     {
         Id = tile.Id;
@@ -89,5 +69,33 @@ public class Tile
     {
         foreach (var behavior in Behaviors)
             behavior.OnSteppedOn(steppingEntity);
+    }
+
+    internal override void BuildFromData(TileData data)
+    {
+        ForegroundColor = ColorUtils.FromHex(data.ForegroundColor);
+        BackgroundColor = ColorUtils.FromHex(data.BackgroundColor);
+        Character = data.Character;
+
+        Tags = data.Tags is null ? new HashSet<string>() : new HashSet<string>(data.Tags);
+
+        CollisionGroup = CollisionGroup.None;
+        if (data.CollisionGroups is not null)
+        {
+            foreach (string groupStr in data.CollisionGroups)
+            {
+                CollisionGroup group = (CollisionGroup)Enum.Parse(typeof(CollisionGroup), groupStr, true);
+                CollisionGroup |= group;
+            }
+        }
+
+        LightAttenuation = data.LightAttenuation;
+
+        if (data.Light is not null)
+        {
+            LightSource = new PointLight(ColorUtils.FromHex(data.Light.Value.Color), data.Light.Value.Radius);
+        }
+        
+        Behaviors = new HashSet<TileBehavior>();
     }
 }

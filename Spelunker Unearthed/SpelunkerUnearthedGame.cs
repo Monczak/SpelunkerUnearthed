@@ -13,6 +13,7 @@ using MariEngine.Logging;
 using MariEngine.Rendering;
 using MariEngine.Services;
 using MariEngine.Tiles;
+using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
 using SpelunkerUnearthed.Scripts.Scenes;
 using SpelunkerUnearthed.Scripts.TileEntities;
 using YamlDotNet.Serialization;
@@ -58,6 +59,7 @@ public class SpelunkerUnearthedGame : Game
         ServiceRegistry.RegisterService(new RandomProvider());
         ServiceRegistry.RegisterService(new TileLoader());
         ServiceRegistry.RegisterService(new InputManager());
+        ServiceRegistry.RegisterService(new BiomeLoader());
         
         // TODO: Load this from a config file
         ServiceRegistry.Get<FontProvider>().AddFont("Tiles", "Hack-Regular");
@@ -118,7 +120,7 @@ public class SpelunkerUnearthedGame : Game
         
         ServiceRegistry.RegisterService(new TileAtlas(GraphicsDevice, spriteBatch, 16));
 
-        var tiles = ServiceRegistry.Get<TileLoader>().LoadTiles();
+        var tiles = ServiceRegistry.Get<TileLoader>().LoadContent();
         ServiceRegistry.Get<TileAtlas>().CreateAtlas(tiles);
         
         scene.Load();

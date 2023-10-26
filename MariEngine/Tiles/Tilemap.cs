@@ -33,7 +33,7 @@ public class Tilemap : Component
 
     protected override void OnAttach()
     {
-        Fill(ServiceRegistry.Get<TileLoader>().GetTile("Nothing"));
+        Fill(ServiceRegistry.Get<TileLoader>().Get("Nothing"));
     }
 
     protected override void Update(GameTime gameTime)
@@ -86,7 +86,7 @@ public class Tilemap : Component
         // TODO: Update light map for all tile entity light emitters that affect this tile when tilemap is changed
         this[tileCoord].OnMined();
         
-        Place(ServiceRegistry.Get<TileLoader>().GetTile("Nothing"), tileCoord);
+        Place(ServiceRegistry.Get<TileLoader>().Get("Nothing"), tileCoord);
     }
 
     public void StepOn(TileEntity steppingEntity, Coord tileCoord)

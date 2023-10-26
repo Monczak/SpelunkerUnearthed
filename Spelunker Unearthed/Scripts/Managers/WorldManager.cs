@@ -92,7 +92,7 @@ public class WorldManager : Component
 
     private void GenerateMap()
     {
-        tilemap.Fill(ServiceRegistry.Get<TileLoader>().GetTile("Nothing"));
+        tilemap.Fill(ServiceRegistry.Get<TileLoader>().Get("Stone"));
         
         foreach (Room room in caveSystemManager.CurrentLevel.Rooms)
         {
@@ -100,8 +100,8 @@ public class WorldManager : Component
             MapGenerationParameters parameters = new MapGenerationParameters
             {
                 Seed = 0,
-                NothingTile = ServiceRegistry.Get<TileLoader>().GetTile("Nothing"),
-                WallTile = ServiceRegistry.Get<TileLoader>().GetTile("Stone"),
+                NothingTile = ServiceRegistry.Get<TileLoader>().Get("Nothing"),
+                WallTile = ServiceRegistry.Get<TileLoader>().Get("Stone"),
                 RandomFillAmount = 0.4f,
                 SmoothIterations = 3,
                 BorderSize = 1,

@@ -106,7 +106,7 @@ public class TestScene : Scene
 
         TileEntity player = new TileEntity("Player")
         {
-            Tile = ServiceRegistry.Get<TileLoader>().GetTile("Player")
+            Tile = ServiceRegistry.Get<TileLoader>().Get("Player")
         };
         tilemap.AddTileEntity(player);
         

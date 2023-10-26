@@ -30,11 +30,6 @@ public class Tile : LoadableObject<TileData>
         
     }
     
-    public Tile(string id) : base(id)
-    {
-        
-    }
-    
     public Tile(Tile tile)
     {
         Id = tile.Id;
@@ -71,7 +66,7 @@ public class Tile : LoadableObject<TileData>
             behavior.OnSteppedOn(steppingEntity);
     }
 
-    internal override void BuildFromData(TileData data)
+    protected internal override void BuildFromData(TileData data)
     {
         ForegroundColor = ColorUtils.FromHex(data.ForegroundColor);
         BackgroundColor = ColorUtils.FromHex(data.BackgroundColor);

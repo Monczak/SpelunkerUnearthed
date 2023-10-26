@@ -47,10 +47,10 @@ public class TestScene : Scene
 
     public override void Update(GameTime gameTime)
     {
-        base.Update(gameTime);
-
         tilemapRenderer.Enabled = !worldManager.IsGenerating;
         lightMap.Enabled = !worldManager.IsGenerating;
+        
+        base.Update(gameTime);
 
         if (!worldManager.IsGenerating)
         {

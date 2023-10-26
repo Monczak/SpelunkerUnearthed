@@ -15,12 +15,12 @@ public abstract class LoaderService<TItem, TProxyData> : Service where TItem : L
 
     protected Dictionary<string, TItem> Content;
 
-    public Dictionary<string, TItem> LoadContent()
+    public Dictionary<string, TItem> LoadContent(INamingConvention namingConvention = null)
     {
         Content = new Dictionary<string, TItem>();
 
         var deserializer = new DeserializerBuilder()
-            .WithNamingConvention(PascalCaseNamingConvention.Instance)
+            .WithNamingConvention(namingConvention ?? PascalCaseNamingConvention.Instance)
             .Build();
         
         foreach (var file in Directory.GetFiles(ContentPath))
@@ -28,9 +28,8 @@ public abstract class LoaderService<TItem, TProxyData> : Service where TItem : L
             string id = Path.GetFileNameWithoutExtension(file);
             try
             {
-                TItem item = new();
                 var data = deserializer.Deserialize<TProxyData>(File.ReadAllText(file));
-                item.Build<TItem>(id, data);
+                var item = LoadableObjectBuilder.Build<TItem, TProxyData>(id, data);
                 if (Content.ContainsKey(id))
                 {
                     throw new ContentLoadingException($"Item with ID {id} already exists.");

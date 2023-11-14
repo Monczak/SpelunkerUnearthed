@@ -32,17 +32,17 @@ public abstract class ResourceLoaderService<TItem, TProxyData> : Service where T
                 var item = ResourceBuilder.Build<TItem, TProxyData>(id, data);
                 if (Content.ContainsKey(id))
                 {
-                    throw new ContentLoadingException($"Item with ID {id} already exists.");
+                    throw new ContentLoadingException($"Resource of type {typeof(TItem).Name} with ID {id} already exists.");
                 }
                 Content[id] = item;
             }
             catch (Exception e)
             {
-                Logger.LogError($"Could not load item {id}: {e.GetType().Name}: {e.Message}");
+                Logger.LogError($"Could not load resource of type {typeof(TItem).Name} with ID {id}: {e.GetType().Name}: {e.Message}");
             }
         }
         
-        Logger.Log($"{GetType().Name}: Loaded {Content.Count} items");
+        Logger.Log($"Loaded {Content.Count} resources of type {typeof(TItem).Name}");
     }
 
     public TItem Get(string id) => Content[id];

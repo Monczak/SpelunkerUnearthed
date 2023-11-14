@@ -13,9 +13,9 @@ public abstract class ResourceLoaderService<TItem, TProxyData> : Service where T
 {
     protected abstract string ContentPath { get; }
 
-    protected Dictionary<string, TItem> Content;
+    public Dictionary<string, TItem> Content { get; private set; }
 
-    protected void LoadContent(INamingConvention namingConvention = null)
+    public virtual void LoadContent(INamingConvention namingConvention = null)
     {
         Content = new Dictionary<string, TItem>();
 

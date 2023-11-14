@@ -2,7 +2,7 @@ using System;
 
 namespace MariEngine.Loading;
 
-public class Resource<TData>
+public abstract class Resource<TData>
 {
     public string Id { get; protected internal set; }
 

@@ -120,8 +120,8 @@ public class SpelunkerUnearthedGame : Game
         
         ServiceRegistry.RegisterService(new TileAtlas(GraphicsDevice, spriteBatch, 16));
 
-        var tiles = ServiceRegistry.Get<TileLoader>().LoadContent();
-        ServiceRegistry.Get<TileAtlas>().CreateAtlas(tiles);
+        ServiceRegistry.Get<TileLoader>().LoadContent();
+        ServiceRegistry.Get<TileAtlas>().CreateAtlas(ServiceRegistry.Get<TileLoader>().Content);
         
         scene.Load();
     }

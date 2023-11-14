@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using MariEngine.Loading;
 using MariEngine.Tiles;
+using YamlDotNet.Serialization;
 
 namespace MariEngine.Services;
 
@@ -8,9 +9,9 @@ public class TileLoader : ResourceLoaderService<Tile, TileData>
 {
     protected override string ContentPath => ContentPaths.Tiles;
 
-    public new Dictionary<string, Tile> LoadContent()
+    public override void LoadContent(INamingConvention convention = null)
     {
-        base.LoadContent();
+        base.LoadContent(convention);
         
         Tile nothingTile = ResourceBuilder.Build<Tile, TileData>("Nothing", new TileData
         {
@@ -22,7 +23,5 @@ public class TileLoader : ResourceLoaderService<Tile, TileData>
             LightAttenuation = 0,
         });
         Content.Add(nothingTile.Id, nothingTile);
-
-        return Content;
     }
 }

@@ -4,7 +4,7 @@ using MariEngine.Tiles;
 
 namespace MariEngine.Services;
 
-public class TileLoader : LoaderService<Tile, TileData>
+public class TileLoader : ResourceLoaderService<Tile, TileData>
 {
     protected override string ContentPath => ContentPaths.Tiles;
 
@@ -12,7 +12,7 @@ public class TileLoader : LoaderService<Tile, TileData>
     {
         base.LoadContent();
         
-        Tile nothingTile = LoadableObjectBuilder.Build<Tile, TileData>("Nothing", new TileData
+        Tile nothingTile = ResourceBuilder.Build<Tile, TileData>("Nothing", new TileData
         {
             ForegroundColor = "#000000",
             BackgroundColor = "#000000",

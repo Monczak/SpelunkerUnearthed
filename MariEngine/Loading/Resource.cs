@@ -2,13 +2,18 @@ using System;
 
 namespace MariEngine.Loading;
 
-public abstract class LoadableObject<TData>
+public class Resource<TData>
 {
     public string Id { get; protected internal set; }
 
-    protected LoadableObject() { }
+    protected Resource() { }
 
-    internal T Build<T>(string id, TData data) where T : LoadableObject<TData>, new()
+    public Resource(string id)
+    {
+        Id = id;
+    }
+
+    internal T Build<T>(string id, TData data) where T : Resource<TData>, new()
     {
         Id = id;
         BuildFromData(data);

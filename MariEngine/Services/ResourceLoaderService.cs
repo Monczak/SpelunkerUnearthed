@@ -9,13 +9,13 @@ using YamlDotNet.Serialization.NamingConventions;
 
 namespace MariEngine.Services;
 
-public abstract class LoaderService<TItem, TProxyData> : Service where TItem : LoadableObject<TProxyData>, new()
+public abstract class ResourceLoaderService<TItem, TProxyData> : Service where TItem : Resource<TProxyData>, new()
 {
     protected abstract string ContentPath { get; }
 
     protected Dictionary<string, TItem> Content;
 
-    public Dictionary<string, TItem> LoadContent(INamingConvention namingConvention = null)
+    protected void LoadContent(INamingConvention namingConvention = null)
     {
         Content = new Dictionary<string, TItem>();
 
@@ -29,7 +29,7 @@ public abstract class LoaderService<TItem, TProxyData> : Service where TItem : L
             try
             {
                 var data = deserializer.Deserialize<TProxyData>(File.ReadAllText(file));
-                var item = LoadableObjectBuilder.Build<TItem, TProxyData>(id, data);
+                var item = ResourceBuilder.Build<TItem, TProxyData>(id, data);
                 if (Content.ContainsKey(id))
                 {
                     throw new ContentLoadingException($"Item with ID {id} already exists.");
@@ -43,8 +43,6 @@ public abstract class LoaderService<TItem, TProxyData> : Service where TItem : L
         }
         
         Logger.Log($"{GetType().Name}: Loaded {Content.Count} items");
-
-        return Content;
     }
 
     public TItem Get(string id) => Content[id];

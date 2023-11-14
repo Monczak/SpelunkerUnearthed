@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 
 namespace MariEngine.Tiles;
 
-public class Tile : LoadableObject<TileData>
+public class Tile : Resource<TileData>
 {
     public Color ForegroundColor { get; set; }
     public Color BackgroundColor { get; set; }

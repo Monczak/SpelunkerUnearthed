@@ -3,6 +3,7 @@ using MariEngine.Components;
 using MariEngine.Input;
 using MariEngine.Services;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MariEngine.Debugging;
 
@@ -20,6 +21,11 @@ public class Gizmos : Component
         Shapes.Add(new LineGizmo(begin, end, color, width, lifetime));
     }
 
+    public void DrawTexture(Vector2 position, Vector2 size, Color color, Texture2D texture, float? lifetime = null)
+    {
+        Shapes.Add(new TextureGizmo(position, size, color, texture, lifetime));
+    }
+    
     protected override void Update(GameTime gameTime)
     {
         foreach (var shape in Shapes)

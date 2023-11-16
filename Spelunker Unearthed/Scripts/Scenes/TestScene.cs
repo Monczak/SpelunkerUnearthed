@@ -11,6 +11,7 @@ using MariEngine.Logging;
 using MariEngine.Rendering;
 using MariEngine.Services;
 using MariEngine.Tiles;
+using MariEngine.Utils;
 using SpelunkerUnearthed.Scripts.Components;
 using SpelunkerUnearthed.Scripts.Managers;
 using SpelunkerUnearthed.Scripts.MapGeneration;
@@ -43,6 +44,23 @@ public class TestScene : Scene
         LoadEntities();
         
         worldManager.StartCaveSystemLevelGenerationTask();
+
+        Random random = ServiceRegistry.Get<RandomProvider>().Request(Constants.BiomeGenRng);
+        random.Seed(0);
+
+        Texture2D texture = ServiceRegistry.Get<TexturePool>().RequestTexture(new Coord(100, 100), out _);
+        Color[] data = new Color[10000];
+        for (int y = 0; y < 100; y++)
+        {
+            for (int x = 0; x < 100; x++)
+            {
+                float perlin = random.Perlin01(new Vector2(x / 100f * 10, y / 100f * 10));
+                data[x + y * 100] = new Color(perlin, perlin, perlin, 1);
+            }
+        }
+        texture.SetData(data);
+        
+        gizmos.DrawTexture(Vector2.Zero, Vector2.One * 48, Color.White, texture, 1000f);
     }
 
     public override void Update(GameTime gameTime)
@@ -54,7 +72,7 @@ public class TestScene : Scene
 
         if (!worldManager.IsGenerating)
         {
-            caveSystemManager.DrawLevel(0, worldManager.BaseTilemapSize);
+            // caveSystemManager.DrawLevel(0, worldManager.BaseTilemapSize);
             
             // TODO: Maybe set this as a toggle?
             cameraController.SetBounds(0, worldManager.GetRoomCameraBounds(playerController.OwnerEntity.Position));

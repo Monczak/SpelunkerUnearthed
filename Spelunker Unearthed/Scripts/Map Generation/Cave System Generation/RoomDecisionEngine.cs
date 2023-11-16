@@ -32,7 +32,7 @@ public abstract class RoomDecisionEngine
             }
         }
 
-        Random random = ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGen);
+        Random random = ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGenRng);
         return random.PickWeighted(sizes, out _);
     }
 }

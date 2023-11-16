@@ -27,7 +27,7 @@ public class CaveSystemLevel
         map.Clear();
         roomQueue.Clear();
 
-        random = ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGen);
+        random = ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGenRng);
         
         // TODO: Get entrance room properties from a properties struct
         Room entranceRoom = new Room(new Coord(0, 0), new Coord(3, 3), 0, RoomFlags.Entrance);

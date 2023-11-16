@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using MariEngine.Logging;
+using Microsoft.Xna.Framework;
 
 namespace MariEngine.Utils;
 
@@ -10,16 +13,22 @@ public class Random
     public Random()
     {
         random = new System.Random();
+        CalculatePermutation(out permutation);
+        CalculateGradients(out gradients);
     }
 
     public Random(int seed)
     {
         random = new System.Random(seed);
+        CalculatePermutation(out permutation);
+        CalculateGradients(out gradients);
     }
 
     public Random Seed(int seed)
     {
         random = new System.Random(seed);
+        CalculatePermutation(out permutation);
+        CalculateGradients(out gradients);
         return this;
     }
     
@@ -72,4 +81,77 @@ public class Random
         picked = false;
         return default;
     }
+    
+    private int[] permutation;
+
+    private Vector2[] gradients;
+
+    private void CalculatePermutation(out int[] p)
+    {
+        p = Enumerable.Range(0, 256).ToArray();
+        
+        for (var i = 0; i < p.Length; i++)
+        {
+            var source = Next(p.Length);
+
+            (p[i], p[source]) = (p[source], p[i]);
+        }
+    }
+
+    private void CalculateGradients(out Vector2[] grad)
+    {
+        grad = new Vector2[256];
+
+        for (var i = 0; i < grad.Length; i++)
+        {
+            Vector2 gradient = new(NextFloat() * 2 - 1, NextFloat() * 2 - 1);
+            gradient.Normalize();
+
+            grad[i] = gradient;
+        }
+
+    }
+
+    private float Fade(float t)
+    {
+        t = Math.Abs(t);
+        return 1f - t * t * t * (t * (t * 6 - 15) + 10);
+    }
+
+    private float Q(float u, float v)
+    {
+        return Fade(u) * Fade(v);
+    }
+
+    private float Perlin(float x, float y)
+    {
+        var cell = new Vector2(MathF.Floor(x), MathF.Floor(y));
+
+        var total = 0f;
+
+        var corners = new[] { new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 0), new Vector2(1, 1) };
+
+        foreach (var n in corners)
+        {
+            var ij = cell + n;
+            var uv = new Vector2(x - ij.X, y - ij.Y);
+
+            var index = permutation[(int)ij.X % permutation.Length];
+            index = permutation[(index + (int)ij.Y) % permutation.Length];
+
+            var grad = gradients[index % gradients.Length];
+
+            total += Q(uv.X, uv.Y) * Vector2.Dot(grad, uv);
+        }
+
+        return Math.Max(Math.Min(total, 1f), -1f);
+    }
+
+    
+    public float Perlin(Vector2 input)
+    {
+        return Perlin(input.X, input.Y);
+    }
+
+    public float Perlin01(Vector2 input) => (Perlin(input) + 1) / 2;
 }

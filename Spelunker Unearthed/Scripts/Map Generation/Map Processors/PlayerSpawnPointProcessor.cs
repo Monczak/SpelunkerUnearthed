@@ -12,7 +12,7 @@ public class PlayerSpawnPointProcessor : MapProcessor
 {
     public override void ProcessMap(TileBuffer map, Room room)
     {
-        Random random = ServiceRegistry.Get<RandomProvider>().Request(Constants.MapGen);
+        Random random = ServiceRegistry.Get<RandomProvider>().Request(Constants.MapGenRng);
         Coord spawnPoint = Coord.Zero;
 
         List<Coord> coordList = new(map.Coords);

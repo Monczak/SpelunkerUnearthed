@@ -34,7 +34,7 @@ public class MapGenerator : Component
     
     public void GenerateMap(Room room, MapGenerationParameters parameters, Coord pastePosition, int baseTilemapSize = 16)
     {
-        random = ServiceRegistry.Get<RandomProvider>().Request(Constants.MapGen).Seed(parameters.Seed);
+        random = ServiceRegistry.Get<RandomProvider>().Request(Constants.MapGenRng).Seed(parameters.Seed);
 
         BuildMap(room, parameters, pastePosition, baseTilemapSize);
     }

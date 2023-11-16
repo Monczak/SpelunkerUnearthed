@@ -61,6 +61,8 @@ public class SpelunkerUnearthedGame : Game
         ServiceRegistry.RegisterService(new InputManager());
         ServiceRegistry.RegisterService(new BiomeLoader());
         
+        ServiceRegistry.RegisterService(new TexturePool(graphics.GraphicsDevice));
+        
         // TODO: Load this from a config file
         ServiceRegistry.Get<FontProvider>().AddFont("Tiles", "Hack-Regular");
         ServiceRegistry.Get<FontProvider>().AddFont("Tiles", "Monospace");

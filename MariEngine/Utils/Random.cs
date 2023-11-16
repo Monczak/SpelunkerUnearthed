@@ -154,34 +154,45 @@ public class Random
 
     public float Perlin01(Vector2 input) => (Perlin(input) + 1) / 2;
 
-    public (int color, float value) VoronoiMultiColor(Vector2 input, float cellSize, int colorCount)
+    public (float value, int cellHash) Voronoi(Vector3 input, float cellSize)
     {
-        Vector2 v = input / cellSize;
-        Vector2 baseCell = Vector2.Floor(v);
+        Vector3 v = input / cellSize;
+        Vector3 baseCell = Vector3.Floor(v);
 
         float minDist = 10;
+        int minCellHash = 0;
         
         for (int dx = -1; dx <= 1; dx++)
         {
             for (int dy = -1; dy <= 1; dy++)
             {
-                Vector2 cell = new((int)baseCell.X + dx, (int)baseCell.Y + dy);
+                for (int dz = -1; dz <= 1; dz++)
+                {
+                    Vector3 cell = new((int)baseCell.X + dx, (int)baseCell.Y + dy, (int)baseCell.Z + dz);
                 
-                int x = PseudoRandomUtils.Hash((int)cell.X);
-                int y = PseudoRandomUtils.Hash(x + (int)cell.Y);
-                x = PseudoRandomUtils.Hash(y);
+                    int x = PseudoRandomUtils.Hash((int)cell.X);
+                    int y = PseudoRandomUtils.Hash(x + (int)cell.Y);
+                    int z = PseudoRandomUtils.Hash(y + (int)cell.Z);
+                    x = PseudoRandomUtils.Hash(z);
         
-                Vector2 cellPos = cell + new Vector2(
-                    x / (float)int.MaxValue,  
-                    y / (float)int.MaxValue
-                );
+                    Vector3 cellPos = cell + new Vector3(
+                        x / (float)int.MaxValue,  
+                        y / (float)int.MaxValue,
+                        z / (float)int.MaxValue
+                    );
 
-                float distToCell = (v - cellPos).Length();
-                if (distToCell < minDist) minDist = distToCell;
+                    float distToCell = (v - cellPos).Length();
+                    if (distToCell < minDist)
+                    {
+                        minDist = distToCell;
+                        minCellHash = PseudoRandomUtils.Hash(x);
+                    }
+                }
+                
             }
         }
         
         
-        return (0, minDist);
+        return (minDist, minCellHash);
     }
 }

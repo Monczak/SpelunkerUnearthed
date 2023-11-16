@@ -21,7 +21,7 @@ public class WorldManager : Component
 
     private PlayerController playerController;
 
-    private CaveSystemManager caveSystemManager;
+    public CaveSystemManager CaveSystemManager { get; private set; }
 
     private Dictionary<Room, CameraBounds> cameraBoundsMap;
     private int cameraBoundsOversize = 5;
@@ -32,7 +32,7 @@ public class WorldManager : Component
 
     public WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, PlayerController playerController)
     {
-        this.caveSystemManager = caveSystemManager;
+        this.CaveSystemManager = caveSystemManager;
         this.tilemap = tilemap;
         this.playerController = playerController;
         
@@ -56,11 +56,11 @@ public class WorldManager : Component
         IsGenerating = true;
         stopwatch.Start();
             
-        caveSystemManager.Generate();
+        CaveSystemManager.Generate();
 
-        caveSystemManager.SetCurrentLevel(0);
+        CaveSystemManager.SetCurrentLevel(0);
 
-        CoordBounds bounds = caveSystemManager.CurrentLevel.BoundingBox;
+        CoordBounds bounds = CaveSystemManager.CurrentLevel.BoundingBox;
         tilemap.Resize(bounds.Size * BaseTilemapSize);
         tilemap.GetComponent<Transform>().Position = bounds.ExactCenter * BaseTilemapSize;
         
@@ -78,7 +78,7 @@ public class WorldManager : Component
     {
         cameraBoundsMap.Clear();
 
-        foreach (CaveSystemLevel level in caveSystemManager.CaveSystem.Levels)
+        foreach (CaveSystemLevel level in CaveSystemManager.CaveSystem.Levels)
         {
             foreach (Room room in level.Rooms)
             {
@@ -94,7 +94,7 @@ public class WorldManager : Component
     {
         tilemap.Fill(ServiceRegistry.Get<TileLoader>().Get("Stone"));
         
-        foreach (Room room in caveSystemManager.CurrentLevel.Rooms)
+        foreach (Room room in CaveSystemManager.CurrentLevel.Rooms)
         {
             // TODO: Redesign the parameter thing so that rooms can have varying params inside
             MapGenerationParameters parameters = new MapGenerationParameters
@@ -118,7 +118,7 @@ public class WorldManager : Component
 
     public Coord RoomPosToTilemapPos(Room room, Coord pos)
     {
-        Coord boundsTopLeft = caveSystemManager.CurrentLevel.BoundingBox.TopLeft;
+        Coord boundsTopLeft = CaveSystemManager.CurrentLevel.BoundingBox.TopLeft;
         return pos - (boundsTopLeft - room.Position) * BaseTilemapSize;
     }
 
@@ -129,13 +129,13 @@ public class WorldManager : Component
 
     private Coord TransformRoomPos(Coord pos)
     {
-        Coord boundsTopLeft = caveSystemManager.CurrentLevel.BoundingBox.TopLeft;
+        Coord boundsTopLeft = CaveSystemManager.CurrentLevel.BoundingBox.TopLeft;
         return (pos - boundsTopLeft) * BaseTilemapSize;
     }
 
     public Room GetRoom(Coord tilemapPos)
     {
-        foreach (Room room in caveSystemManager.CurrentLevel.Rooms)
+        foreach (Room room in CaveSystemManager.CurrentLevel.Rooms)
         {
             CoordBounds roomBounds = GetRoomBounds(room);
             if (roomBounds.PointInside(tilemapPos))

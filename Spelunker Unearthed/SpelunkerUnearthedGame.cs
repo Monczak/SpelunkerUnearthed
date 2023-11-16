@@ -125,6 +125,8 @@ public class SpelunkerUnearthedGame : Game
         ServiceRegistry.Get<TileLoader>().LoadContent();
         ServiceRegistry.Get<TileAtlas>().CreateAtlas(ServiceRegistry.Get<TileLoader>().Content);
         
+        ServiceRegistry.Get<BiomeLoader>().LoadContent();
+        
         scene.Load();
     }
 

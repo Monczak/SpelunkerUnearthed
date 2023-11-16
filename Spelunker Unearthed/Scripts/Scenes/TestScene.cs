@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -45,22 +47,24 @@ public class TestScene : Scene
         
         worldManager.StartCaveSystemLevelGenerationTask();
 
-        Random random = ServiceRegistry.Get<RandomProvider>().Request(Constants.BiomeGenRng);
-        random.Seed(0);
+        Texture2D texture = ServiceRegistry.Get<TexturePool>().RequestTexture(new Coord(1000, 1000), out _);
+        Color[] data = new Color[1000 * 1000];
 
-        Texture2D texture = ServiceRegistry.Get<TexturePool>().RequestTexture(new Coord(100, 100), out _);
-        Color[] data = new Color[10000];
-        for (int y = 0; y < 100; y++)
+        List<Coord> coords = new();
+        
+        for (int y = 0; y < 1000; y++)
+            for (int x = 0; x < 1000; x++)
+                coords.Add(new Coord(x, y));
+
+        Parallel.ForEach(coords, coord =>
         {
-            for (int x = 0; x < 100; x++)
-            {
-                (int _, float noise) = random.VoronoiMultiColor(new Vector2(x, y), 10, 0);
-                data[x + y * 100] = new Color(noise, noise, noise, 1);
-            }
-        }
+            (int x, int y) = coord;
+            Color color = worldManager.CaveSystemManager.CaveSystem.BiomeMap.GetBiome(coord).Color;
+            data[x + y * 1000] = new Color(color.R, color.G, color.B, (byte)20);
+        });
         texture.SetData(data);
         
-        gizmos.DrawTexture(Vector2.Zero, Vector2.One * 48, Color.White, texture, 1000f);
+        gizmos.DrawTexture(new Vector2(-500, -500), Vector2.One * 1000, Color.White, texture, 1000f);
     }
 
     public override void Update(GameTime gameTime)

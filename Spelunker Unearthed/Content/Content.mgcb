@@ -25,3 +25,12 @@
 #begin Tiles/Stone.yml
 /copy:Tiles/Stone.yml
 
+#begin World Gen/Biomes/Biome1.yml
+/copy:World Gen/Biomes/Biome1.yml
+
+#begin World Gen/Biomes/Biome2.yml
+/copy:World Gen/Biomes/Biome2.yml
+
+#begin World Gen/Biomes/Biome3.yml
+/copy:World Gen/Biomes/Biome3.yml
+

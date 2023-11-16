@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using MariEngine.Logging;
+using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 
 public class CaveSystem
 {
     public List<CaveSystemLevel> Levels { get; private set; } = new();
+    public BiomeMap BiomeMap { get; private set; } = new(new SimpleBiomeProvider());
 
     public RoomDecisionEngine DecisionEngine { get; set; } = new TestDecisionEngine();  // TODO: Remove this assignment
 

@@ -146,7 +146,6 @@ public class Random
 
         return Math.Max(Math.Min(total, 1f), -1f);
     }
-
     
     public float Perlin(Vector2 input)
     {
@@ -154,4 +153,35 @@ public class Random
     }
 
     public float Perlin01(Vector2 input) => (Perlin(input) + 1) / 2;
+
+    public (int color, float value) VoronoiMultiColor(Vector2 input, float cellSize, int colorCount)
+    {
+        Vector2 v = input / cellSize;
+        Vector2 baseCell = Vector2.Floor(v);
+
+        float minDist = 10;
+        
+        for (int dx = -1; dx <= 1; dx++)
+        {
+            for (int dy = -1; dy <= 1; dy++)
+            {
+                Vector2 cell = new((int)baseCell.X + dx, (int)baseCell.Y + dy);
+                
+                int x = PseudoRandomUtils.Hash((int)cell.X);
+                int y = PseudoRandomUtils.Hash(x + (int)cell.Y);
+                x = PseudoRandomUtils.Hash(y);
+        
+                Vector2 cellPos = cell + new Vector2(
+                    x / (float)int.MaxValue,  
+                    y / (float)int.MaxValue
+                );
+
+                float distToCell = (v - cellPos).Length();
+                if (distToCell < minDist) minDist = distToCell;
+            }
+        }
+        
+        
+        return (0, minDist);
+    }
 }

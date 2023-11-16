@@ -54,8 +54,8 @@ public class TestScene : Scene
         {
             for (int x = 0; x < 100; x++)
             {
-                float perlin = random.Perlin01(new Vector2(x / 100f * 10, y / 100f * 10));
-                data[x + y * 100] = new Color(perlin, perlin, perlin, 1);
+                (int _, float noise) = random.VoronoiMultiColor(new Vector2(x, y), 10, 0);
+                data[x + y * 100] = new Color(noise, noise, noise, 1);
             }
         }
         texture.SetData(data);

@@ -8,7 +8,7 @@ namespace SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
 
 public class SimpleBiomeProvider : IBiomeProvider
 {
-    public float CoordDisplacementFrequency { get; init; } = 0.1f;
+    public float CoordDisplacementFrequency { get; init; } = 0.03f;
     public float CoordDisplacementAmplitude { get; init; } = 30;
     public float VoronoiCellSize { get; init; } = 60;
     

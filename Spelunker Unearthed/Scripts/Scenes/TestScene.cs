@@ -46,15 +46,21 @@ public class TestScene : Scene
         LoadEntities();
         
         worldManager.StartCaveSystemLevelGenerationTask();
+        
+        TestBiomeGeneration();
+    }
 
+    private void TestBiomeGeneration()
+    {
+        ServiceRegistry.Get<RandomProvider>().Request(Constants.BiomeGenRng).Seed(0);
         Texture2D texture = ServiceRegistry.Get<TexturePool>().RequestTexture(new Coord(1000, 1000), out _);
         Color[] data = new Color[1000 * 1000];
 
         List<Coord> coords = new();
-        
+
         for (int y = 0; y < 1000; y++)
-            for (int x = 0; x < 1000; x++)
-                coords.Add(new Coord(x, y));
+        for (int x = 0; x < 1000; x++)
+            coords.Add(new Coord(x, y));
 
         Parallel.ForEach(coords, coord =>
         {
@@ -63,8 +69,8 @@ public class TestScene : Scene
             data[x + y * 1000] = new Color(color.R, color.G, color.B, (byte)20);
         });
         texture.SetData(data);
-        
-        gizmos.DrawTexture(new Vector2(-500, -500), Vector2.One * 1000, Color.White, texture, 1000f);
+
+        gizmos.DrawTexture(Vector2.Zero, Vector2.One * 100, Color.White, texture, 1000f);
     }
 
     public override void Update(GameTime gameTime)

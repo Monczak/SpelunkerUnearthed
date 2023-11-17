@@ -10,6 +10,7 @@ using MariEngine.Light;
 using MariEngine.Logging;
 using MariEngine.Services;
 using MariEngine.Tiles;
+using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
 
 namespace SpelunkerUnearthed.Scripts.TileEntities;
 
@@ -27,6 +28,7 @@ public class PlayerController : TileEntityComponent
     private Coord facingDirection;
 
     private DebugScreenLine<(Coord, Vector2)> playerPosDebugLine;
+    private DebugScreenLine<Biome> biomeDebugLine;
     
     protected override void OnAttach()
     {

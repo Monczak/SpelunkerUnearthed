@@ -15,10 +15,10 @@ public class SimpleBiomeProvider : IBiomeProvider
     public Biome GetBiome(Coord worldPos)
     {
         Random random = ServiceRegistry.Get<RandomProvider>().Request(Constants.BiomeGenRng);
-        
-        (int x, int y) = worldPos;
-        Vector3 v = new(x, y, 0);
-        v += new Vector3(1, 1, 0) * random.Perlin(new Vector2(x, y) * CoordDisplacementFrequency) * CoordDisplacementAmplitude;
+
+        Vector3 v = new((Vector2)worldPos, 0);
+        v += Vector3.Right * random.Perlin((Vector2)worldPos * CoordDisplacementFrequency) * CoordDisplacementAmplitude;
+        v += Vector3.Up * random.Perlin(((Vector2)worldPos + Vector2.One * 1000) * CoordDisplacementFrequency) * CoordDisplacementAmplitude;
         (float noise, int cellHash) = random.Voronoi(v, VoronoiCellSize);
 
         var biomes = ServiceRegistry.Get<BiomeLoader>().Content.Values.ToList();

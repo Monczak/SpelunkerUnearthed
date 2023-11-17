@@ -17,6 +17,7 @@ using MariEngine.Utils;
 using SpelunkerUnearthed.Scripts.Components;
 using SpelunkerUnearthed.Scripts.Managers;
 using SpelunkerUnearthed.Scripts.MapGeneration;
+using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
 using SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 using SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
 using SpelunkerUnearthed.Scripts.TileEntities;
@@ -37,6 +38,8 @@ public class TestScene : Scene
 
     private Gizmos gizmos;
     
+    private DebugScreenLine<Biome> biomeDebugLine = new(biome => $"Biome: {biome?.Name ?? "none"}");
+    
     public TestScene(GameWindow window, GraphicsDeviceManager graphics) : base(window, graphics)
     {
     }
@@ -44,33 +47,37 @@ public class TestScene : Scene
     public override void Load()
     {
         LoadEntities();
+
+        const int seed = 0;
+        ServiceRegistry.Get<RandomProvider>().Request(Constants.BiomeGenRng).Seed(seed);
+        ServiceRegistry.Get<RandomProvider>().Request(Constants.MapGenRng).Seed(seed);
+        ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGenRng).Seed(seed);
+
+        worldManager.StartCaveSystemLevelGenerationTask().ContinueWith(_ =>
+        {
+            TestBiomeGeneration();
+        });
         
-        worldManager.StartCaveSystemLevelGenerationTask();
-        
-        TestBiomeGeneration();
+        ServiceRegistry.Get<DebugScreen>().AddLine(biomeDebugLine);
     }
 
     private void TestBiomeGeneration()
     {
-        ServiceRegistry.Get<RandomProvider>().Request(Constants.BiomeGenRng).Seed(0);
-        Texture2D texture = ServiceRegistry.Get<TexturePool>().RequestTexture(new Coord(1000, 1000), out _);
-        Color[] data = new Color[1000 * 1000];
+        Texture2D texture = ServiceRegistry.Get<TexturePool>().RequestTexture(new Coord(tilemap.MapWidth, tilemap.MapHeight), out _);
+        Color[] data = new Color[tilemap.MapWidth * tilemap.MapHeight];
 
-        List<Coord> coords = new();
-
-        for (int y = 0; y < 1000; y++)
-        for (int x = 0; x < 1000; x++)
-            coords.Add(new Coord(x, y));
-
-        Parallel.ForEach(coords, coord =>
+        Parallel.ForEach(tilemap.Coords, coord =>
         {
             (int x, int y) = coord;
             Color color = worldManager.CaveSystemManager.CaveSystem.BiomeMap.GetBiome(coord).Color;
-            data[x + y * 1000] = new Color(color.R, color.G, color.B, (byte)20);
+            data[x + y * tilemap.MapWidth] = new Color(color.R, color.G, color.B, (byte)20);
         });
         texture.SetData(data);
 
-        gizmos.DrawTexture(Vector2.Zero, Vector2.One * 100, Color.White, texture, 1000f);
+        var bounds = tilemap.Bounds;
+        var topLeft = tilemapRenderer.CoordToWorldPoint(bounds.TopLeft);
+        var bottomRight = tilemapRenderer.CoordToWorldPoint(bounds.BottomRight) + Vector2.One;
+        gizmos.DrawTexture(topLeft, bottomRight - topLeft, Color.White, texture, 10000f);
     }
 
     public override void Update(GameTime gameTime)
@@ -86,6 +93,8 @@ public class TestScene : Scene
             
             // TODO: Maybe set this as a toggle?
             cameraController.SetBounds(0, worldManager.GetRoomCameraBounds(playerController.OwnerEntity.Position));
+            
+            biomeDebugLine.SetParams(caveSystemManager.CaveSystem.BiomeMap.GetBiome(playerController.OwnerEntity.Position));
         }
     }
 

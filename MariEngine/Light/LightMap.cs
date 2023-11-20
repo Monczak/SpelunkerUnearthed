@@ -175,15 +175,6 @@ public class LightMap : Component
     {
         CoordBounds? lightBounds = data.LightSource.GetBounds(data.Position.Get());
         if (lightBounds is null) return;    // TODO: Support unbounded (global) lights
-
-        if (!derender)
-        {
-            for (int x = 0; x < data.RenderedLight.GetLength(0); x++)
-            {
-                for (int y = 0; y < data.RenderedLight.GetLength(1); y++)
-                    data.RenderedLight[x, y] = Vector3.Zero;
-            }
-        }
         
         for (int x = lightBounds.Value.TopLeft.X; x <= lightBounds.Value.BottomRight.X; x++)
         {

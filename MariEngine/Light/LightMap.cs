@@ -123,7 +123,7 @@ public class LightMap : Component
             {
                 lock (lockObj)
                 {
-                    toRemove.Adda(data);
+                    toRemove.Add(data);
                 }
             }
 

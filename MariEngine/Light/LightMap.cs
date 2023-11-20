@@ -21,11 +21,14 @@ public class LightMap : Component
     
     private Dictionary<LightSource, LightSourceData> lightSources;
 
-    private HashSet<LightSource> toRemove;
+    private HashSet<LightSource> dirtyLightSources = new();
+    private HashSet<LightSource> toRemove = new();
 
     private Vector3[,] map;
 
     public int RenderThreads { get; set; } = 4;
+
+    private Action<LightSource> dirtyLightAction;
 
     private class LightSourceData
     {
@@ -52,8 +55,11 @@ public class LightMap : Component
         tilemap = GetComponent<Tilemap>();
         lightSources = new Dictionary<LightSource, LightSourceData>();
         toRemove = new HashSet<LightSource>();
+        dirtyLightSources = new HashSet<LightSource>();
 
         map = new Vector3[tilemap.MapWidth, tilemap.MapHeight];
+
+        dirtyLightAction = OnLightSourceDirty;
     }
 
     public void Resize(Coord newSize)
@@ -78,41 +84,40 @@ public class LightMap : Component
     {
         foreach (LightSource source in toRemove)
         {
+            source.OnDirty -= dirtyLightAction;
             lightSources.Remove(source);
         }
     }
 
     private void UpdateDirtyLights()
     {
-        foreach (LightSource source in lightSources.Keys)
+        foreach (LightSource source in dirtyLightSources)
         {
-            if (source.Dirty)
+            if (!lightSources[source].New)
             {
-                if (!lightSources[source].New)
-                {
-                    RenderLight(source, lightSources[source].Position.Get(), derender: true);
-                }
-                else
-                {
-                    toRemove.Remove(source);
-                }
-
-                lightSources[source].Position.Update();
-                source.UpdateAllProperties();
-                
-                if (!lightSources[source].Old)
-                {
-                    RenderLight(source, lightSources[source].Position.Get());
-                }
-                else
-                {
-                    toRemove.Add(source);
-                }
-
-                lightSources[source].New = false;
-                source.Dirty = false;
+                RenderLight(source, lightSources[source].Position.Get(), derender: true);
             }
+            else
+            {
+                toRemove.Remove(source);
+            }
+
+            lightSources[source].Position.Update();
+            source.UpdateAllProperties();
+                
+            if (!lightSources[source].Old)
+            {
+                RenderLight(source, lightSources[source].Position.Get());
+            }
+            else
+            {
+                toRemove.Add(source);
+            }
+
+            lightSources[source].New = false;
+            source.Dirty = false;
         }
+        dirtyLightSources.Clear();
     }
 
     public void UpdatePosition(LightSource source, Coord position)
@@ -123,33 +128,42 @@ public class LightMap : Component
 
     public void AddEmittingTile(Tile tile, Coord position)
     {
-        lightSources.Add(tile.LightSource, new LightSourceData(position));
-        tile.LightSource.Dirty = true;
+        AddLightSource(tile.LightSource, new LightSourceData(position));
     }
 
     public void RemoveEmittingTile(Tile tile)
     {
-        if (lightSources.TryGetValue(tile.LightSource, out var sourceData))
-        {
-            sourceData.Old = true;
-            tile.LightSource.Dirty = true;
-        }
+        RemoveLightSource(tile.LightSource);
     }
 
     public void AddEmitter(LightEmitter emitter)
     {
-        lightSources.Add(emitter.LightSource, new LightSourceData(emitter.OwnerEntity.Position));
-        emitter.LightSource.Dirty = true;
+        AddLightSource(emitter.LightSource, new LightSourceData(emitter.OwnerEntity.Position));
     }
 
     public void RemoveEmitter(LightEmitter emitter)
     {
-        if (lightSources.TryGetValue(emitter.LightSource, out var sourceData))
+        RemoveLightSource(emitter.LightSource);
+    }
+
+    private void AddLightSource(LightSource lightSource, LightSourceData data)
+    {
+        lightSources.Add(lightSource, data);
+        lightSource.OnDirty += dirtyLightAction;
+        
+        lightSource.Dirty = true;
+    }
+
+    private void RemoveLightSource(LightSource lightSource)
+    {
+        if (lightSources.TryGetValue(lightSource, out var sourceData))
         {
             sourceData.Old = true;
-            emitter.LightSource.Dirty = true;
+            lightSource.Dirty = true;
         }
     }
+
+    private void OnLightSourceDirty(LightSource source) => dirtyLightSources.Add(source);
 
     private void RenderLight(LightSource source, Coord position, bool derender = false)
     {

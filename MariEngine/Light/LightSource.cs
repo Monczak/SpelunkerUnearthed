@@ -21,8 +21,19 @@ public abstract class LightSource : ICloneable
     }
 
     protected Tilemap Tilemap;
-    
-    internal bool Dirty { get; set; }
+
+    private bool dirty;
+    internal bool Dirty
+    {
+        get => dirty;
+        set
+        {
+            dirty = value;
+            if (dirty) OnDirty?.Invoke(this);
+        }
+    }
+
+    public event Action<LightSource> OnDirty;
 
     protected LightSource(Color color)
     {

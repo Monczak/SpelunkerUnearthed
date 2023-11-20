@@ -28,7 +28,7 @@ public class LightMap : Component
 
     public int RenderThreads { get; set; } = 8;
 
-    private Action<LightSource> dirtyLightAction;
+    private readonly Action<LightSource> dirtyLightHandler;
 
     private class LightSourceData
     {
@@ -55,6 +55,11 @@ public class LightMap : Component
         }
     }
 
+    public LightMap()
+    {
+        dirtyLightHandler = OnLightSourceDirty;
+    }
+
     protected override void OnAttach()
     {
         tilemap = GetComponent<Tilemap>();
@@ -63,8 +68,6 @@ public class LightMap : Component
         dirtyLightSources = new HashSet<LightSourceData>();
 
         map = new Vector3[tilemap.MapWidth, tilemap.MapHeight];
-
-        dirtyLightAction = OnLightSourceDirty;
     }
 
     public void Resize(Coord newSize)
@@ -89,7 +92,7 @@ public class LightMap : Component
     {
         foreach (LightSourceData data in toRemove)
         {
-            data.LightSource.OnDirty -= dirtyLightAction;
+            data.LightSource.OnDirty -= dirtyLightHandler;
             lightSources.Remove(data.LightSource);
         }
         toRemove.Clear();
@@ -162,7 +165,7 @@ public class LightMap : Component
     private void AddLightSource(LightSourceData data)
     {
         lightSources.Add(data.LightSource, data);
-        data.LightSource.OnDirty += dirtyLightAction;
+        data.LightSource.OnDirty += dirtyLightHandler;
         
         data.LightSource.Dirty = true;
     }

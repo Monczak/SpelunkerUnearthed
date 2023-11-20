@@ -123,8 +123,8 @@ public class TestScene : Scene
 
         lightMap = new LightMap
         {
-            // AmbientLight = Color.White,
-            AmbientLight = new Color(20, 15, 17),
+            AmbientLight = Color.White,
+            // AmbientLight = new Color(20, 15, 17),
             // AmbientLight = Color.Black,
         };
         tilemapEntity.AttachComponent(lightMap);

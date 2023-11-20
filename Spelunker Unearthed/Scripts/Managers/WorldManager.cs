@@ -21,7 +21,7 @@ public class WorldManager : Component
 
     private PlayerController playerController;
 
-    public CaveSystemManager CaveSystemManager { get; private set; }
+    public CaveSystemManager CaveSystemManager { get; }
 
     private Dictionary<Room, CameraBounds> cameraBoundsMap;
     private int cameraBoundsOversize = 5;
@@ -32,7 +32,7 @@ public class WorldManager : Component
 
     public WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, PlayerController playerController)
     {
-        this.CaveSystemManager = caveSystemManager;
+        CaveSystemManager = caveSystemManager;
         this.tilemap = tilemap;
         this.playerController = playerController;
         
@@ -99,7 +99,6 @@ public class WorldManager : Component
             // TODO: Redesign the parameter thing so that rooms can have varying params inside
             MapGenerationParameters parameters = new MapGenerationParameters
             {
-                Seed = 0,
                 NothingTile = ServiceRegistry.Get<TileLoader>().Get("Nothing"),
                 WallTile = ServiceRegistry.Get<TileLoader>().Get("Stone"),
                 RandomFillAmount = 0.4f,

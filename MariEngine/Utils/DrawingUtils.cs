@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace MariEngine.Utils;
 
 public static class DrawingUtils
 {
-    private static readonly List<Coord> Coords = new();
+    private static readonly ThreadLocal<List<Coord>> Coords = new(() => new List<Coord>());
     
     public static void BresenhamLine(List<Coord> coordList, Coord start, Coord end, bool endPreemptively = false)
     {
@@ -45,7 +46,9 @@ public static class DrawingUtils
     
     public static List<Coord> BresenhamLine(Coord start, Coord end, bool endPreemptively = false)
     {
-        BresenhamLine(Coords, start, end, endPreemptively);
-        return Coords;
+        var coords = Coords.Value;
+        coords.Clear();
+        BresenhamLine(coords, start, end, endPreemptively);
+        return coords;
     }
 }

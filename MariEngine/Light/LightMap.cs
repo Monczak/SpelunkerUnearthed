@@ -26,7 +26,7 @@ public class LightMap : Component
 
     private Vector3[,] map;
 
-    public int RenderThreads { get; set; } = 4;
+    public int RenderThreads { get; set; } = 8;
 
     private Action<LightSource> dirtyLightAction;
 
@@ -97,7 +97,8 @@ public class LightMap : Component
 
     private void UpdateDirtyLights()
     {
-        foreach (LightSourceData data in dirtyLightSources)
+        object lockObj = new();
+        Parallel.ForEach(dirtyLightSources, new ParallelOptions { MaxDegreeOfParallelism = RenderThreads },data =>
         {
             if (!data.New)
             {
@@ -105,24 +106,30 @@ public class LightMap : Component
             }
             else
             {
-                toRemove.Remove(data);
+                lock (lockObj)
+                {
+                    toRemove.Remove(data);
+                }
             }
 
             data.Position.Update();
             data.LightSource.UpdateAllProperties();
-                
+
             if (!data.Old)
             {
                 RenderLight(data);
             }
             else
             {
-                toRemove.Add(data);
+                lock (lockObj)
+                {
+                    toRemove.Adda(data);
+                }
             }
 
             data.New = false;
             data.LightSource.Dirty = false;
-        }
+        });
         dirtyLightSources.Clear();
     }
 

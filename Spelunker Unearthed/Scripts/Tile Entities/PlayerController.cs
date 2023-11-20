@@ -54,7 +54,7 @@ public class PlayerController : TileEntityComponent
     private void Mine()
     {
         if (OwnerEntity.Tilemap.IsInBounds(OwnerEntity.Position + facingDirection))
-            OwnerEntity.Tilemap.Mine(OwnerEntity.Position + facingDirection);
+            OwnerEntity.Tilemap.Mine(OwnerEntity.Position + facingDirection, Tilemap.BaseLayer);
     }
 
     private void OnUp()

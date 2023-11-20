@@ -63,14 +63,14 @@ public class TestScene : Scene
 
     private void TestBiomeGeneration()
     {
-        Texture2D texture = ServiceRegistry.Get<TexturePool>().RequestTexture(new Coord(tilemap.MapWidth, tilemap.MapHeight), out _);
-        Color[] data = new Color[tilemap.MapWidth * tilemap.MapHeight];
+        Texture2D texture = ServiceRegistry.Get<TexturePool>().RequestTexture(new Coord(tilemap.Width, tilemap.Height), out _);
+        Color[] data = new Color[tilemap.Width * tilemap.Height];
 
         Parallel.ForEach(tilemap.Coords, coord =>
         {
             (int x, int y) = coord;
             Color color = worldManager.CaveSystemManager.CaveSystem.BiomeMap.GetBiome(coord).Color;
-            data[x + y * tilemap.MapWidth] = new Color(color.R, color.G, color.B, (byte)20);
+            data[x + y * tilemap.Width] = new Color(color.R, color.G, color.B, (byte)20);
         });
         texture.SetData(data);
 
@@ -117,14 +117,15 @@ public class TestScene : Scene
         
         Entity tilemapEntity = new("Tilemap");
         tilemap = new Tilemap(64, 64);
+        tilemap.AddLayer(-1);
         
         tilemapEntity.AttachComponent(new Transform());
         tilemapEntity.AttachComponent(tilemap);
 
         lightMap = new LightMap
         {
-            AmbientLight = Color.White,
-            // AmbientLight = new Color(20, 15, 17),
+            // AmbientLight = Color.White,
+            AmbientLight = new Color(20, 15, 17),
             // AmbientLight = Color.Black,
         };
         tilemapEntity.AttachComponent(lightMap);

@@ -59,7 +59,7 @@ public class MapGenerator : Component
             processor.ProcessMap(buffer, room);
         }
         
-        tilemap.PasteAt(buffer, pastePosition);
+        tilemap.PasteAt(buffer, pastePosition, Tilemap.BaseLayer);  // TODO: Add support for more layers
     }
 
     private void FillRandom(float fillAmount, Tile positiveTile, Tile negativeTile)

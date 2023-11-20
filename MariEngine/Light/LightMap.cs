@@ -67,7 +67,7 @@ public class LightMap : Component
         toRemove = new HashSet<LightSourceData>();
         dirtyLightSources = new HashSet<LightSourceData>();
 
-        map = new Vector3[tilemap.MapWidth, tilemap.MapHeight];
+        map = new Vector3[tilemap.Width, tilemap.Height];
     }
 
     public void Resize(Coord newSize)

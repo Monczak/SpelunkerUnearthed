@@ -127,8 +127,8 @@ public class TileEntity
     public void Move(int dx = 0, int dy = 0)
     {
         Position += new Coord(dx, dy);
-        Position = new Coord(MathHelper.Clamp(Position.X, 0, Tilemap.MapWidth - 1),
-            MathHelper.Clamp(Position.Y, 0, Tilemap.MapHeight - 1));
+        Position = new Coord(MathHelper.Clamp(Position.X, 0, Tilemap.Width - 1),
+            MathHelper.Clamp(Position.Y, 0, Tilemap.Height - 1));
     }
 
     public void Move(Coord delta) => Move(delta.X, delta.Y);

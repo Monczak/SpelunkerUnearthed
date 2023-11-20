@@ -43,7 +43,7 @@ public class TilemapRenderer : Renderer
             {
                 Coord coord = new(x, y);
                 if (!tilemap.IsInBounds(coord)) continue;
-                RenderTile(spriteBatch, CoordToWorldPoint(coord), tilemap[coord], lightMap.GetRenderedLight(coord));
+                RenderTile(spriteBatch, CoordToWorldPoint(coord), tilemap.GetTop(coord), lightMap.GetRenderedLight(coord));
             }
         }
         
@@ -74,7 +74,7 @@ public class TilemapRenderer : Renderer
     internal Bounds? GetWorldCullingBounds()
     {
         Bounds cameraBounds = camera.ViewingWindow;
-        Bounds tilemapBounds = new(CoordToWorldPoint(Coord.Zero), new Vector2(tilemap.MapWidth, tilemap.MapHeight));
+        Bounds tilemapBounds = new(CoordToWorldPoint(Coord.Zero), new Vector2(tilemap.Width, tilemap.Height));
         Bounds? overlap = Bounds.Overlap(cameraBounds, tilemapBounds);
         return overlap;
     }
@@ -91,7 +91,7 @@ public class TilemapRenderer : Renderer
 
     protected override Vector2 CalculateCenterOffset()
     {
-        return -new Vector2(tilemap.MapWidth / 2f, tilemap.MapHeight / 2f);
+        return -new Vector2(tilemap.Width / 2f, tilemap.Height / 2f);
     }
 
     private void RenderTile(SpriteBatch spriteBatch, Vector2 pos, Tile tile, Color tint)
@@ -101,6 +101,7 @@ public class TilemapRenderer : Renderer
         // TODO: Optimize this to use GPU instancing (or whatever it's called, drawing primitives with setup vertex/index buffers)
         // 1 or 2 draw calls (one for background, one for foreground)
         // https://badecho.com/index.php/2022/08/04/drawing-tiles/
-        ServiceRegistry.Get<TileAtlas>().DrawTile(spriteBatch, pos * camera.TileSize, tile.Id, tint);
+        if (tile is not null)
+            ServiceRegistry.Get<TileAtlas>().DrawTile(spriteBatch, pos * camera.TileSize, tile.Id, tint);
     }
 }

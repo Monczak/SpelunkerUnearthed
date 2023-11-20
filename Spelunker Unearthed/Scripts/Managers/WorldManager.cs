@@ -45,7 +45,13 @@ public class WorldManager : Component
     public Task StartCaveSystemLevelGenerationTask()
     {
         if (IsGenerating) return null;
-        return Task.Run(GenerateCaveSystemLevel);
+        return Task.Run(GenerateCaveSystemLevel).ContinueWith(task =>
+        {
+            if (task.IsFaulted)
+            {
+                Logger.LogError($"Cave generation failed: {task.Exception}");
+            }
+        });
     }
 
     private void GenerateCaveSystemLevel()
@@ -92,7 +98,8 @@ public class WorldManager : Component
 
     private void GenerateMap()
     {
-        tilemap.Fill(ServiceRegistry.Get<TileLoader>().Get("Stone"));
+        tilemap.Fill(ServiceRegistry.Get<TileLoader>().Get("Stone"), Tilemap.BaseLayer);
+        // tilemap.Fill(ServiceRegistry.Get<TileLoader>().Get("Stone"), -1);
         
         foreach (Room room in CaveSystemManager.CurrentLevel.Rooms)
         {

@@ -21,8 +21,8 @@ public class LightMap : Component
     
     private Dictionary<LightSource, LightSourceData> lightSources;
 
-    private HashSet<LightSource> dirtyLightSources = new();
-    private HashSet<LightSource> toRemove = new();
+    private HashSet<LightSourceData> dirtyLightSources = new();
+    private HashSet<LightSourceData> toRemove = new();
 
     private Vector3[,] map;
 
@@ -32,21 +32,26 @@ public class LightMap : Component
 
     private class LightSourceData
     {
+        public LightSource LightSource { get; }
         public Deferred<Coord> Position { get; }
         
         public bool New { get; set; }
         public bool Old { get; set; }
         
-        // TODO: Maybe there's a better way to store rendered light?
-        public Dictionary<(int x, int y), Vector3> RenderedLight { get; }
+        public Vector3[,] RenderedLight;
 
-        public LightSourceData(Coord position)
+        public LightSourceData(LightSource lightSource, Coord position)
         {
+            LightSource = lightSource;
             Position = new Deferred<Coord>(position);
             New = true;
             Old = false;
 
-            RenderedLight = new Dictionary<(int x, int y), Vector3>();
+            var bounds = lightSource.GetBounds(Coord.Zero);
+            if (bounds is not null)
+                RenderedLight = new Vector3[bounds.Value.Size.X, bounds.Value.Size.Y];
+            else
+                RenderedLight = new Vector3[1, 1]; // TODO: What to do with unbounded lights?
         }
     }
 
@@ -54,8 +59,8 @@ public class LightMap : Component
     {
         tilemap = GetComponent<Tilemap>();
         lightSources = new Dictionary<LightSource, LightSourceData>();
-        toRemove = new HashSet<LightSource>();
-        dirtyLightSources = new HashSet<LightSource>();
+        toRemove = new HashSet<LightSourceData>();
+        dirtyLightSources = new HashSet<LightSourceData>();
 
         map = new Vector3[tilemap.MapWidth, tilemap.MapHeight];
 
@@ -82,40 +87,41 @@ public class LightMap : Component
 
     private void RemoveLights()
     {
-        foreach (LightSource source in toRemove)
+        foreach (LightSourceData data in toRemove)
         {
-            source.OnDirty -= dirtyLightAction;
-            lightSources.Remove(source);
+            data.LightSource.OnDirty -= dirtyLightAction;
+            lightSources.Remove(data.LightSource);
         }
+        toRemove.Clear();
     }
 
     private void UpdateDirtyLights()
     {
-        foreach (LightSource source in dirtyLightSources)
+        foreach (LightSourceData data in dirtyLightSources)
         {
-            if (!lightSources[source].New)
+            if (!data.New)
             {
-                RenderLight(source, lightSources[source].Position.Get(), derender: true);
+                RenderLight(data, derender: true);
             }
             else
             {
-                toRemove.Remove(source);
+                toRemove.Remove(data);
             }
 
-            lightSources[source].Position.Update();
-            source.UpdateAllProperties();
+            data.Position.Update();
+            data.LightSource.UpdateAllProperties();
                 
-            if (!lightSources[source].Old)
+            if (!data.Old)
             {
-                RenderLight(source, lightSources[source].Position.Get());
+                RenderLight(data);
             }
             else
             {
-                toRemove.Add(source);
+                toRemove.Add(data);
             }
 
-            lightSources[source].New = false;
-            source.Dirty = false;
+            data.New = false;
+            data.LightSource.Dirty = false;
         }
         dirtyLightSources.Clear();
     }
@@ -128,7 +134,7 @@ public class LightMap : Component
 
     public void AddEmittingTile(Tile tile, Coord position)
     {
-        AddLightSource(tile.LightSource, new LightSourceData(position));
+        AddLightSource(new LightSourceData(tile.LightSource, position));
     }
 
     public void RemoveEmittingTile(Tile tile)
@@ -138,7 +144,7 @@ public class LightMap : Component
 
     public void AddEmitter(LightEmitter emitter)
     {
-        AddLightSource(emitter.LightSource, new LightSourceData(emitter.OwnerEntity.Position));
+        AddLightSource(new LightSourceData(emitter.LightSource, emitter.OwnerEntity.Position));
     }
 
     public void RemoveEmitter(LightEmitter emitter)
@@ -146,12 +152,12 @@ public class LightMap : Component
         RemoveLightSource(emitter.LightSource);
     }
 
-    private void AddLightSource(LightSource lightSource, LightSourceData data)
+    private void AddLightSource(LightSourceData data)
     {
-        lightSources.Add(lightSource, data);
-        lightSource.OnDirty += dirtyLightAction;
+        lightSources.Add(data.LightSource, data);
+        data.LightSource.OnDirty += dirtyLightAction;
         
-        lightSource.Dirty = true;
+        data.LightSource.Dirty = true;
     }
 
     private void RemoveLightSource(LightSource lightSource)
@@ -163,36 +169,45 @@ public class LightMap : Component
         }
     }
 
-    private void OnLightSourceDirty(LightSource source) => dirtyLightSources.Add(source);
+    private void OnLightSourceDirty(LightSource source) => dirtyLightSources.Add(lightSources[source]);
 
-    private void RenderLight(LightSource source, Coord position, bool derender = false)
+    private void RenderLight(LightSourceData data, bool derender = false)
     {
-        CoordBounds? lightBounds = source.GetBounds(position);
+        CoordBounds? lightBounds = data.LightSource.GetBounds(data.Position.Get());
         if (lightBounds is null) return;    // TODO: Support unbounded (global) lights
-        
+
         if (!derender)
-            lightSources[source].RenderedLight.Clear();
+        {
+            for (int x = 0; x < data.RenderedLight.GetLength(0); x++)
+            {
+                for (int y = 0; y < data.RenderedLight.GetLength(1); y++)
+                    data.RenderedLight[x, y] = Vector3.Zero;
+            }
+        }
         
         for (int x = lightBounds.Value.TopLeft.X; x <= lightBounds.Value.BottomRight.X; x++)
         {
             for (int y = lightBounds.Value.TopLeft.Y; y <= lightBounds.Value.BottomRight.Y; y++)
             {
-                Coord coord = (Coord)new Vector2(x, y);
+                Coord coord = new(x, y);
                 if (!tilemap.IsInBounds(coord)) continue;
+
+                int cx = x - lightBounds.Value.TopLeft.X;
+                int cy = y - lightBounds.Value.TopLeft.Y;
 
                 Vector3 light;
                 if (derender)
-                    light = lightSources[source].RenderedLight[(coord.X, coord.Y)];
+                    light = data.RenderedLight[cx, cy];
                 else
                 {
-                    light = source.GetLight(position, coord).ToVector3();
-                    lightSources[source].RenderedLight[(coord.X, coord.Y)] = light;
+                    light = data.LightSource.GetLight(data.Position.Get(), coord).ToVector3();
+                    data.RenderedLight[cx, cy] = light;
                 }
                 
-                map[coord.X, coord.Y] += light * (derender ? -1 : 1);
-                map[coord.X, coord.Y].X = MathF.Max(0, map[coord.X, coord.Y].X);
-                map[coord.X, coord.Y].Y = MathF.Max(0, map[coord.X, coord.Y].Y);
-                map[coord.X, coord.Y].Z = MathF.Max(0, map[coord.X, coord.Y].Z);
+                map[x, y] += light * (derender ? -1 : 1);
+                map[x, y].X = MathF.Max(0, map[x, y].X);
+                map[x, y].Y = MathF.Max(0, map[x, y].Y);
+                map[x, y].Z = MathF.Max(0, map[x, y].Z);
             }
         }
     }

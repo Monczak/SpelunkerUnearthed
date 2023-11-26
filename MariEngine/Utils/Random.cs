@@ -136,8 +136,8 @@ public class Random
             var ij = cell + n;
             var uv = new Vector2(x - ij.X, y - ij.Y);
 
-            var index = permutation[(int)ij.X % permutation.Length];
-            index = permutation[(index + (int)ij.Y) % permutation.Length];
+            var index = permutation[((int)ij.X + permutation.Length) % permutation.Length];
+            index = permutation[(index + (int)ij.Y + permutation.Length) % permutation.Length];
 
             var grad = gradients[index % gradients.Length];
 

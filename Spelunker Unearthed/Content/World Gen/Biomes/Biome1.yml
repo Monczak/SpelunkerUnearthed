@@ -1,2 +1,6 @@
 Name: "Biome 1"
 Color: "#FF0000"
+WallProvider:
+  Type: "Basic"
+  Options:
+    Tile: "Stone"

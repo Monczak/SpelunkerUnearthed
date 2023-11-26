@@ -7,7 +7,6 @@ public struct MapGenerationParameters
 {
     public int Seed { get; init; }  // TODO: No longer necessary?
     
-    public Tile WallTile { get; init; }     // TODO: Replace with tile providers set by biome
     public Tile NothingTile { get; init; }
     
     public float RandomFillAmount { get; init; }

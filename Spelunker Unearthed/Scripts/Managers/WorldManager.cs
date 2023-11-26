@@ -98,7 +98,11 @@ public class WorldManager : Component
 
     private void GenerateMap()
     {
-        tilemap.Fill(ServiceRegistry.Get<TileLoader>().Get("Stone"), Tilemap.BaseLayer);
+        foreach (Coord coord in tilemap.Coords)
+        {
+            tilemap.Set(CaveSystemManager.CaveSystem.BiomeMap.GetBiome(coord).WallProvider.GetTile(coord), coord, Tilemap.BaseLayer);
+        }
+        
         // tilemap.Fill(ServiceRegistry.Get<TileLoader>().Get("Stone"), -1);
         
         foreach (Room room in CaveSystemManager.CurrentLevel.Rooms)
@@ -107,7 +111,6 @@ public class WorldManager : Component
             MapGenerationParameters parameters = new MapGenerationParameters
             {
                 NothingTile = ServiceRegistry.Get<TileLoader>().Get("Nothing"),
-                WallTile = ServiceRegistry.Get<TileLoader>().Get("Stone"),
                 RandomFillAmount = 0.4f,
                 SmoothIterations = 3,
                 BorderSize = 1,
@@ -115,7 +118,7 @@ public class WorldManager : Component
                 BorderGradientFillAmount = 0.6f,
             };
             
-            mapGenerator.GenerateMap(room, parameters, TransformRoomPos(room.Position), BaseTilemapSize);
+            mapGenerator.GenerateRoomMap(room, parameters, TransformRoomPos(room.Position), CaveSystemManager.CaveSystem.BiomeMap, BaseTilemapSize);
 
             if ((room.Flags & RoomFlags.Entrance) != 0)
                 playerController.OwnerEntity.Position = RoomPosToTilemapPos(room, room.PointsOfInterest[PointOfInterestType.PlayerSpawnPoint][0].Position);

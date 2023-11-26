@@ -9,13 +9,55 @@ public struct CoordBounds
     public Coord TopLeft { get; set; }
     public Coord Size { get; set; }
 
-    public Coord TopRight => TopLeft + Coord.UnitX * (Size - Coord.One);
-    public Coord BottomLeft => TopLeft + Coord.UnitY * (Size - Coord.One);
-    public Coord BottomRight => TopLeft + Coord.One * (Size - Coord.One);
+    private Coord? topRight = null;
+    private Coord? bottomLeft = null;
+    private Coord? bottomRight = null;
+    private Coord? center = null;
+    private Vector2? exactCenter = null;
 
-    public Coord Center => TopLeft + (Size - Coord.One) / 2;
-    public Vector2 ExactCenter => (Vector2)TopLeft + (Vector2)Size / 2;
-    
+    public Coord TopRight
+    {
+        get
+        {
+            topRight ??= TopLeft + Coord.UnitX * (Size - Coord.One);
+            return topRight.Value;
+        }
+    }
+    public Coord BottomLeft
+    {
+        get 
+        { 
+            bottomLeft ??= TopLeft + Coord.UnitY * (Size - Coord.One);
+            return bottomLeft.Value;
+        }
+    }
+
+    public Coord BottomRight
+    {
+        get
+        {
+            bottomRight ??= TopLeft + Coord.One * (Size - Coord.One);
+            return bottomRight.Value;
+        }
+    }
+
+    public Coord Center
+    {
+        get
+        {
+            center ??= TopLeft + (Size - Coord.One) / 2;
+            return center.Value;
+        }
+    }
+    public Vector2 ExactCenter
+    {
+        get 
+        { 
+            exactCenter ??= (Vector2)TopLeft + (Vector2)Size / 2;
+            return exactCenter.Value; 
+        }
+    }
+
     public CoordBounds(Coord topLeft, Coord size)
     {
         TopLeft = topLeft;
@@ -34,7 +76,8 @@ public struct CoordBounds
 
     public bool PointInside(Coord point)
     {
-        return point.X >= TopLeft.X && point.X <= TopRight.X && point.Y >= TopLeft.Y && point.Y <= BottomLeft.Y;
+        return point.X >= TopLeft.X && point.X <= TopLeft.X + Size.X - 1 && point.Y >= TopLeft.Y &&
+               point.Y <= TopLeft.Y + Size.Y - 1;
     }
 
     public bool Overlaps(CoordBounds bounds)

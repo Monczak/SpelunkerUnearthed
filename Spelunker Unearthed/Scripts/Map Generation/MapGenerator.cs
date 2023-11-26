@@ -7,8 +7,10 @@ using MariEngine.Logging;
 using MariEngine.Services;
 using MariEngine.Tiles;
 using MariEngine.Utils;
+using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
 using SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 using SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
+using SpelunkerUnearthed.Scripts.MapGeneration.TileProviders;
 using Random = MariEngine.Utils.Random;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration;
@@ -32,26 +34,26 @@ public class MapGenerator : Component
         processors.Add(processor);
     }   
     
-    public void GenerateMap(Room room, MapGenerationParameters parameters, Coord pastePosition, int baseTilemapSize = 16)
+    public void GenerateRoomMap(Room room, MapGenerationParameters parameters, Coord pastePosition, BiomeMap biomeMap, int baseTilemapSize = 16)
     {
         random = ServiceRegistry.Get<RandomProvider>().Request(Constants.MapGenRng);
 
-        BuildMap(room, parameters, pastePosition, baseTilemapSize);
+        BuildRoomMap(room, parameters, pastePosition, biomeMap, baseTilemapSize);
     }
 
-    private void BuildMap(Room room, MapGenerationParameters parameters, Coord pastePosition, int baseTilemapSize)
+    private void BuildRoomMap(Room room, MapGenerationParameters parameters, Coord pastePosition, BiomeMap biomeMap, int baseTilemapSize)
     {
         buffer = new TileBuffer(room.Size * baseTilemapSize);
 
-        FillRandom(parameters.RandomFillAmount, parameters.WallTile, parameters.NothingTile);
+        FillRandom(parameters.RandomFillAmount, pastePosition, biomeMap, parameters.NothingTile);
 
-        MakeBorder(parameters.BorderSize, parameters.WallTile);
+        MakeBorder(parameters.BorderSize, pastePosition, biomeMap);
         SmoothBorder(parameters.BorderSize, parameters.BorderGradientSize, parameters.BorderGradientFillAmount,
-            parameters.WallTile);
+            pastePosition, biomeMap);
 
         for (int i = 0; i < parameters.SmoothIterations; i++)
         {
-            Smooth(parameters.WallTile, parameters.NothingTile);
+            Smooth(pastePosition, biomeMap, parameters.NothingTile);
         }
 
         foreach (var processor in processors)
@@ -62,20 +64,22 @@ public class MapGenerator : Component
         tilemap.PasteAt(buffer, pastePosition, Tilemap.BaseLayer);  // TODO: Add support for more layers
     }
 
-    private void FillRandom(float fillAmount, Tile positiveTile, Tile negativeTile)
+    private void FillRandom(float fillAmount, Coord basePos, BiomeMap biomeMap, Tile negativeTile)
     {
         foreach (Coord coord in buffer.Coords)
         {
-            buffer[coord] = random.NextFloat() < fillAmount ? positiveTile : negativeTile;
+            buffer[coord] = random.NextFloat() < fillAmount 
+                ? biomeMap.GetBiome(coord + basePos).WallProvider.GetTile(coord + basePos) 
+                : negativeTile;
         }
     }
 
-    private void MakeBorder(int size, Tile borderTile)
+    private void MakeBorder(int size, Coord basePos, BiomeMap biomeMap)
     {
         foreach (Coord coord in buffer.Coords)
         {
             if (IsInRing(coord, 0, size))
-                buffer[coord] = borderTile;
+                buffer[coord] = biomeMap.GetBiome(coord + basePos).WallProvider.GetTile(coord + basePos);
         }
     }
 
@@ -85,19 +89,19 @@ public class MapGenerator : Component
             || (coord.Y >= outerMargin && coord.Y < outerMargin + size) || (coord.Y > buffer.Height - outerMargin - size && coord.Y <= buffer.Height - outerMargin);
     }
 
-    private void SmoothBorder(int borderSize, int gradientSize, float fillPercent, Tile tile)
+    private void SmoothBorder(int borderSize, int gradientSize, float fillPercent, Coord basePos, BiomeMap biomeMap)
     {
         foreach (Coord coord in buffer.Coords)
         {
             if (IsInRing(coord, borderSize, gradientSize))
             {
                 if (random.NextFloat() < fillPercent)
-                    buffer[coord] = tile;
+                    buffer[coord] = biomeMap.GetBiome(coord + basePos).WallProvider.GetTile(coord + basePos);
             }
         }
     }
 
-    private void Smooth(Tile positiveTile, Tile negativeTile)
+    private void Smooth(Coord basePos, BiomeMap biomeMap,  Tile negativeTile)
     {
         // TODO: Use double buffering if this ends up too slow
         buffer.CopyTo(out var newMap);
@@ -107,7 +111,7 @@ public class MapGenerator : Component
             int neighborWalls = CountNeighbors(coord, "Wall");
 
             if (neighborWalls > 4)
-                newMap[coord] = positiveTile;
+                newMap[coord] = biomeMap.GetBiome(coord + basePos).WallProvider.GetTile(coord + basePos);
             else if (neighborWalls < 4)
                 newMap[coord] = negativeTile;
         }

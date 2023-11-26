@@ -24,6 +24,6 @@ public class BiomeMap
 
     public Tile GetWall(Coord worldPos)
     {
-        return GetBiome(worldPos).WallProvider.GetTile(worldPos);
+        return GetBiome(worldPos).WallProvider.Get(worldPos);
     }
 }

@@ -7,5 +7,5 @@ public struct BiomeData
     public string Name { get; private set; }
     public string Color { get; private set; }
     
-    public TileProviderData WallProvider { get; private set; }
+    public ParameterProviderData WallProvider { get; private set; }
 }

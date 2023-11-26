@@ -5,11 +5,11 @@ using MariEngine.Tiles;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.TileProviders;
 
-public class BasicTileProvider : TileProvider
+public class BasicTileProvider : ParameterProvider<Tile>
 {
     private Tile tile;
-    
-    protected override void BuildFromData(TileProviderData data)
+
+    protected override void BuildFromData(ParameterProviderData data)
     {
         if (data.Type != "Basic")
             throw new ArgumentException("Tried to initialize BasicTileProvider, but Type was not Basic.");
@@ -17,7 +17,7 @@ public class BasicTileProvider : TileProvider
         tile = ServiceRegistry.Get<TileLoader>().Get(data.Options["Tile"]);
     }
 
-    public override Tile GetTile(Coord worldPos)
+    public override Tile Get(Coord worldPos)
     {
         return new Tile(tile);
     }

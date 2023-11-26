@@ -100,7 +100,7 @@ public class WorldManager : Component
     {
         foreach (Coord coord in tilemap.Coords)
         {
-            tilemap.Set(CaveSystemManager.CaveSystem.BiomeMap.GetBiome(coord).WallProvider.GetTile(coord), coord, Tilemap.BaseLayer);
+            tilemap.Place(CaveSystemManager.CaveSystem.BiomeMap.GetWall(coord), coord, Tilemap.BaseLayer);
         }
         
         // tilemap.Fill(ServiceRegistry.Get<TileLoader>().Get("Stone"), -1);

@@ -1,4 +1,5 @@
 using MariEngine;
+using MariEngine.Tiles;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
 
@@ -19,5 +20,10 @@ public class BiomeMap
     public Biome GetBiome(Coord worldPos)
     {
         return biomeProvider.GetBiome(worldPos);
+    }
+
+    public Tile GetWall(Coord worldPos)
+    {
+        return GetBiome(worldPos).WallProvider.GetTile(worldPos);
     }
 }

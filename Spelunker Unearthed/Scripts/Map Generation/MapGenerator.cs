@@ -69,7 +69,7 @@ public class MapGenerator : Component
         foreach (Coord coord in buffer.Coords)
         {
             buffer[coord] = random.NextFloat() < fillAmount 
-                ? biomeMap.GetBiome(coord + basePos).WallProvider.GetTile(coord + basePos) 
+                ? biomeMap.GetWall(coord + basePos) 
                 : negativeTile;
         }
     }
@@ -79,7 +79,7 @@ public class MapGenerator : Component
         foreach (Coord coord in buffer.Coords)
         {
             if (IsInRing(coord, 0, size))
-                buffer[coord] = biomeMap.GetBiome(coord + basePos).WallProvider.GetTile(coord + basePos);
+                buffer[coord] = biomeMap.GetWall(coord + basePos);
         }
     }
 
@@ -96,7 +96,7 @@ public class MapGenerator : Component
             if (IsInRing(coord, borderSize, gradientSize))
             {
                 if (random.NextFloat() < fillPercent)
-                    buffer[coord] = biomeMap.GetBiome(coord + basePos).WallProvider.GetTile(coord + basePos);
+                    buffer[coord] = biomeMap.GetWall(coord + basePos);
             }
         }
     }
@@ -111,7 +111,7 @@ public class MapGenerator : Component
             int neighborWalls = CountNeighbors(coord, "Wall");
 
             if (neighborWalls > 4)
-                newMap[coord] = biomeMap.GetBiome(coord + basePos).WallProvider.GetTile(coord + basePos);
+                newMap[coord] = biomeMap.GetWall(coord + basePos);
             else if (neighborWalls < 4)
                 newMap[coord] = negativeTile;
         }

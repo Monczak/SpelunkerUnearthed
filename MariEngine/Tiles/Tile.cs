@@ -18,7 +18,7 @@ public class Tile : Resource<TileData>
     public LightSource LightSource { get; private set; }
     public float LightAttenuation { get; private set; }
     
-    public HashSet<string> Tags { get; private set; }
+    public int Tags { get; private set; }
     
     public Tilemap OwnerTilemap { get; set; }
     public HashSet<TileBehavior> Behaviors { get; private set; }
@@ -36,8 +36,8 @@ public class Tile : Resource<TileData>
         ForegroundColor = tile.ForegroundColor;
         BackgroundColor = tile.BackgroundColor;
         Character = tile.Character;
-        
-        Tags = tile.Tags is null ? new HashSet<string>() : new HashSet<string>(tile.Tags);
+
+        Tags = tile.Tags;
 
         if (tile.LightSource is not null)
             LightSource = tile.LightSource.Clone() as LightSource;
@@ -72,7 +72,13 @@ public class Tile : Resource<TileData>
         BackgroundColor = ColorUtils.FromHex(data.BackgroundColor);
         Character = data.Character;
 
-        Tags = data.Tags is null ? new HashSet<string>() : new HashSet<string>(data.Tags);
+        if (data.Tags is not null)
+        {
+            foreach (string tag in data.Tags)
+            {
+                Tags |= MariEngine.Tags.GetValue(tag);
+            }
+        }
 
         CollisionGroup = CollisionGroup.None;
         if (data.CollisionGroups is not null)

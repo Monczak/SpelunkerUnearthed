@@ -13,6 +13,7 @@ public class Tilemap : Component
     private SortedDictionary<int, TileBuffer> layers;
 
     public const int BaseLayer = 0;
+    public const int GroundLayer = -1;
 
     private List<int> layerIds = new();
     

@@ -101,9 +101,8 @@ public class WorldManager : Component
         foreach (Coord coord in tilemap.Coords)
         {
             tilemap.Place(CaveSystemManager.CaveSystem.BiomeMap.GetWall(coord), coord, Tilemap.BaseLayer);
+            tilemap.Place(CaveSystemManager.CaveSystem.BiomeMap.GetGround(coord), coord, Tilemap.GroundLayer);
         }
-        
-        // tilemap.Fill(ServiceRegistry.Get<TileLoader>().Get("Stone"), -1);
         
         foreach (Room room in CaveSystemManager.CurrentLevel.Rooms)
         {

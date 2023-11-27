@@ -1,6 +1,0 @@
-Name: "Biome 3"
-Color: "#0000FF"
-WallProvider:
-  Type: "Basic"
-  Options: 
-    Tile: "Stone"

@@ -18,7 +18,8 @@ namespace SpelunkerUnearthed.Scripts.MapGeneration;
 public class MapGenerator : Component
 {
     private Tilemap tilemap;
-    private TileBuffer buffer;
+    private TileBuffer wallBuffer;
+    private TileBuffer groundBuffer;
 
     private Random random;
 
@@ -43,7 +44,10 @@ public class MapGenerator : Component
 
     private void BuildRoomMap(Room room, MapGenerationParameters parameters, Coord pastePosition, BiomeMap biomeMap, int baseTilemapSize)
     {
-        buffer = new TileBuffer(room.Size * baseTilemapSize);
+        wallBuffer = new TileBuffer(room.Size * baseTilemapSize);
+        groundBuffer = new TileBuffer(room.Size * baseTilemapSize);
+
+        MakeGround(pastePosition, biomeMap);
 
         FillRandom(parameters.RandomFillAmount, pastePosition, biomeMap, parameters.NothingTile);
 
@@ -58,17 +62,26 @@ public class MapGenerator : Component
 
         foreach (var processor in processors)
         {
-            processor.ProcessMap(buffer, room);
+            processor.ProcessMap(wallBuffer, room);
         }
         
-        tilemap.PasteAt(buffer, pastePosition, Tilemap.BaseLayer);  // TODO: Add support for more layers
+        tilemap.PasteAt(wallBuffer, pastePosition, Tilemap.BaseLayer);
+        tilemap.PasteAt(groundBuffer, pastePosition, Tilemap.GroundLayer);
+    }
+
+    private void MakeGround(Coord basePos, BiomeMap biomeMap)
+    {
+        foreach (Coord coord in groundBuffer.Coords)
+        {
+            groundBuffer[coord] = biomeMap.GetGround(coord + basePos);
+        }
     }
 
     private void FillRandom(float fillAmount, Coord basePos, BiomeMap biomeMap, Tile negativeTile)
     {
-        foreach (Coord coord in buffer.Coords)
+        foreach (Coord coord in wallBuffer.Coords)
         {
-            buffer[coord] = random.NextFloat() < fillAmount 
+            wallBuffer[coord] = random.NextFloat() < fillAmount 
                 ? biomeMap.GetWall(coord + basePos) 
                 : negativeTile;
         }
@@ -76,27 +89,27 @@ public class MapGenerator : Component
 
     private void MakeBorder(int size, Coord basePos, BiomeMap biomeMap)
     {
-        foreach (Coord coord in buffer.Coords)
+        foreach (Coord coord in wallBuffer.Coords)
         {
             if (IsInRing(coord, 0, size))
-                buffer[coord] = biomeMap.GetWall(coord + basePos);
+                wallBuffer[coord] = biomeMap.GetWall(coord + basePos);
         }
     }
 
     private bool IsInRing(Coord coord, int outerMargin, int size)
     {
-        return (coord.X >= outerMargin && coord.X < outerMargin + size) || (coord.X > buffer.Width - outerMargin - size && coord.X <= buffer.Width - outerMargin)
-            || (coord.Y >= outerMargin && coord.Y < outerMargin + size) || (coord.Y > buffer.Height - outerMargin - size && coord.Y <= buffer.Height - outerMargin);
+        return (coord.X >= outerMargin && coord.X < outerMargin + size) || (coord.X > wallBuffer.Width - outerMargin - size && coord.X <= wallBuffer.Width - outerMargin)
+            || (coord.Y >= outerMargin && coord.Y < outerMargin + size) || (coord.Y > wallBuffer.Height - outerMargin - size && coord.Y <= wallBuffer.Height - outerMargin);
     }
 
     private void SmoothBorder(int borderSize, int gradientSize, float fillPercent, Coord basePos, BiomeMap biomeMap)
     {
-        foreach (Coord coord in buffer.Coords)
+        foreach (Coord coord in wallBuffer.Coords)
         {
             if (IsInRing(coord, borderSize, gradientSize))
             {
                 if (random.NextFloat() < fillPercent)
-                    buffer[coord] = biomeMap.GetWall(coord + basePos);
+                    wallBuffer[coord] = biomeMap.GetWall(coord + basePos);
             }
         }
     }
@@ -104,7 +117,7 @@ public class MapGenerator : Component
     private void Smooth(Coord basePos, BiomeMap biomeMap,  Tile negativeTile)
     {
         // TODO: Use double buffering if this ends up too slow
-        buffer.CopyTo(out var newMap);
+        wallBuffer.CopyTo(out var newMap);
 
         foreach (Coord coord in newMap.Coords)
         {
@@ -116,7 +129,7 @@ public class MapGenerator : Component
                 newMap[coord] = negativeTile;
         }
         
-        buffer.CopyFrom(newMap);
+        wallBuffer.CopyFrom(newMap);
     }
 
     private int CountNeighbors(Coord coord, string tag)
@@ -129,9 +142,9 @@ public class MapGenerator : Component
                 if (x == y) continue;
                 
                 Coord neighborCoord = new(x, y);
-                if (!buffer.IsInBounds(neighborCoord)) 
+                if (!wallBuffer.IsInBounds(neighborCoord)) 
                     count++;
-                else if (buffer[neighborCoord].Tags.Contains(tag))
+                else if (Tags.HasTag(wallBuffer[neighborCoord].Tags, tag))
                     count++;
             }
         }

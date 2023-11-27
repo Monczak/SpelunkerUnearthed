@@ -17,6 +17,7 @@ public class BiomeMap
         biomeProvider = provider;
     }
 
+    // TODO: Cache results nicely
     public Biome GetBiome(Coord worldPos)
     {
         return biomeProvider.GetBiome(worldPos);
@@ -24,6 +25,11 @@ public class BiomeMap
 
     public Tile GetWall(Coord worldPos)
     {
-        return GetBiome(worldPos).WallProvider.Get(worldPos);
+        return GetBiome(worldPos).WallTileProvider.Get(worldPos);
+    }
+
+    public Tile GetGround(Coord worldPos)
+    {
+        return GetBiome(worldPos).GroundTileProvider.Get(worldPos);
     }
 }

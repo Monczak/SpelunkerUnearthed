@@ -1,6 +1,0 @@
-Name: "Biome 2"
-Color: "#00FF00"
-WallProvider:
-  Type: "Basic"
-  Options:
-    Tile: "Stone"

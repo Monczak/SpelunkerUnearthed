@@ -23,7 +23,7 @@ public class PlayerSpawnPointProcessor : MapProcessor
             coordList.RemoveAt(i);
 
             // TODO: Proper spawnable space handling
-            if (!map[coord].Tags.Contains("Wall"))
+            if (!Tags.HasTag(map[coord].Tags, "Wall"))
             {
                 spawnPoint = coord;
                 break;

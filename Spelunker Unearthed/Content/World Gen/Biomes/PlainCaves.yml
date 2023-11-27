@@ -1,0 +1,10 @@
+Name: "Plain Caves"
+Color: "#aaaaaa"
+WallProvider:
+  Type: "Basic"
+  Options:
+    Tile: "Stone"
+GroundProvider:
+  Type: "Basic"
+  Options:
+    Tile: "StoneGround"

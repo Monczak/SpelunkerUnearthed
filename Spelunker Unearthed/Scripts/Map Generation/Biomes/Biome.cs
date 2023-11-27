@@ -12,17 +12,14 @@ public class Biome : Resource<BiomeData>
     public string Name { get; private set; }
     public Color Color { get; private set; }
     
-    public ParameterProvider<Tile> WallProvider { get; private set; }
+    public ParameterProvider<Tile> WallTileProvider { get; private set; }
+    public ParameterProvider<Tile> GroundTileProvider { get; private set; }
     
     protected override void BuildFromData(BiomeData data)
     {
         Name = data.Name;
         Color = ColorUtils.FromHex(data.Color);
-        WallProvider = data.WallProvider.Type switch
-        {
-            "Basic" => ResourceBuilder.Build<BasicTileProvider, ParameterProviderData>("BasicTileProvider",
-                data.WallProvider),
-            _ => throw new ArgumentException($"Unknown tile provider type: {data.WallProvider.Type}")
-        };
+        WallTileProvider = ParameterProviderRegistry.GetTileProvider(data.WallProvider);
+        GroundTileProvider = ParameterProviderRegistry.GetTileProvider(data.GroundProvider);
     }
 }

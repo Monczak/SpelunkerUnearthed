@@ -19,18 +19,33 @@
 #begin Fonts/Monospace.ttf
 /copy:Fonts/Monospace.ttf
 
+#begin Tiles/Basalt.yml
+/copy:Tiles/Basalt.yml
+
+#begin Tiles/Ice.yml
+/copy:Tiles/Ice.yml
+
+#begin Tiles/PackedIce.yml
+/copy:Tiles/PackedIce.yml
+
 #begin Tiles/Player.yml
 /copy:Tiles/Player.yml
+
+#begin Tiles/Scoria.yml
+/copy:Tiles/Scoria.yml
 
 #begin Tiles/Stone.yml
 /copy:Tiles/Stone.yml
 
-#begin World Gen/Biomes/Biome1.yml
-/copy:World Gen/Biomes/Biome1.yml
+#begin Tiles/StoneGround.yml
+/copy:Tiles/StoneGround.yml
 
-#begin World Gen/Biomes/Biome2.yml
-/copy:World Gen/Biomes/Biome2.yml
+#begin World Gen/Biomes/Glaciers.yml
+/copy:World Gen/Biomes/Glaciers.yml
 
-#begin World Gen/Biomes/Biome3.yml
-/copy:World Gen/Biomes/Biome3.yml
+#begin World Gen/Biomes/PlainCaves.yml
+/copy:World Gen/Biomes/PlainCaves.yml
+
+#begin World Gen/Biomes/Volcano.yml
+/copy:World Gen/Biomes/Volcano.yml
 

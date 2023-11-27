@@ -1,0 +1,12 @@
+Name: "Volcano"
+Color: "#ff0000"
+WallProvider:
+  Type: "Random"
+  Options: 
+    Tiles: 
+      Scoria: 10
+      Basalt: 3
+GroundProvider:
+  Type: "Basic"
+  Options:
+    Tile: "StoneGround"

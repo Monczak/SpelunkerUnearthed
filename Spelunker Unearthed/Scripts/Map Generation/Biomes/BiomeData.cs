@@ -8,4 +8,5 @@ public struct BiomeData
     public string Color { get; private set; }
     
     public ParameterProviderData WallProvider { get; private set; }
+    public ParameterProviderData GroundProvider { get; private set; }
 }

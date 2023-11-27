@@ -1,0 +1,14 @@
+Name: "Glaciers"
+Color: "#0055ff"
+WallProvider:
+  Type: "Perlin"
+  Options:
+    Tiles:
+      Ice: 0.5
+      PackedIce: 0.7
+      Stone: 1
+    Frequency: 0.05 0.05
+GroundProvider:
+  Type: "Basic"
+  Options:
+    Tile: "StoneGround"

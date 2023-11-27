@@ -1,0 +1,6 @@
+ForegroundColor: "#1c1c1b"
+BackgroundColor: "#000000"
+Character: '='
+Tags:
+  - Ground
+LightAttenuation: 0.5

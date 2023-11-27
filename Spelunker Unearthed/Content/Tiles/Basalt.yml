@@ -1,0 +1,8 @@
+ForegroundColor: "#8a8481"
+BackgroundColor: "#4a4947"
+Character: '+'
+Tags:
+  - Wall
+CollisionGroups:
+  - Group1
+LightAttenuation: 0.5

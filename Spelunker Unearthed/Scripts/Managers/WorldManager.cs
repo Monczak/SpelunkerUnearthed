@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using MariEngine;
 using MariEngine.Components;
+using MariEngine.Light;
 using MariEngine.Logging;
 using MariEngine.Services;
 using MariEngine.Tiles;
@@ -70,9 +71,14 @@ public class WorldManager : Component
         tilemap.Resize(bounds.Size * BaseTilemapSize);
         tilemap.GetComponent<Transform>().Position = bounds.ExactCenter * BaseTilemapSize;
         
+        Logger.Log($"Cave generation: generating map");
         GenerateMap();
-
         SetupRoomCameraBounds();
+
+        var checkpoint = stopwatch.Elapsed.TotalSeconds;
+        Logger.Log($"Cave generation: baking light map");
+        tilemap.GetComponent<LightMap>().ForceUpdate();
+        Logger.Log($"Cave generation: light map baking done, completed in {stopwatch.Elapsed.TotalSeconds - checkpoint:F3} seconds");
         
         stopwatch.Stop();
         IsGenerating = false;

@@ -9,6 +9,7 @@ namespace MariEngine.Light;
 public abstract class LightSource : ICloneable
 {
     private readonly Deferred<Color> color;
+    private readonly Deferred<float> intensity;
 
     public Color Color
     {
@@ -16,6 +17,16 @@ public abstract class LightSource : ICloneable
         set
         {
             color.Set(value);
+            Dirty = true;
+        }
+    }
+
+    public float Intensity
+    {
+        get => intensity.Get();
+        set
+        {
+            intensity.Set(value);
             Dirty = true;
         }
     }
@@ -35,9 +46,10 @@ public abstract class LightSource : ICloneable
 
     public event Action<LightSource> OnDirty;
 
-    protected LightSource(Color color)
+    protected LightSource(Color color, float intensity)
     {
         this.color = new Deferred<Color>(color);
+        this.intensity = new Deferred<float>(intensity);
     }
 
     public void AttachTilemap(Tilemap tilemap)
@@ -52,7 +64,7 @@ public abstract class LightSource : ICloneable
 
     public Color GetLight(Coord sourcePosition, Coord receiverPosition)
     {
-        return CalculateLight(sourcePosition, receiverPosition) * CalculateAttenuation(sourcePosition, receiverPosition);
+        return CalculateLight(sourcePosition, receiverPosition) * CalculateAttenuation(sourcePosition, receiverPosition) * Intensity;
     }
 
     public object Clone()

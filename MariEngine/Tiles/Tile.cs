@@ -94,7 +94,7 @@ public class Tile : Resource<TileData>
 
         if (data.Light is not null)
         {
-            LightSource = new PointLight(ColorUtils.FromHex(data.Light.Value.Color), data.Light.Value.Radius);
+            LightSource = new PointLight(ColorUtils.FromHex(data.Light.Value.Color), data.Light.Value.Intensity, data.Light.Value.Radius);
         }
         
         Behaviors = new HashSet<TileBehavior>();

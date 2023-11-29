@@ -137,6 +137,11 @@ public class LightMap : Component
         dirtyLightSources.Clear();
     }
 
+    public void ForceUpdate()
+    {
+        UpdateDirtyLights();
+    }
+
     public void UpdatePosition(LightSource source, Coord position)
     {
         lightSources[source].Position.Set(position);

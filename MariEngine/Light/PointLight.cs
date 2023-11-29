@@ -21,7 +21,7 @@ public class PointLight : LightSource
         }
     }
 
-    public PointLight(Color color, int radius) : base(color)
+    public PointLight(Color color, float intensity, int radius) : base(color, intensity)
     {
         this.radius = new Deferred<int>(radius);
     }
@@ -61,7 +61,7 @@ public class PointLight : LightSource
         return new CoordBounds(sourcePosition - Coord.One * radius.Get(), Coord.One * (radius.Get() * 2 + 1));
     }
 
-    protected override LightSource MakeClone() => new PointLight(Color, Radius) { Tilemap = Tilemap };
+    protected override LightSource MakeClone() => new PointLight(Color, Intensity, Radius) { Tilemap = Tilemap };
 
     protected override void UpdateProperties()
     {

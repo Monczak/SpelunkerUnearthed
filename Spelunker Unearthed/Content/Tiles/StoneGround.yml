@@ -1,5 +1,5 @@
-ForegroundColor: "#1c1c1b"
-BackgroundColor: "#000000"
+ForegroundColor: "#2c2c2b"
+BackgroundColor: "#121212"
 Character: '='
 Tags:
   - Ground

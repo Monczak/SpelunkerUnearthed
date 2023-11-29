@@ -89,7 +89,7 @@ public class TestScene : Scene
 
         if (!worldManager.IsGenerating)
         {
-            // caveSystemManager.DrawLevel(0, worldManager.BaseTilemapSize);
+            caveSystemManager.DrawLevel(0, worldManager.BaseTilemapSize);
             
             // TODO: Maybe set this as a toggle?
             cameraController.SetBounds(0, worldManager.GetRoomCameraBounds(playerController.OwnerEntity.Position));
@@ -151,7 +151,7 @@ public class TestScene : Scene
         playerController = new PlayerController();
         player.AttachComponent(playerController);
         
-        player.AttachComponent(new LightEmitter { LightSource = new PointLight(new Color(237, 222, 138), 30) });
+        player.AttachComponent(new LightEmitter { LightSource = new PointLight(new Color(237, 222, 138), 1f, 30) });
 
         AddEntity(tilemapEntity);
         

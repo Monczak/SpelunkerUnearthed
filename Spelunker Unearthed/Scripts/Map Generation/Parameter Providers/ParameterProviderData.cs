@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SpelunkerUnearthed.Scripts.MapGeneration.TileProviders;
+namespace SpelunkerUnearthed.Scripts.MapGeneration.ParameterProviders;
 
 public struct ParameterProviderData
 {

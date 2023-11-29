@@ -1,11 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using MariEngine.Loading;
-using MariEngine.Tiles;
 
-namespace SpelunkerUnearthed.Scripts.MapGeneration.TileProviders;
+namespace SpelunkerUnearthed.Scripts.MapGeneration.ParameterProviders;
 
 public static class ParameterProviderRegistry
 {
@@ -18,6 +14,17 @@ public static class ParameterProviderRegistry
             "Random" => ResourceBuilder.Build<RandomTileProvider, ParameterProviderData>("RandomTileProvider", data),
             "Perlin" => ResourceBuilder.Build<PerlinTileProvider, ParameterProviderData>("PerlinTileProvider", data),
             _ => throw new ArgumentException($"Unknown tile provider type: {data.Type}")
+        };
+    }
+
+    public static NumberProvider GetNumberProvider(ParameterProviderData data)
+    {
+        return data.Type switch
+        {
+            "Constant" => ResourceBuilder.Build<ConstantNumberProvider, ParameterProviderData>("ConstantNumberProvider", data),
+            "Random" => ResourceBuilder.Build<RandomNumberProvider, ParameterProviderData>("RandomNumberProvider", data),
+            "Perlin" => ResourceBuilder.Build<PerlinNumberProvider, ParameterProviderData>("PerlinNumberProvider", data),
+            _ => throw new ArgumentException($"Unknown number provider type: {data.Type}")
         };
     }
 }

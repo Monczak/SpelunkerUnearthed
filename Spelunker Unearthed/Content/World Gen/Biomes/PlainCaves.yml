@@ -1,10 +1,22 @@
 Name: "Plain Caves"
 Color: "#aaaaaa"
+
 WallProvider:
   Type: "Basic"
   Options:
     Tile: "Stone"
+
 GroundProvider:
   Type: "Basic"
   Options:
     Tile: "StoneGround"
+
+FillProvider:
+  Type: "Constant"
+  Options:
+    Value: 0.4
+
+SmoothProvider:
+  Type: "Constant"
+  Options:
+    Value: 3

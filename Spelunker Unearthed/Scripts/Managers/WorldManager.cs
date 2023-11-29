@@ -78,7 +78,7 @@ public class WorldManager : Component
         var checkpoint = stopwatch.Elapsed.TotalSeconds;
         Logger.Log($"Cave generation: baking light map");
         tilemap.GetComponent<LightMap>().ForceUpdate();
-        Logger.Log($"Cave generation: light map baking done, completed in {stopwatch.Elapsed.TotalSeconds - checkpoint:F3} seconds");
+        Logger.Log($"Cave generation: light map baking completed in {stopwatch.Elapsed.TotalSeconds - checkpoint:F3} seconds");
         
         stopwatch.Stop();
         IsGenerating = false;
@@ -116,7 +116,6 @@ public class WorldManager : Component
             MapGenerationParameters parameters = new MapGenerationParameters
             {
                 NothingTile = ServiceRegistry.Get<TileLoader>().Get("Nothing"),
-                RandomFillAmount = 0.4f,
                 SmoothIterations = 3,
                 BorderSize = 1,
                 BorderGradientSize = 2,

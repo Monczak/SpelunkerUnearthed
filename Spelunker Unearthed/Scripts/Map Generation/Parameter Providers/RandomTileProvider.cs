@@ -5,7 +5,7 @@ using MariEngine.Loading;
 using MariEngine.Services;
 using MariEngine.Tiles;
 
-namespace SpelunkerUnearthed.Scripts.MapGeneration.TileProviders;
+namespace SpelunkerUnearthed.Scripts.MapGeneration.ParameterProviders;
 
 
 [ParameterProviderName("Random")]

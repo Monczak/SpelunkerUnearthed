@@ -32,4 +32,14 @@ public class BiomeMap
     {
         return GetBiome(worldPos).GroundTileProvider.Get(worldPos);
     }
+
+    public float GetRandomFillAmount(Coord worldPos)
+    {
+        return GetBiome(worldPos).RandomFillAmountProvider.Get(worldPos);
+    }
+    
+    public int GetSmoothIterations(Coord worldPos)
+    {
+        return (int)GetBiome(worldPos).SmoothIterationsProvider.Get(worldPos);
+    }
 }

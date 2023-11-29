@@ -1,6 +1,6 @@
 using System;
 
-namespace SpelunkerUnearthed.Scripts.MapGeneration.TileProviders;
+namespace SpelunkerUnearthed.Scripts.MapGeneration.ParameterProviders;
 
 public class ParameterProviderNameAttribute : Attribute
 {

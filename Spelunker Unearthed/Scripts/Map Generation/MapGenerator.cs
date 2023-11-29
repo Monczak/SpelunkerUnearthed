@@ -10,7 +10,7 @@ using MariEngine.Utils;
 using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
 using SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 using SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
-using SpelunkerUnearthed.Scripts.MapGeneration.TileProviders;
+using SpelunkerUnearthed.Scripts.MapGeneration.ParameterProviders;
 using Random = MariEngine.Utils.Random;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration;
@@ -49,16 +49,13 @@ public class MapGenerator : Component
 
         MakeGround(pastePosition, biomeMap);
 
-        FillRandom(parameters.RandomFillAmount, pastePosition, biomeMap, parameters.NothingTile);
+        FillRandom(pastePosition, biomeMap, parameters.NothingTile);
 
         MakeBorder(parameters.BorderSize, pastePosition, biomeMap);
         SmoothBorder(parameters.BorderSize, parameters.BorderGradientSize, parameters.BorderGradientFillAmount,
             pastePosition, biomeMap);
-
-        for (int i = 0; i < parameters.SmoothIterations; i++)
-        {
-            Smooth(pastePosition, biomeMap, parameters.NothingTile);
-        }
+        
+        Smooth(pastePosition, biomeMap, parameters.NothingTile);
 
         foreach (var processor in processors)
         {
@@ -77,12 +74,13 @@ public class MapGenerator : Component
         }
     }
 
-    private void FillRandom(float fillAmount, Coord basePos, BiomeMap biomeMap, Tile negativeTile)
+    private void FillRandom(Coord basePos, BiomeMap biomeMap, Tile negativeTile)
     {
         foreach (Coord coord in wallBuffer.Coords)
         {
-            wallBuffer[coord] = random.NextFloat() < fillAmount 
-                ? biomeMap.GetWall(coord + basePos) 
+            Coord worldPos = coord + basePos;
+            wallBuffer[coord] = random.NextFloat() < biomeMap.GetRandomFillAmount(worldPos) 
+                ? biomeMap.GetWall(worldPos) 
                 : negativeTile;
         }
     }
@@ -114,22 +112,36 @@ public class MapGenerator : Component
         }
     }
 
-    private void Smooth(Coord basePos, BiomeMap biomeMap,  Tile negativeTile)
+    private void Smooth(Coord basePos, BiomeMap biomeMap, Tile negativeTile)
     {
-        // TODO: Use double buffering if this ends up too slow
-        wallBuffer.CopyTo(out var newMap);
-
-        foreach (Coord coord in newMap.Coords)
+        int maxIterationCount = 0;
+        foreach (Coord coord in wallBuffer.Coords)
         {
-            int neighborWalls = CountNeighbors(coord, "Wall");
-
-            if (neighborWalls > 4)
-                newMap[coord] = biomeMap.GetWall(coord + basePos);
-            else if (neighborWalls < 4)
-                newMap[coord] = negativeTile;
+            int iterCount = biomeMap.GetSmoothIterations(coord + basePos);
+            if (iterCount > maxIterationCount)
+                maxIterationCount = iterCount;
         }
-        
-        wallBuffer.CopyFrom(newMap);
+
+        for (int i = 0; i < maxIterationCount; i++)
+        {
+            // TODO: Use double buffering if this ends up too slow
+            wallBuffer.CopyTo(out var newMap);
+            foreach (Coord coord in newMap.Coords)
+            {
+                if (i >= biomeMap.GetSmoothIterations(coord + basePos))
+                    continue;
+
+                int neighborWalls = CountNeighbors(coord, "Wall");
+
+                if (neighborWalls > 4)
+                    newMap[coord] = biomeMap.GetWall(coord + basePos);
+                else if (neighborWalls < 4)
+                    newMap[coord] = negativeTile;
+            }
+
+            wallBuffer.CopyFrom(newMap);
+        }
+
     }
 
     private int CountNeighbors(Coord coord, string tag)

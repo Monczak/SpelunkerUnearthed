@@ -1,7 +1,7 @@
 ﻿using MariEngine;
 using MariEngine.Loading;
 
-namespace SpelunkerUnearthed.Scripts.MapGeneration.TileProviders;
+namespace SpelunkerUnearthed.Scripts.MapGeneration.ParameterProviders;
 
 public abstract class ParameterProvider : Resource<ParameterProviderData>
 {

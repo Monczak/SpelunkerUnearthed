@@ -5,4 +5,5 @@ public static class Constants
     public const string CaveSystemGenRng = "CaveSystemGen";
     public const string MapGenRng = "MapGen";
     public const string BiomeGenRng = "BiomeGenRng";
+    public const string GeneralPurposeRng = "GeneralPurposeRng";
 }

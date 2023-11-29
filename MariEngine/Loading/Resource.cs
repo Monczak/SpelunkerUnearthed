@@ -8,7 +8,7 @@ public abstract class Resource<TData>
 
     protected Resource() { }
 
-    public Resource(string id)
+    protected Resource(string id)
     {
         Id = id;
     }

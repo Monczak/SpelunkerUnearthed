@@ -8,6 +8,7 @@ using MariEngine.Debugging;
 using MariEngine.Input;
 using MariEngine.Light;
 using MariEngine.Logging;
+using MariEngine.Rendering;
 using MariEngine.Services;
 using MariEngine.Tiles;
 using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
@@ -46,9 +47,16 @@ public class PlayerController : TileEntityComponent
         inputManager.OnReleased("Right", ReadInput);
         
         inputManager.OnPressed("Mine", Mine);
+        inputManager.OnPressed("Use", Use);
 
         playerPosDebugLine = new DebugScreenLine<(Coord, Vector2)>(tuple => $"Position: {tuple.Item1} World: ({tuple.Item2.X}, {tuple.Item2.Y})");
         ServiceRegistry.Get<DebugScreen>().AddLine(playerPosDebugLine);
+    }
+
+    private void Use()
+    {
+        // TODO: DEBUG - remove this
+        ServiceRegistry.Get<TileAtlas>().Resize(ServiceRegistry.Get<TileAtlas>().TileSize + 1);
     }
 
     private void Mine()

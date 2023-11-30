@@ -30,12 +30,15 @@ public class CameraController : Component
         base.Update(gameTime);
 
         if (trackedTileEntity is not null)
-            TargetPosition = trackedTileEntity.Tilemap.GetComponent<TilemapRenderer>().CoordToWorldPoint(trackedTileEntity.Position);
+            TargetPosition = trackedTileEntity.Tilemap.GetComponent<TilemapRenderer>().Vector2ToWorldPoint(trackedTileEntity.SmoothedPosition);
         
         foreach (CameraBounds bounds in boundsDict.Values)
             RestrictToBounds(bounds.GetBounds());
 
-        camera.WorldPosition = Vector2.Lerp(camera.WorldPosition, TargetPosition,
+        if (Smoothing == 0)
+            camera.WorldPosition = TargetPosition;
+        else
+            camera.WorldPosition = Vector2.Lerp(camera.WorldPosition, TargetPosition,
             Smoothing * (float)gameTime.ElapsedGameTime.TotalSeconds);
     }
 

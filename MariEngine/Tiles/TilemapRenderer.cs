@@ -55,7 +55,7 @@ public class TilemapRenderer : Renderer
         {
             if (!cullingBounds.Value.PointInside((Vector2)entity.Position)) continue;
             
-            RenderTile(spriteBatch, CoordToWorldPoint(entity.Position), entity.Tile, lightMap.GetRenderedLight(entity.Position));
+            RenderTile(spriteBatch, Vector2ToWorldPoint(entity.SmoothedPosition), entity.Tile, lightMap.GetRenderedLight(entity.Position));
         }
 
         spriteBatch.End();
@@ -81,7 +81,12 @@ public class TilemapRenderer : Renderer
 
     public Vector2 CoordToWorldPoint(Coord coord)
     {
-        return (Vector2)coord + transform.Position + CalculateCenterOffset();
+        return Vector2ToWorldPoint((Vector2)coord);
+    }
+    
+    public Vector2 Vector2ToWorldPoint(Vector2 v)
+    {
+        return v + transform.Position + CalculateCenterOffset();
     }
 
     public Coord WorldPointToCoord(Vector2 point)

@@ -25,6 +25,10 @@ public class TileEntity
             Tilemap.StepOn(this, position);
         }
     }
+    
+    public Vector2 SmoothedPosition { get; private set; }
+    public float PositionSmoothing { get; set; }
+    
     public Tile Tile { get; set; }
     
     public Tilemap Tilemap { get; private set; }
@@ -122,6 +126,12 @@ public class TileEntity
     {
         foreach (TileEntityComponent component in components.Values)
             component.Update(gameTime);
+
+        if (PositionSmoothing == 0)
+            SmoothedPosition = (Vector2)Position;
+        else
+            SmoothedPosition = Vector2.Lerp(SmoothedPosition, (Vector2)Position,
+            PositionSmoothing * (float)gameTime.ElapsedGameTime.TotalSeconds);
     }
 
     public void Move(int dx = 0, int dy = 0)

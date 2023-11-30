@@ -75,8 +75,6 @@ public class SpelunkerUnearthedGame : Game
         InitializeDebugScreen();
 
         InitializeInputs();
-
-        scene = new TestScene(Window, graphics);
         
         base.Initialize();
     }
@@ -112,6 +110,7 @@ public class SpelunkerUnearthedGame : Game
         inputManager.RegisterEvent(new InputEvent("Left", Keys.Left));
         inputManager.RegisterEvent(new InputEvent("Right", Keys.Right));
         inputManager.RegisterEvent(new InputEvent("Mine", Keys.Z));
+        inputManager.RegisterEvent(new InputEvent("Use", Keys.X));
 
         inputManager.OnPressed("ToggleDebugScreen", () => debugScreen.Enabled ^= true);
     }
@@ -123,10 +122,13 @@ public class SpelunkerUnearthedGame : Game
         ServiceRegistry.RegisterService(new TileAtlas(GraphicsDevice, spriteBatch, 16));
 
         ServiceRegistry.Get<TileLoader>().LoadContent();
-        ServiceRegistry.Get<TileAtlas>().CreateAtlas(ServiceRegistry.Get<TileLoader>().Content);
+        
+        ServiceRegistry.Get<TileAtlas>().SetTiles(ServiceRegistry.Get<TileLoader>().Content);
+        ServiceRegistry.Get<TileAtlas>().CreateAtlas();
         
         ServiceRegistry.Get<BiomeLoader>().LoadContent();
         
+        scene = new TestScene(Window, graphics);
         scene.Load();
     }
 

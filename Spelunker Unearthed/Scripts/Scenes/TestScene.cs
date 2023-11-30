@@ -111,13 +111,13 @@ public class TestScene : Scene
         managersEntity.AttachComponent(caveSystemManager);
         
         Entity cameraControllerEntity = new("Camera Controller");
-        cameraController = new(Camera) { Smoothing = 10.0f };
+        cameraController = new CameraController(Camera) { Smoothing = 10f };
         cameraControllerEntity.AttachComponent(cameraController);
         AddEntity(cameraControllerEntity);
         
         Entity tilemapEntity = new("Tilemap");
         tilemap = new Tilemap(64, 64);
-        tilemap.AddLayer(-1);
+        tilemap.AddLayer(Tilemap.GroundLayer);
         
         tilemapEntity.AttachComponent(new Transform());
         tilemapEntity.AttachComponent(tilemap);

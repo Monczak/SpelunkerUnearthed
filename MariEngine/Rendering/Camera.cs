@@ -1,4 +1,5 @@
 ﻿using System;
+using MariEngine.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -8,10 +9,11 @@ public class Camera
 {
     private GameWindow window;
     private GraphicsDeviceManager graphics;
+    private TileAtlas tileAtlas;
     
     public Vector2 Position { get; set; } = Vector2.Zero;
     public float Scale { get; set; } = 1f;
-    public int TileSize { get; set; } = 16;
+    public int TileSize => tileAtlas.TileSize;
 
     public Vector2 WorldPosition
     {
@@ -23,6 +25,7 @@ public class Camera
     {
         this.window = window;
         this.graphics = graphics;
+        tileAtlas = ServiceRegistry.Get<TileAtlas>();
     }
 
     public Matrix TransformMatrix => Matrix.CreateScale(Scale)

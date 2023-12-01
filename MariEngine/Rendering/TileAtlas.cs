@@ -101,6 +101,8 @@ public class TileAtlas : Service
             for (int x = 0; x < atlasSize.X; x++)
             {
                 int i = x + y * atlasSize.X;
+                if (i >= tiles.Count) return;
+                
                 tileAtlasCoords[ids[i]] = new Coord(x, y);
             }
         }

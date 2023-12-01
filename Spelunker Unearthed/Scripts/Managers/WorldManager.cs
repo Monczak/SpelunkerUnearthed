@@ -112,11 +112,9 @@ public class WorldManager : Component
         
         foreach (Room room in CaveSystemManager.CurrentLevel.Rooms)
         {
-            // TODO: Redesign the parameter thing so that rooms can have varying params inside
             MapGenerationParameters parameters = new MapGenerationParameters
             {
                 NothingTile = ServiceRegistry.Get<TileLoader>().Get("Nothing"),
-                SmoothIterations = 3,
                 BorderSize = 1,
                 BorderGradientSize = 2,
                 BorderGradientFillAmount = 0.6f,

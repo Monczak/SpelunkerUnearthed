@@ -103,7 +103,7 @@ public class TestScene : Scene
         Entity debugEntity = new("Debug");
         gizmos = new Gizmos();
         debugEntity.AttachComponent(gizmos);
-        debugEntity.AttachComponent(new GizmoRenderer(graphics.GraphicsDevice, Camera) { Layer = 100 });
+        debugEntity.AttachComponent(new GizmoRenderer(graphics.GraphicsDevice, Camera) { Layer = 100, Enabled = false });
         AddEntity(debugEntity);
 
         Entity managersEntity = new("Managers");

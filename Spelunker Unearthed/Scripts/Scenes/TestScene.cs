@@ -156,7 +156,7 @@ public class TestScene : Scene
         AddEntity(tilemapEntity);
         
         worldManager = new WorldManager(caveSystemManager, tilemap, playerController, gizmos);
-        worldManager.AddProcessor(new RoomConnectionProcessor(), 0);
+        worldManager.AddProcessor(new RoomConnectionProcessor(worldManager.BaseRoomSize, gizmos), 0);
         
         managersEntity.AttachComponent(worldManager);
         

@@ -11,5 +11,22 @@ public enum Direction
     Left = 1 << 3,
     
     None = 0,
-    All = ~None
+    All = ~None,
+    
+    Horizontal = Up | Down,
+    Vertical = Left | Right,
+}
+
+public static class DirectionExtensions
+{
+    public static Direction Reversed(this Direction direction) => direction switch
+    {
+        Direction.Up => Direction.Down,
+        Direction.Down => Direction.Up,
+        Direction.Left => Direction.Right,
+        Direction.Right => Direction.Left,
+        Direction.None => Direction.None,
+        Direction.All => Direction.All,
+        _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
+    };
 }

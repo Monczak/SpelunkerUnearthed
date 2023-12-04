@@ -69,7 +69,7 @@ public class Room
         SubRoom subRoom = SubRooms[subRoomPos];
         SubRoom newSubRoom = otherRoom.SubRooms[node.Position];
 
-        SubRoomConnection connection = new(subRoom, newSubRoom);
+        SubRoomConnection connection = new(subRoom, newSubRoom, node.Direction);
 
         int count = Connections.Count;
         Connections.Add(connection);

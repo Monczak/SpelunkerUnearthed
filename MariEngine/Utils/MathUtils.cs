@@ -5,6 +5,11 @@ namespace MariEngine.Utils;
 
 public static class MathUtils
 {
+    public const float Pi = 3.14159f;
+
+    public const float Rad2Deg = 180 / Pi;
+    public const float Deg2Rad = Pi / 180;
+    
     public static float LerpUnclamped(float a, float b, float t)
     {
         return (1 - t) * a + b * t;
@@ -47,5 +52,13 @@ public static class MathUtils
     {
         float angle = AngleBetween(a, b);
         return Cross(a, b) < 0 ? MathHelper.TwoPi - angle : angle;
+    }
+
+    public static float DiamondAngle(Vector2 v)
+    {
+        var (x, y) = v;
+        if (y >= 0)
+            return x >= 0 ? y / (x + y) : 1 - x / ( -x + y);
+        return x < 0 ? 2 - y / (-x - y) : 3 + x / (x - y);
     }
 }

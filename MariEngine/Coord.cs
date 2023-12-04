@@ -111,4 +111,10 @@ public struct Coord
             return Y > 0 ? Direction.Down : Direction.Up;
         }
     }
+
+    public static Coord Min(Coord coord1, Coord coord2) =>
+        new(Math.Min(coord1.X, coord2.X), Math.Min(coord1.Y, coord2.Y));
+    
+    public static Coord Max(Coord coord1, Coord coord2) =>
+        new(Math.Max(coord1.X, coord2.X), Math.Max(coord1.Y, coord2.Y));
 }

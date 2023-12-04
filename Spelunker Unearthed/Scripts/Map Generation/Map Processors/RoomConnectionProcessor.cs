@@ -34,16 +34,12 @@ public class RoomConnectionProcessor : MapProcessor
 
     private void HandleConnection(Tilemap tilemap, CaveSystemLevel level, SubRoomConnection connection)
     {
-        Logger.LogDebug($"Connection from {connection.From.Position} to {connection.To.Position}");
-
         Coord fromPoint = RoomMath.TransformRoomPos(level, connection.From.Position, BaseRoomSize) + Coord.One * BaseRoomSize / 2;
         Coord toPoint = RoomMath.TransformRoomPos(level, connection.To.Position, BaseRoomSize) + Coord.One * BaseRoomSize / 2;
         Coord midpoint = (fromPoint + toPoint) / 2;
-        Logger.LogDebug($"Midpoint: {midpoint}");
 
         var (from, to) = FindConnectionCoords(tilemap, level, connection.From.Room, connection.To.Room, midpoint);
         (from, to) = StraightenLine(tilemap, from, to, connection.Direction);
-        Logger.LogDebug($"From: {from} To: {to}");
         
         gizmos.DrawLine(tilemap.CoordToWorldPoint(from) + Vector2.One * 0.5f, tilemap.CoordToWorldPoint(to) + Vector2.One * 0.5f, Color.Coral, lifetime: 10000);
     }
@@ -82,13 +78,10 @@ public class RoomConnectionProcessor : MapProcessor
             >= 2.5f and < 3.5f => Direction.Up,
             _ => throw new ArgumentOutOfRangeException()
         };
-        Logger.LogDebug(dir);
-        Logger.LogDebug(connectionDirection);
 
         if ((connectionDirection & dir) == 0)
             return (from, to);
         
-        // TODO: Straighten (sweep a line across the room boundary within the area occupied by bounds with corners (from, to) and find the shortest one
         CoordBounds bounds = CoordBounds.MakeCorners(Coord.Min(from, to) - Coord.One * lookahead, Coord.Max(from, to) + Coord.One * lookahead);
         return Sweep(bounds, dir);
 

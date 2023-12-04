@@ -66,11 +66,10 @@ public class WorldManager : Component
 
     private void GenerateCaveSystemLevel()
     {
-        Logger.Log($"Cave generation started");
-        Stopwatch stopwatch = new();
+        var stopwatch = Logger.StartStopwatch();
+        Logger.Log($"Cave generation started", stopwatch);
 
         IsGenerating = true;
-        stopwatch.Start();
             
         CaveSystemManager.Generate();
 
@@ -80,26 +79,24 @@ public class WorldManager : Component
         tilemap.Resize(bounds.Size * BaseTilemapSize);
         tilemap.GetComponent<Transform>().Position = bounds.ExactCenter * BaseTilemapSize;
         
-        Logger.Log($"Cave generation: generating rooms");
+        Logger.Log($"Cave generation: generating rooms", stopwatch);
         GenerateRooms();
         SetupRoomCameraBounds();
         
-        Logger.Log($"Cave generation: processing map");
+        Logger.Log($"Cave generation: processing map", stopwatch);
         var rooms = CaveSystemManager.CurrentLevel.Rooms;
         foreach (var (_, processor) in mapProcessors)
         {
             processor.ProcessMap(tilemap, rooms);
         }
         
-        var checkpoint = stopwatch.Elapsed.TotalSeconds;
-        Logger.Log($"Cave generation: baking light map");
+        Logger.Log($"Cave generation: baking light map", stopwatch);
         tilemap.GetComponent<LightMap>().ForceUpdate();
-        Logger.Log($"Cave generation: light map baking completed in {stopwatch.Elapsed.TotalSeconds - checkpoint:F3} seconds");
+        Logger.Log($"Cave generation: light map baking completed", stopwatch);
         
-        stopwatch.Stop();
         IsGenerating = false;
 
-        Logger.Log($"Cave generation completed in {stopwatch.Elapsed.TotalSeconds:F3} seconds");
+        Logger.Log($"Cave generation completed", stopwatch);
     }
 
     private void SetupRoomCameraBounds()

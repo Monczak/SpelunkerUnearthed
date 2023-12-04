@@ -137,9 +137,9 @@ public class TestScene : Scene
         
         tilemapEntity.AttachComponent(new TilemapCollider());
 
-        MapGenerator mapGenerator = new();
-        mapGenerator.AddProcessor(new PlayerSpawnPointProcessor()); // TODO: Load all processors using reflection
-        tilemapEntity.AttachComponent(mapGenerator);
+        RoomMapGenerator roomMapGenerator = new();
+        roomMapGenerator.AddProcessor(new PlayerSpawnPointProcessor()); // TODO: Load all processors using reflection
+        tilemapEntity.AttachComponent(roomMapGenerator);
         tilemapEntity.AttachComponent(new TilemapCameraBounds());
 
         TileEntity player = new TileEntity("Player")
@@ -156,6 +156,8 @@ public class TestScene : Scene
         AddEntity(tilemapEntity);
         
         worldManager = new WorldManager(caveSystemManager, tilemap, playerController);
+        worldManager.AddProcessor(new RoomConnectionProcessor(), 0);
+        
         managersEntity.AttachComponent(worldManager);
         
         cameraController.TrackTileEntity(player);

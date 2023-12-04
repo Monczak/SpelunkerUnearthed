@@ -15,7 +15,7 @@ using Random = MariEngine.Utils.Random;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration;
 
-public class MapGenerator : Component
+public class RoomMapGenerator : Component
 {
     private Tilemap tilemap;
     private TileBuffer wallBuffer;
@@ -23,26 +23,26 @@ public class MapGenerator : Component
 
     private Random random;
 
-    private List<MapProcessor> processors = new();
+    private List<IRoomMapProcessor> processors = new();
 
     protected override void OnAttach()
     {
         tilemap = GetComponent<Tilemap>();
     }
 
-    public void AddProcessor<T>(T processor) where T : MapProcessor
+    public void AddProcessor<T>(T processor) where T : IRoomMapProcessor
     {
         processors.Add(processor);
     }   
     
-    public void GenerateRoomMap(Room room, MapGenerationParameters parameters, Coord pastePosition, BiomeMap biomeMap, int baseTilemapSize = 16)
+    public void GenerateRoomMap(Room room, RoomMapGenerationParameters parameters, Coord pastePosition, BiomeMap biomeMap, int baseTilemapSize = 16)
     {
         random = ServiceRegistry.Get<RandomProvider>().Request(Constants.MapGenRng);
 
         BuildRoomMap(room, parameters, pastePosition, biomeMap, baseTilemapSize);
     }
 
-    private void BuildRoomMap(Room room, MapGenerationParameters parameters, Coord pastePosition, BiomeMap biomeMap, int baseTilemapSize)
+    private void BuildRoomMap(Room room, RoomMapGenerationParameters parameters, Coord pastePosition, BiomeMap biomeMap, int baseTilemapSize)
     {
         wallBuffer = new TileBuffer(room.Size * baseTilemapSize);
         groundBuffer = new TileBuffer(room.Size * baseTilemapSize);
@@ -59,7 +59,7 @@ public class MapGenerator : Component
 
         foreach (var processor in processors)
         {
-            processor.ProcessMap(wallBuffer, room);
+            processor.ProcessRoomMap(wallBuffer, room);
         }
         
         tilemap.PasteAt(wallBuffer, pastePosition, Tilemap.BaseLayer);

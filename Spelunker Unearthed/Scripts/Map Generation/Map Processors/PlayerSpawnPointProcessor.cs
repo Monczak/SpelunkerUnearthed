@@ -8,14 +8,14 @@ using SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
 
-public class PlayerSpawnPointProcessor : MapProcessor
+public class PlayerSpawnPointProcessor : IRoomMapProcessor
 {
-    public override void ProcessMap(TileBuffer map, Room room)
+    public void ProcessRoomMap(TileBuffer roomMap, Room room)
     {
         Random random = ServiceRegistry.Get<RandomProvider>().Request(Constants.MapGenRng);
         Coord spawnPoint = Coord.Zero;
 
-        List<Coord> coordList = new(map.Coords);
+        List<Coord> coordList = new(roomMap.Coords);
         while (coordList.Count > 0)
         {
             int i = random.Next(coordList.Count);
@@ -23,7 +23,7 @@ public class PlayerSpawnPointProcessor : MapProcessor
             coordList.RemoveAt(i);
 
             // TODO: Proper spawnable space handling
-            if (!Tags.HasTag(map[coord].Tags, "Wall"))
+            if (!Tags.HasTag(roomMap[coord].Tags, "Wall"))
             {
                 spawnPoint = coord;
                 break;

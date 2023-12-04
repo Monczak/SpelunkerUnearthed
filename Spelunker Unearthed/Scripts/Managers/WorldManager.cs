@@ -10,6 +10,7 @@ using MariEngine.Tiles;
 using Microsoft.Xna.Framework;
 using SpelunkerUnearthed.Scripts.MapGeneration;
 using SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
+using SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
 using SpelunkerUnearthed.Scripts.TileEntities;
 
 namespace SpelunkerUnearthed.Scripts.Managers;
@@ -18,7 +19,7 @@ public class WorldManager : Component
 {
     private Tilemap tilemap;
     private TilemapRenderer tilemapRenderer;
-    private MapGenerator mapGenerator;
+    private RoomMapGenerator roomMapGenerator;
 
     private PlayerController playerController;
 
@@ -26,6 +27,8 @@ public class WorldManager : Component
 
     private Dictionary<Room, CameraBounds> cameraBoundsMap;
     private int cameraBoundsOversize = 5;
+
+    private SortedList<int, IMapProcessor> mapProcessors;
     
     public int BaseTilemapSize => 16;
     
@@ -38,9 +41,15 @@ public class WorldManager : Component
         this.playerController = playerController;
         
         tilemapRenderer = tilemap.GetComponent<TilemapRenderer>();
-        mapGenerator = tilemap.GetComponent<MapGenerator>();
+        roomMapGenerator = tilemap.GetComponent<RoomMapGenerator>();
 
         cameraBoundsMap = new Dictionary<Room, CameraBounds>();
+        mapProcessors = new SortedList<int, IMapProcessor>();
+    }
+
+    public void AddProcessor(IMapProcessor processor, int priority)
+    {
+        mapProcessors.Add(priority, processor);
     }
 
     public Task StartCaveSystemLevelGenerationTask()
@@ -71,10 +80,17 @@ public class WorldManager : Component
         tilemap.Resize(bounds.Size * BaseTilemapSize);
         tilemap.GetComponent<Transform>().Position = bounds.ExactCenter * BaseTilemapSize;
         
-        Logger.Log($"Cave generation: generating map");
-        GenerateMap();
+        Logger.Log($"Cave generation: generating rooms");
+        GenerateRooms();
         SetupRoomCameraBounds();
-
+        
+        Logger.Log($"Cave generation: processing map");
+        var rooms = CaveSystemManager.CurrentLevel.Rooms;
+        foreach (var (_, processor) in mapProcessors)
+        {
+            processor.ProcessMap(tilemap, rooms);
+        }
+        
         var checkpoint = stopwatch.Elapsed.TotalSeconds;
         Logger.Log($"Cave generation: baking light map");
         tilemap.GetComponent<LightMap>().ForceUpdate();
@@ -102,7 +118,7 @@ public class WorldManager : Component
         }
     }
 
-    private void GenerateMap()
+    private void GenerateRooms()
     {
         foreach (Coord coord in tilemap.Coords)
         {
@@ -112,7 +128,7 @@ public class WorldManager : Component
         
         foreach (Room room in CaveSystemManager.CurrentLevel.Rooms)
         {
-            MapGenerationParameters parameters = new MapGenerationParameters
+            RoomMapGenerationParameters parameters = new RoomMapGenerationParameters
             {
                 NothingTile = ServiceRegistry.Get<TileLoader>().Get("Nothing"),
                 BorderSize = 1,
@@ -120,7 +136,7 @@ public class WorldManager : Component
                 BorderGradientFillAmount = 0.6f,
             };
             
-            mapGenerator.GenerateRoomMap(room, parameters, TransformRoomPos(room.Position), CaveSystemManager.CaveSystem.BiomeMap, BaseTilemapSize);
+            roomMapGenerator.GenerateRoomMap(room, parameters, TransformRoomPos(room.Position), CaveSystemManager.CaveSystem.BiomeMap, BaseTilemapSize);
 
             if ((room.Flags & RoomFlags.Entrance) != 0)
                 playerController.OwnerEntity.Position = RoomPosToTilemapPos(room, room.PointsOfInterest[PointOfInterestType.PlayerSpawnPoint][0].Position);

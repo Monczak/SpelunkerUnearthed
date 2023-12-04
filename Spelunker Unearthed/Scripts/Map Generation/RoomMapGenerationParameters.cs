@@ -3,7 +3,7 @@ using SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration;
 
-public struct MapGenerationParameters
+public struct RoomMapGenerationParameters
 {
     public Tile NothingTile { get; init; }
     

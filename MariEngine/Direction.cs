@@ -13,8 +13,8 @@ public enum Direction
     None = 0,
     All = ~None,
     
-    Horizontal = Up | Down,
-    Vertical = Left | Right,
+    Horizontal = Left | Right,
+    Vertical = Up | Down,
 }
 
 public static class DirectionExtensions
@@ -27,6 +27,8 @@ public static class DirectionExtensions
         Direction.Right => Direction.Left,
         Direction.None => Direction.None,
         Direction.All => Direction.All,
+        Direction.Horizontal => Direction.Vertical,
+        Direction.Vertical => Direction.Horizontal,
         _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
     };
 }

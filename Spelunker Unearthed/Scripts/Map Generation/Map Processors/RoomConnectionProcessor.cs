@@ -90,131 +90,57 @@ public class RoomConnectionProcessor : MapProcessor
         
         // TODO: Straighten (sweep a line across the room boundary within the area occupied by bounds with corners (from, to) and find the shortest one
         CoordBounds bounds = CoordBounds.MakeCorners(Coord.Min(from, to) - Coord.One * lookahead, Coord.Max(from, to) + Coord.One * lookahead);
-        Logger.LogDebug("Straighten");
+        return Sweep(bounds, dir);
 
-        // TODO: Refactor this huge bowl of spaghetti
-        int minWallCount = int.MaxValue;        
-        if ((dir & Direction.Horizontal) != 0)
+        Coord NarrowInto(int start, int end, Direction direction, int otherCoord)
         {
-            for (int x = bounds.TopLeft.X; x <= bounds.BottomRight.X; x++)
+            Coord coord = default;
+            int step = start < end ? 1 : -1;
+            for (int i = start; step < 0 ? i >= end : i <= end; i += step)
+            {
+                coord = (direction & Direction.Horizontal) != 0 ? new Coord(i, otherCoord) : new Coord(otherCoord, i);
+                if (!Tags.HasTag(tilemap.Get(coord, Tilemap.BaseLayer).Tags, "Wall"))
+                    return coord;
+            }
+
+            return coord;
+        }
+
+        (Coord from, Coord to) Sweep(CoordBounds sweepBounds, Direction sweepAxis)
+        {
+            Coord fromCoord = default, toCoord = default;
+            
+            bool isVertical = (sweepAxis & Direction.Vertical) != 0;
+            int orthoStart = isVertical ? sweepBounds.TopLeft.X : sweepBounds.TopLeft.Y;
+            int orthoEnd = isVertical ? sweepBounds.BottomRight.X : sweepBounds.BottomRight.Y;
+            int sweepStart = isVertical ? sweepBounds.TopLeft.Y : sweepBounds.TopLeft.X;
+            int sweepEnd = isVertical ? sweepBounds.BottomRight.Y : sweepBounds.BottomRight.X;
+
+            int center = isVertical ? sweepBounds.Center.Y : sweepBounds.Center.X;
+            
+            int minWallCount = int.MaxValue;
+            for (int ortho = orthoStart; ortho <= orthoEnd; ortho++)
             {
                 int wallCount = 0;
-                for (int y = bounds.TopLeft.Y; y <= bounds.BottomRight.Y; y++)
+                for (int sweep = sweepStart; sweep <= sweepEnd; sweep++)
                 {
-                    if (Tags.HasTag(tilemap.Get(new Coord(x, y), Tilemap.BaseLayer).Tags, "Wall"))
+                    Coord coord = isVertical ? new Coord(ortho, sweep) : new Coord(sweep, ortho);
+                    if (Tags.HasTag(tilemap.Get(coord, Tilemap.BaseLayer).Tags, "Wall"))
                         wallCount++;
                 }
 
                 if (wallCount < minWallCount)
                 {
                     minWallCount = wallCount;
-                    if (dir == Direction.Up)
-                    {
-                        for (int y = bounds.Center.Y; y >= bounds.TopLeft.Y; y--)
-                        {
-                            Coord coord = new(x, y);
-                            if (!Tags.HasTag(tilemap.Get(coord, Tilemap.BaseLayer).Tags, "Wall"))
-                            {
-                                from = coord;
-                                break;
-                            }
-                        }
-                        for (int y = bounds.Center.Y; y <= bounds.BottomRight.Y; y++)
-                        {
-                            Coord coord = new(x, y);
-                            if (!Tags.HasTag(tilemap.Get(coord, Tilemap.BaseLayer).Tags, "Wall"))
-                            {
-                                to = coord;
-                                break;
-                            }
-                        }    
-                    }
-                    else
-                    {
-                        for (int y = bounds.Center.Y; y <= bounds.BottomRight.Y; y++)
-                        {
-                            Coord coord = new(x, y);
-                            if (!Tags.HasTag(tilemap.Get(coord, Tilemap.BaseLayer).Tags, "Wall"))
-                            {
-                                from = coord;
-                                break;
-                            }
-                        }
-                        for (int y = bounds.Center.Y; y >= bounds.TopLeft.Y; y--)
-                        {
-                            Coord coord = new(x, y);
-                            if (!Tags.HasTag(tilemap.Get(coord, Tilemap.BaseLayer).Tags, "Wall"))
-                            {
-                                to = coord;
-                                break;
-                            }
-                        } 
-                    }
+                    
+                    fromCoord = NarrowInto(center, sweepStart, sweepAxis.Reversed(), ortho);
+                    toCoord = NarrowInto(center, sweepEnd, sweepAxis.Reversed(), ortho);
+                    if ((sweepAxis & (Direction.Down | Direction.Right)) != 0)
+                        (fromCoord, toCoord) = (toCoord, fromCoord);
                 }
             }
+
+            return (fromCoord, toCoord);
         }
-        else
-        {
-            for (int y = bounds.TopLeft.Y; y <= bounds.BottomRight.Y; y++)
-            {
-                int wallCount = 0;
-                for (int x = bounds.TopLeft.X; x <= bounds.BottomRight.X; x++)
-                {
-                    if (Tags.HasTag(tilemap.Get(new Coord(x, y), Tilemap.BaseLayer).Tags, "Wall"))
-                        wallCount++;
-                }
-
-                if (wallCount < minWallCount)
-                {
-                    minWallCount = wallCount;
-                    if (dir == Direction.Left)
-                    {
-                        for (int x = bounds.Center.X; x >= bounds.TopLeft.X; x--)
-                        {
-                            Coord coord = new(x, y);
-                            if (!Tags.HasTag(tilemap.Get(coord, Tilemap.BaseLayer).Tags, "Wall"))
-                            {
-                                from = coord;
-                                break;
-                            }
-                        }
-
-                        for (int x = bounds.Center.X; y <= bounds.BottomRight.X; x++)
-                        {
-                            Coord coord = new(x, y);
-                            if (!Tags.HasTag(tilemap.Get(coord, Tilemap.BaseLayer).Tags, "Wall"))
-                            {
-                                to = coord;
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        for (int x = bounds.Center.X; x <= bounds.BottomRight.X; x++)
-                        {
-                            Coord coord = new(x, y);
-                            if (!Tags.HasTag(tilemap.Get(coord, Tilemap.BaseLayer).Tags, "Wall"))
-                            {
-                                from = coord;
-                                break;
-                            }
-                        }
-
-                        for (int x = bounds.Center.X; x >= bounds.TopLeft.X; x--)
-                        {
-                            Coord coord = new(x, y);
-                            if (!Tags.HasTag(tilemap.Get(coord, Tilemap.BaseLayer).Tags, "Wall"))
-                            {
-                                to = coord;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-        return (from, to);
     }
 }

@@ -5,46 +5,27 @@ using MariEngine.Debugging;
 using MariEngine.Input;
 using MariEngine.Logging;
 using MariEngine.Services;
+using MariEngine.Tiles;
 using MariEngine.Utils;
 using Microsoft.Xna.Framework;
 using SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
+using SpelunkerUnearthed.Scripts.Utils;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration;
 
 public class CaveSystemManager : Component
 {
     public CaveSystem CaveSystem { get; } = new();
-    
-    private Gizmos gizmos;
+
+    private Tilemap tilemap;
 
     public CaveSystemLevel CurrentLevel { get; set; }
-
-    public CaveSystemManager(Gizmos gizmos)
-    {
-        this.gizmos = gizmos;
-        
-        // TODO: Remove this, this is for testing only
-        // ServiceRegistry.Get<InputManager>().OnPressed("Mine", Generate);
-    }
 
     public void Generate()
     {
         // TODO: Add option for setting the seed
         // ServiceRegistry.Get<RandomNumberGenerator>().Seed(1337);
         CaveSystem.Generate();
-    }
-
-    public void DrawLevel(int level, int scale)
-    {
-        foreach (Room room in CaveSystem.Levels[level].Rooms)
-        {
-            gizmos.DrawRectangle((Vector2)room.Position * scale + Vector2.One * 0.05f, (Vector2)room.Size * scale - Vector2.One * 0.1f,
-                Color.Aqua * MathUtils.InverseLerp(20, 0, room.Distance), 0);
-            foreach (SubRoomConnection connection in room.Connections)
-            {
-                gizmos.DrawLine(((Vector2)connection.From.Position + Vector2.One * 0.5f) * scale, ((Vector2)connection.To.Position + Vector2.One * 0.5f) * scale, Color.Red, lifetime: 0);
-            }
-        }
     }
 
     public void SetCurrentLevel(int level)

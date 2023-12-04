@@ -55,7 +55,7 @@ public class TestScene : Scene
 
         worldManager.StartCaveSystemLevelGenerationTask().ContinueWith(_ =>
         {
-            TestBiomeGeneration();
+            // TestBiomeGeneration();
         });
         
         ServiceRegistry.Get<DebugScreen>().AddLine(biomeDebugLine);
@@ -75,8 +75,8 @@ public class TestScene : Scene
         texture.SetData(data);
 
         var bounds = tilemap.Bounds;
-        var topLeft = tilemapRenderer.CoordToWorldPoint(bounds.TopLeft);
-        var bottomRight = tilemapRenderer.CoordToWorldPoint(bounds.BottomRight) + Vector2.One;
+        var topLeft = tilemap.CoordToWorldPoint(bounds.TopLeft);
+        var bottomRight = tilemap.CoordToWorldPoint(bounds.BottomRight) + Vector2.One;
         gizmos.DrawTexture(topLeft, bottomRight - topLeft, Color.White, texture, 10000f);
     }
 
@@ -89,7 +89,7 @@ public class TestScene : Scene
 
         if (!worldManager.IsGenerating)
         {
-            caveSystemManager.DrawLevel(0, worldManager.BaseTilemapSize);
+            worldManager.DrawLevel(0);
             
             // TODO: Maybe set this as a toggle?
             cameraController.SetBounds(0, worldManager.GetRoomCameraBounds(playerController.OwnerEntity.Position));
@@ -107,7 +107,7 @@ public class TestScene : Scene
         AddEntity(debugEntity);
 
         Entity managersEntity = new("Managers");
-        caveSystemManager = new CaveSystemManager(gizmos);
+        caveSystemManager = new CaveSystemManager();
         managersEntity.AttachComponent(caveSystemManager);
         
         Entity cameraControllerEntity = new("Camera Controller");
@@ -155,7 +155,7 @@ public class TestScene : Scene
 
         AddEntity(tilemapEntity);
         
-        worldManager = new WorldManager(caveSystemManager, tilemap, playerController);
+        worldManager = new WorldManager(caveSystemManager, tilemap, playerController, gizmos);
         worldManager.AddProcessor(new RoomConnectionProcessor(), 0);
         
         managersEntity.AttachComponent(worldManager);

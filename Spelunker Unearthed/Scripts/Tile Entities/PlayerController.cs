@@ -124,7 +124,7 @@ public class PlayerController : TileEntityComponent
 
         previousInput = input;
         
-        playerPosDebugLine.SetParams((OwnerEntity.Position, OwnerEntity.Tilemap.GetComponent<TilemapRenderer>().CoordToWorldPoint(OwnerEntity.Position)));
+        playerPosDebugLine.SetParams((OwnerEntity.Position, OwnerEntity.Tilemap.CoordToWorldPoint(OwnerEntity.Position)));
     }
 
     private void ReadInput()

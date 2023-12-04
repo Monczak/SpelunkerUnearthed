@@ -16,7 +16,6 @@ public class TilemapRenderer : Renderer
 {
     private Tilemap tilemap;
     private LightMap lightMap;
-    private Transform transform;
     
     public TilemapRenderer(GraphicsDevice graphicsDevice, Camera camera) : base(graphicsDevice, camera)
     {
@@ -27,7 +26,6 @@ public class TilemapRenderer : Renderer
     {
         tilemap = GetComponent<Tilemap>();
         lightMap = GetComponent<LightMap>();
-        transform = GetComponent<Transform>();
     }
 
     protected override void Render(SpriteBatch spriteBatch)
@@ -43,7 +41,7 @@ public class TilemapRenderer : Renderer
             {
                 Coord coord = new(x, y);
                 if (!tilemap.IsInBounds(coord)) continue;
-                RenderTile(spriteBatch, CoordToWorldPoint(coord), tilemap.GetTop(coord), lightMap.GetRenderedLight(coord));
+                RenderTile(spriteBatch, tilemap.CoordToWorldPoint(coord), tilemap.GetTop(coord), lightMap.GetRenderedLight(coord));
             }
         }
         
@@ -55,7 +53,7 @@ public class TilemapRenderer : Renderer
         {
             if (!cullingBounds.Value.PointInside((Vector2)entity.Position)) continue;
             
-            RenderTile(spriteBatch, Vector2ToWorldPoint(entity.SmoothedPosition), entity.Tile, lightMap.GetRenderedLight(entity.Position));
+            RenderTile(spriteBatch, tilemap.Vector2ToWorldPoint(entity.SmoothedPosition), entity.Tile, lightMap.GetRenderedLight(entity.Position));
         }
 
         spriteBatch.End();
@@ -66,38 +64,20 @@ public class TilemapRenderer : Renderer
         var cullingBoundsTest = GetWorldCullingBounds();
         if (cullingBoundsTest is null) return null;
         
-        Bounds cullingBounds = Bounds.MakeCorners((Vector2)WorldPointToCoord(cullingBoundsTest.Value.TopLeft),
-            (Vector2)WorldPointToCoord(cullingBoundsTest.Value.BottomRight));
+        Bounds cullingBounds = Bounds.MakeCorners((Vector2)tilemap.WorldPointToCoord(cullingBoundsTest.Value.TopLeft),
+            (Vector2)tilemap.WorldPointToCoord(cullingBoundsTest.Value.BottomRight));
         return cullingBounds;
     }
 
     internal Bounds? GetWorldCullingBounds()
     {
         Bounds cameraBounds = camera.ViewingWindow;
-        Bounds tilemapBounds = new(CoordToWorldPoint(Coord.Zero), new Vector2(tilemap.Width, tilemap.Height));
+        Bounds tilemapBounds = new(tilemap.CoordToWorldPoint(Coord.Zero), new Vector2(tilemap.Width, tilemap.Height));
         Bounds? overlap = Bounds.Overlap(cameraBounds, tilemapBounds);
         return overlap;
     }
 
-    public Vector2 CoordToWorldPoint(Coord coord)
-    {
-        return Vector2ToWorldPoint((Vector2)coord);
-    }
-    
-    public Vector2 Vector2ToWorldPoint(Vector2 v)
-    {
-        return v + transform.Position + CalculateCenterOffset();
-    }
-
-    public Coord WorldPointToCoord(Vector2 point)
-    {
-        return (Coord)(point - CalculateCenterOffset() - transform.Position);
-    }
-
-    protected override Vector2 CalculateCenterOffset()
-    {
-        return -new Vector2(tilemap.Width / 2f, tilemap.Height / 2f);
-    }
+    protected override Vector2 CalculateCenterOffset() => tilemap.CalculateCenterOffset();
 
     private void RenderTile(SpriteBatch spriteBatch, Vector2 pos, Tile tile, Color tint)
     {

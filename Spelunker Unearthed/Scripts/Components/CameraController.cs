@@ -30,7 +30,7 @@ public class CameraController : Component
         base.Update(gameTime);
 
         if (trackedTileEntity is not null)
-            TargetPosition = trackedTileEntity.Tilemap.GetComponent<TilemapRenderer>().Vector2ToWorldPoint(trackedTileEntity.SmoothedPosition);
+            TargetPosition = trackedTileEntity.Tilemap.Vector2ToWorldPoint(trackedTileEntity.SmoothedPosition);
         
         foreach (CameraBounds bounds in boundsDict.Values)
             RestrictToBounds(bounds.GetBounds());

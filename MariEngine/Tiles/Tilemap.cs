@@ -10,6 +10,7 @@ namespace MariEngine.Tiles;
 
 public class Tilemap : Component
 {
+    private Transform transform;
     private SortedDictionary<int, TileBuffer> layers;
 
     public const int BaseLayer = 0;
@@ -48,6 +49,8 @@ public class Tilemap : Component
 
     protected override void OnAttach()
     {
+        transform = GetComponent<Transform>();
+        
         foreach (var pair in layers)
         {
             Fill(ServiceRegistry.Get<TileLoader>().Get("Nothing"), pair.Key);
@@ -186,6 +189,24 @@ public class Tilemap : Component
     }
 
     public IEnumerable<Coord> Coords => Bounds.Coords;
+    
+    
+    public Vector2 CoordToWorldPoint(Coord coord)
+    {
+        return Vector2ToWorldPoint((Vector2)coord);
+    }
+    
+    public Vector2 Vector2ToWorldPoint(Vector2 v)
+    {
+        return v + transform.Position + CalculateCenterOffset();
+    }
+
+    public Coord WorldPointToCoord(Vector2 point)
+    {
+        return (Coord)(point - CalculateCenterOffset() - transform.Position);
+    }
+    
+    internal Vector2 CalculateCenterOffset() => -new Vector2(Width / 2f, Height / 2f);
 
     protected override void OnDestroy()
     {

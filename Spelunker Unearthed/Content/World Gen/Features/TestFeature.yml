@@ -1,0 +1,7 @@
+Name: "TestFeature"
+Structure:
+  - "a.a"
+  - ".a."
+  - "a.a"
+Keys:
+  a: Player

@@ -49,3 +49,6 @@
 #begin World Gen/Biomes/Volcano.yml
 /copy:World Gen/Biomes/Volcano.yml
 
+#begin World Gen/Features/TestFeature.yml
+/copy:World Gen/Features/TestFeature.yml
+

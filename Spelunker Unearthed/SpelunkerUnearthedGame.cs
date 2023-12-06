@@ -14,6 +14,7 @@ using MariEngine.Rendering;
 using MariEngine.Services;
 using MariEngine.Tiles;
 using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
+using SpelunkerUnearthed.Scripts.MapGeneration.Features;
 using SpelunkerUnearthed.Scripts.Scenes;
 using SpelunkerUnearthed.Scripts.TileEntities;
 using YamlDotNet.Serialization;
@@ -60,6 +61,7 @@ public class SpelunkerUnearthedGame : Game
         ServiceRegistry.RegisterService(new TileLoader());
         ServiceRegistry.RegisterService(new InputManager());
         ServiceRegistry.RegisterService(new BiomeLoader());
+        ServiceRegistry.RegisterService(new FeatureLoader());
         
         ServiceRegistry.RegisterService(new TexturePool(graphics.GraphicsDevice));
         
@@ -127,6 +129,7 @@ public class SpelunkerUnearthedGame : Game
         ServiceRegistry.Get<TileAtlas>().CreateAtlas();
         
         ServiceRegistry.Get<BiomeLoader>().LoadContent();
+        ServiceRegistry.Get<FeatureLoader>().LoadContent();
         
         scene = new TestScene(Window, graphics);
         scene.Load();

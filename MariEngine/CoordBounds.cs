@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 
 namespace MariEngine;
@@ -67,7 +68,24 @@ public struct CoordBounds(Coord topLeft, Coord size)
         };
         return bounds;
     }
+    
+    public static CoordBounds MakeEnvelope(Coord coord1, Coord coord2) => MakeCorners(Coord.Min(coord1, coord2), Coord.Max(coord1, coord2));
 
+    public static CoordBounds MakeEnvelope(ICollection<Coord> coords)
+    {
+        if (coords.Count < 2)
+            throw new ArgumentException("Coord collection must be at least 2 elements long.");
+        
+        Coord minCoord = coords.First(), maxCoord = coords.First();
+        foreach (Coord coord in coords)
+        {
+            minCoord = Coord.Min(coord, minCoord);
+            maxCoord = Coord.Max(coord, maxCoord);
+        }
+
+        return MakeEnvelope(minCoord, maxCoord);
+    }
+    
     public bool PointInside(Coord point)
     {
         return point.X >= TopLeft.X && point.X <= TopLeft.X + Size.X - 1 && point.Y >= TopLeft.Y &&

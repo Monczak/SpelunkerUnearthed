@@ -137,12 +137,14 @@ public class Tilemap : Component
         }
     }
 
-    public void PasteAt(TileBuffer buffer, Coord position, int layerId)
+    public void PasteAt(TileBuffer buffer, Coord position, int layerId, bool maskNulls = true)
     {
         foreach (Coord coord in buffer.Coords)
         {
             Coord actualCoord = coord + position;
             if (!IsInBounds(actualCoord)) continue;
+            if (maskNulls && buffer[coord] is null) continue;
+            
             Place(buffer[coord], actualCoord, layerId);
         }
     }

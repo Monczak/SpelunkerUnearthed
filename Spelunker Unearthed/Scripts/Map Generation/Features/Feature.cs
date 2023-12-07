@@ -10,6 +10,9 @@ public class Feature : Resource<FeatureData>, IFeature
 {
     private TileBuffer buffer;
     
+    public string Name { get; private set; }
+    public CoordBounds Bounds { get; private set; }
+    
     protected override void BuildFromData(FeatureData data)
     {
         Name = data.Name;
@@ -37,9 +40,6 @@ public class Feature : Resource<FeatureData>, IFeature
 
         Bounds = new CoordBounds(Coord.Zero, new Coord(width, height));
     }
-
-    public string Name { get; set; }
-    public CoordBounds Bounds { get; set; }
     
-    public TileBuffer Generate() => buffer;
+    public TileBuffer Generate(Tilemap tilemap) => buffer;
 }

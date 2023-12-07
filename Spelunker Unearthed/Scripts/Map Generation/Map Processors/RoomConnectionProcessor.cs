@@ -8,6 +8,7 @@ using MariEngine.Tiles;
 using MariEngine.Utils;
 using Microsoft.Xna.Framework;
 using SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
+using SpelunkerUnearthed.Scripts.MapGeneration.Features;
 using SpelunkerUnearthed.Scripts.Utils;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
@@ -33,6 +34,10 @@ public class RoomConnectionProcessor(int baseRoomSize, Gizmos gizmos) : MapProce
 
         var (from, to) = FindConnectionCoords(tilemap, level, connection.From.Room, connection.To.Room, midpoint);
         (from, to) = StraightenLine(tilemap, from, to, connection.Direction);
+
+        Tunnel tunnel = new(from, to, 1);
+        var tunnelTiles = tunnel.Generate(tilemap);
+        tilemap.PasteAt(tunnelTiles, tunnel.Bounds.TopLeft, Tilemap.BaseLayer);
         
         gizmos.DrawLine(tilemap.CoordToWorldPoint(from) + Vector2.One * 0.5f, tilemap.CoordToWorldPoint(to) + Vector2.One * 0.5f, Color.Coral, lifetime: 10000);
     }

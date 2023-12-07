@@ -14,6 +14,7 @@ public class CameraController : Component
 {
     public float Smoothing { get; set; }
     public Vector2 TargetPosition { get; set; }
+    public Vector2 CurrentPosition { get; set; }
     
     private Camera camera;
     private TileEntity trackedTileEntity;
@@ -36,10 +37,12 @@ public class CameraController : Component
             RestrictToBounds(bounds.GetBounds());
 
         if (Smoothing == 0)
-            camera.WorldPosition = TargetPosition;
+            CurrentPosition = TargetPosition;
         else
-            camera.WorldPosition = Vector2.Lerp(camera.WorldPosition, TargetPosition,
+            CurrentPosition = Vector2.Lerp(camera.WorldPosition, TargetPosition,
             Smoothing * (float)gameTime.ElapsedGameTime.TotalSeconds);
+
+        camera.WorldPosition = CurrentPosition + Vector2.One * 0.0001f; // This manages to fix graphical issues somehow (lines between tiles, tile graphics warping, etc.)
     }
 
     private void RestrictToBounds(Bounds restrictBounds)

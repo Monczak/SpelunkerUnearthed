@@ -12,15 +12,8 @@ using SpelunkerUnearthed.Scripts.Utils;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
 
-public class RoomConnectionProcessor : MapProcessor
+public class RoomConnectionProcessor(int baseRoomSize, Gizmos gizmos) : MapProcessor(baseRoomSize)
 {
-    private Gizmos gizmos;
-    
-    public RoomConnectionProcessor(int baseRoomSize, Gizmos gizmos) : base(baseRoomSize)
-    {
-        this.gizmos = gizmos;
-    }
-    
     public override void ProcessMap(Tilemap tilemap, CaveSystemLevel level)
     {
         var connections = level.Rooms

@@ -3,15 +3,8 @@ using MariEngine.Tiles;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
 
-public class BiomeMap
+public class BiomeMap(IBiomeProvider biomeProvider)
 {
-    private IBiomeProvider biomeProvider;
-
-    public BiomeMap(IBiomeProvider biomeProvider)
-    {
-        this.biomeProvider = biomeProvider;
-    }
-
     public void SetBiomeProvider(IBiomeProvider provider)
     {
         biomeProvider = provider;

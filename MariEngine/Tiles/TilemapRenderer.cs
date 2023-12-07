@@ -12,15 +12,10 @@ using MariEngine.Rendering;
 
 namespace MariEngine.Tiles;
 
-public class TilemapRenderer : Renderer
+public class TilemapRenderer(GraphicsDevice graphicsDevice, Camera camera) : Renderer(graphicsDevice, camera)
 {
     private Tilemap tilemap;
     private LightMap lightMap;
-    
-    public TilemapRenderer(GraphicsDevice graphicsDevice, Camera camera) : base(graphicsDevice, camera)
-    {
-        
-    }
 
     protected override void OnAttach()
     {

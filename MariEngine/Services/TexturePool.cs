@@ -4,15 +4,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MariEngine.Services;
 
-public class TexturePool : Service
+public class TexturePool(GraphicsDevice graphicsDevice) : Service
 {
     private Dictionary<Guid, Texture2D> textures = new();
-    private GraphicsDevice graphicsDevice;
-
-    public TexturePool(GraphicsDevice graphicsDevice)
-    {
-        this.graphicsDevice = graphicsDevice;
-    }
 
     public Texture2D RequestTexture(Coord size, out Guid guid)
     {

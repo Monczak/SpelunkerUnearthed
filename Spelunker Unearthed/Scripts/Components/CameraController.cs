@@ -10,21 +10,15 @@ using MariEngine.Utils;
 
 namespace SpelunkerUnearthed.Scripts.Components;
 
-public class CameraController : Component
+public class CameraController(Camera camera) : Component
 {
     public float Smoothing { get; set; }
     public Vector2 TargetPosition { get; set; }
     public Vector2 CurrentPosition { get; set; }
-    
-    private Camera camera;
+
     private TileEntity trackedTileEntity;
 
     private SortedDictionary<int, CameraBounds> boundsDict = new();
-
-    public CameraController(Camera camera)
-    {
-        this.camera = camera;
-    }
 
     protected override void Update(GameTime gameTime)
     {

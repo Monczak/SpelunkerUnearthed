@@ -5,11 +5,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MariEngine.Rendering;
 
-public class Camera
+public class Camera(GameWindow window, GraphicsDeviceManager graphics)
 {
-    private GameWindow window;
-    private GraphicsDeviceManager graphics;
-    private TileAtlas tileAtlas;
+    private GraphicsDeviceManager graphics = graphics;
+    private TileAtlas tileAtlas = ServiceRegistry.Get<TileAtlas>();
     
     public Vector2 Position { get; set; } = Vector2.Zero;
     public float Scale { get; set; } = 1f;
@@ -21,16 +20,9 @@ public class Camera
         set => Position = value * TileSize;
     }
 
-    public Camera(GameWindow window, GraphicsDeviceManager graphics)
-    {
-        this.window = window;
-        this.graphics = graphics;
-        tileAtlas = ServiceRegistry.Get<TileAtlas>();
-    }
-
     public Matrix TransformMatrix => Matrix.CreateScale(Scale)
-                                         * Matrix.CreateTranslation(-new Vector3(Position.X, Position.Y, 0))
-                                         * Matrix.CreateTranslation(new Vector3(window.ClientBounds.Width / 2f, window.ClientBounds.Height / 2f, 0));
+                                     * Matrix.CreateTranslation(-new Vector3(Position.X, Position.Y, 0))
+                                     * Matrix.CreateTranslation(new Vector3(window.ClientBounds.Width / 2f, window.ClientBounds.Height / 2f, 0));
 
     public Matrix InverseTransformMatrix => Matrix.Invert(TransformMatrix);
     

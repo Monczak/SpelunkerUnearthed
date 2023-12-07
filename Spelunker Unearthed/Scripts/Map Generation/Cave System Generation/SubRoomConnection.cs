@@ -2,21 +2,14 @@ using MariEngine;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 
-public class SubRoomConnection
+public class SubRoomConnection(SubRoom from, SubRoom to, Direction direction)
 {
-    public SubRoom From { get; }
-    public SubRoom To { get; }
-    
-    public Direction Direction { get; }
+    public SubRoom From { get; } = from;
+    public SubRoom To { get; } = to;
+
+    public Direction Direction { get; } = direction;
 
     public SubRoomConnection Reversed => new(To, From, Direction.Reversed());
-
-    public SubRoomConnection(SubRoom from, SubRoom to, Direction direction)
-    {
-        From = from;
-        To = to;
-        Direction = direction;
-    }
 
     public override bool Equals(object obj)
     {

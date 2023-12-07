@@ -2,14 +2,8 @@ using MariEngine;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration;
 
-public struct PointOfInterest
+public readonly struct PointOfInterest(PointOfInterestType poiType, Coord position)
 {
-    public PointOfInterestType PoiType { get; init; }
-    public Coord Position { get; init; }
-
-    public PointOfInterest(PointOfInterestType poiType, Coord position)
-    {
-        PoiType = poiType;
-        Position = position;
-    }
+    public PointOfInterestType PoiType { get; } = poiType;
+    public Coord Position { get; } = position;
 }

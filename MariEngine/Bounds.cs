@@ -3,20 +3,14 @@ using Microsoft.Xna.Framework;
 
 namespace MariEngine;
 
-public struct Bounds
+public struct Bounds(Vector2 topLeft, Vector2 size)
 {
-    public Vector2 TopLeft { get; set; }
-    public Vector2 Size { get; set; }
+    public Vector2 TopLeft { get; set; } = topLeft;
+    public Vector2 Size { get; set; } = size;
 
     public Vector2 TopRight => TopLeft + Vector2.UnitX * Size;
     public Vector2 BottomLeft => TopLeft + Vector2.UnitY * Size;
     public Vector2 BottomRight => TopLeft + Vector2.One * Size;
-
-    public Bounds(Vector2 topLeft, Vector2 size)
-    {
-        TopLeft = topLeft;
-        Size = size;
-    }
 
     public static Bounds MakeCorners(Vector2 topLeft, Vector2 bottomRight)
     {

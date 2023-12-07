@@ -18,40 +18,23 @@ using SpelunkerUnearthed.Scripts.Utils;
 
 namespace SpelunkerUnearthed.Scripts.Managers;
 
-public class WorldManager : Component
+public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, PlayerController playerController,
+        Gizmos gizmos)
+    : Component
 {
-    private Tilemap tilemap;
-    private TilemapRenderer tilemapRenderer;
-    private RoomMapGenerator roomMapGenerator;
+    private TilemapRenderer tilemapRenderer = tilemap.GetComponent<TilemapRenderer>();
+    private RoomMapGenerator roomMapGenerator = tilemap.GetComponent<RoomMapGenerator>();
 
-    private PlayerController playerController;
+    public CaveSystemManager CaveSystemManager { get; } = caveSystemManager;
 
-    private Gizmos gizmos;
-
-    public CaveSystemManager CaveSystemManager { get; }
-
-    private Dictionary<Room, CameraBounds> cameraBoundsMap;
+    private Dictionary<Room, CameraBounds> cameraBoundsMap = new();
     private int cameraBoundsOversize = 5;
 
-    private SortedList<int, MapProcessor> mapProcessors;
+    private SortedList<int, MapProcessor> mapProcessors = new();
     
     public int BaseRoomSize => 16;
     
     public bool IsGenerating { get; private set; }
-
-    public WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, PlayerController playerController, Gizmos gizmos)
-    {
-        CaveSystemManager = caveSystemManager;
-        this.tilemap = tilemap;
-        this.playerController = playerController;
-        this.gizmos = gizmos;
-        
-        tilemapRenderer = tilemap.GetComponent<TilemapRenderer>();
-        roomMapGenerator = tilemap.GetComponent<RoomMapGenerator>();
-
-        cameraBoundsMap = new Dictionary<Room, CameraBounds>();
-        mapProcessors = new SortedList<int, MapProcessor>();
-    }
 
     public void AddProcessor(MapProcessor processor, int priority)
     {

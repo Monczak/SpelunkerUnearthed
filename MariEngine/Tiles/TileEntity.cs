@@ -8,9 +8,9 @@ using Microsoft.Xna.Framework;
 namespace MariEngine.Tiles;
 
 // TODO: Refactor this to use a generic base class for a component container
-public class TileEntity
+public class TileEntity(string name)
 {
-    public string Name { get; set; }
+    public string Name { get; set; } = name;
 
     private Coord position;
 
@@ -33,14 +33,8 @@ public class TileEntity
     
     public Tilemap Tilemap { get; private set; }
 
-    private Dictionary<Type, TileEntityComponent> components;
+    private Dictionary<Type, TileEntityComponent> components = new();
 
-    public TileEntity(string name)
-    {
-        Name = name;
-        components = new Dictionary<Type, TileEntityComponent>();
-    }
-    
     public T AddComponent<T>() where T : TileEntityComponent
     {
         AssertComponent<T>();

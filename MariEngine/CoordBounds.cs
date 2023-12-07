@@ -4,10 +4,10 @@ using Microsoft.Xna.Framework;
 
 namespace MariEngine;
 
-public struct CoordBounds
+public struct CoordBounds(Coord topLeft, Coord size)
 {
-    public Coord TopLeft { get; set; }
-    public Coord Size { get; set; }
+    public Coord TopLeft { get; set; } = topLeft;
+    public Coord Size { get; set; } = size;
 
     private Coord? topRight = null;
     private Coord? bottomLeft = null;
@@ -56,12 +56,6 @@ public struct CoordBounds
             exactCenter ??= (Vector2)TopLeft + (Vector2)Size / 2;
             return exactCenter.Value; 
         }
-    }
-
-    public CoordBounds(Coord topLeft, Coord size)
-    {
-        TopLeft = topLeft;
-        Size = size;
     }
 
     public static CoordBounds MakeCorners(Coord topLeft, Coord bottomRight) 

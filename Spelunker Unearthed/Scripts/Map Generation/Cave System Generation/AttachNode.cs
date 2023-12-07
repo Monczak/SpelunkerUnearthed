@@ -3,16 +3,10 @@ using MariEngine;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 
-public readonly struct AttachNode
+public readonly struct AttachNode(Coord position, Direction direction)
 {
-    public Coord Position { get; init; }
-    public Direction Direction { get; init; }
-
-    public AttachNode(Coord position, Direction direction)
-    {
-        Position = position;
-        Direction = direction;
-    }
+    public Coord Position { get; init; } = position;
+    public Direction Direction { get; init; } = direction;
 
     public IEnumerable<Coord> GetRoomPositions(Coord roomSize)
     {

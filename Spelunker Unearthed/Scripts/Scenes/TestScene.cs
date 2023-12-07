@@ -24,7 +24,7 @@ using SpelunkerUnearthed.Scripts.TileEntities;
 
 namespace SpelunkerUnearthed.Scripts.Scenes;
 
-public class TestScene : Scene
+public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scene(window, graphics)
 {
     private Tilemap tilemap;
     private TilemapRenderer tilemapRenderer;
@@ -39,10 +39,6 @@ public class TestScene : Scene
     private Gizmos gizmos;
     
     private DebugScreenLine<Biome> biomeDebugLine = new(biome => $"Biome: {biome?.Name ?? "none"}");
-    
-    public TestScene(GameWindow window, GraphicsDeviceManager graphics) : base(window, graphics)
-    {
-    }
 
     public override void Load()
     {

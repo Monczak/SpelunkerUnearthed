@@ -6,10 +6,10 @@ using MariEngine.Utils;
 
 namespace MariEngine.Light;
 
-public abstract class LightSource : ICloneable
+public abstract class LightSource(Color color, float intensity) : ICloneable
 {
-    private readonly Deferred<Color> color;
-    private readonly Deferred<float> intensity;
+    private readonly Deferred<Color> color = new Deferred<Color>(color);
+    private readonly Deferred<float> intensity = new Deferred<float>(intensity);
 
     public Color Color
     {
@@ -45,12 +45,6 @@ public abstract class LightSource : ICloneable
     }
 
     public event Action<LightSource> OnDirty;
-
-    protected LightSource(Color color, float intensity)
-    {
-        this.color = new Deferred<Color>(color);
-        this.intensity = new Deferred<float>(intensity);
-    }
 
     public void AttachTilemap(Tilemap tilemap)
     {

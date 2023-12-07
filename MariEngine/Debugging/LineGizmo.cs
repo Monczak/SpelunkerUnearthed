@@ -5,17 +5,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MariEngine.Debugging;
 
-public class LineGizmo : GizmoShape
+public class LineGizmo(Vector2 point1, Vector2 point2, Color color, int width = 3, float? lifetime = null)
+    : GizmoShape(point1, color, lifetime)
 {
-    private Vector2 point2;
-    private int width;
-    
-    public LineGizmo(Vector2 point1, Vector2 point2, Color color, int width = 3, float? lifetime = null) : base(point1, color, lifetime)
-    {
-        this.point2 = point2;
-        this.width = width;
-    }
-
     internal override void Render(SpriteBatch spriteBatch, Camera camera, Texture2D texture)
     {
         Rectangle rectangle = new Rectangle((int)(Position.X * camera.TileSize), (int)(Position.Y * camera.TileSize), (int)((point2 - Position).Length() * camera.

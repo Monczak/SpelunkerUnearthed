@@ -7,9 +7,9 @@ using MariEngine.Logging;
 
 namespace MariEngine.Light;
 
-public class PointLight : LightSource
+public class PointLight(Color color, float intensity, int radius) : LightSource(color, intensity)
 {
-    private readonly Deferred<int> radius;
+    private readonly Deferred<int> radius = new Deferred<int>(radius);
 
     public int Radius
     {
@@ -19,11 +19,6 @@ public class PointLight : LightSource
             radius.Set(value);
             Dirty = true;
         }
-    }
-
-    public PointLight(Color color, float intensity, int radius) : base(color, intensity)
-    {
-        this.radius = new Deferred<int>(radius);
     }
 
     protected override Color CalculateLight(Coord sourcePosition, Coord receiverPosition)

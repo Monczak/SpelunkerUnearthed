@@ -4,16 +4,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MariEngine.Debugging;
 
-public class TextureGizmo : GizmoShape
+public class TextureGizmo(Vector2 position, Vector2 size, Color color, Texture2D texture, float? lifetime = null)
+    : GizmoShape(position, color, lifetime)
 {
-    private Texture2D texture;
-    private Vector2 Size { get; init; }
-    
-    public TextureGizmo(Vector2 position, Vector2 size, Color color, Texture2D texture, float? lifetime = null) : base(position, color, lifetime)
-    {
-        this.texture = texture;
-        Size = size;
-    }
+    private Vector2 Size { get; init; } = size;
 
     internal override void Render(SpriteBatch spriteBatch, Camera camera, Texture2D _)
     {

@@ -7,19 +7,13 @@ using Microsoft.Xna.Framework;
 
 namespace MariEngine;
 
-public class Entity
+public class Entity(string name)
 {
-    public string Name { get; set; }
+    public string Name { get; set; } = name;
 
     public bool ToBeDestroyed { get; private set; }
 
-    private Dictionary<Type, Component> components;
-
-    public Entity(string name)
-    {
-        Name = name;
-        components = new Dictionary<Type, Component>();
-    }
+    private Dictionary<Type, Component> components = new();
 
     public T AddComponent<T>() where T : Component
     {

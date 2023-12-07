@@ -5,19 +5,12 @@ using MariEngine.Exceptions;
 
 namespace MariEngine.Tiles;
 
-public class TileBuffer : IEnumerable<Tile>
+public class TileBuffer(int width, int height) : IEnumerable<Tile>
 {
-    private readonly Tile[] map;
+    private readonly Tile[] map = new Tile[width * height];
     
-    public int Width { get; private set; }
-    public int Height { get; private set; }
-
-    public TileBuffer(int width, int height)
-    {
-        map = new Tile[width * height];
-        Width = width;
-        Height = height;
-    }
+    public int Width { get; private set; } = width;
+    public int Height { get; private set; } = height;
 
     public TileBuffer(Coord size) : this(size.X, size.Y)
     {

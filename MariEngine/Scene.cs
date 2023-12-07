@@ -7,24 +7,16 @@ using MariEngine.Logging;
 
 namespace MariEngine;
 
-public abstract class Scene
+public abstract class Scene(GameWindow window, GraphicsDeviceManager graphics)
 {
     public List<Entity> Entities { get; } = new();
-    public Camera Camera { get; }
+    public Camera Camera { get; } = new(window, graphics);
 
-    private readonly PriorityQueue<Renderer, int> rendererQueue;
+    private readonly PriorityQueue<Renderer, int> rendererQueue = new();
 
-    protected GraphicsDeviceManager graphics;
+    protected GraphicsDeviceManager graphics = graphics;
 
     public abstract void Load();
-
-    public Scene(GameWindow window, GraphicsDeviceManager graphics)
-    {
-        Camera = new Camera(window, graphics);
-        this.graphics = graphics;
-
-        rendererQueue = new PriorityQueue<Renderer, int>();
-    }    
 
     public void AddEntity(Entity entity)
     {

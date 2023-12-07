@@ -3,18 +3,11 @@ using Microsoft.Xna.Framework;
 
 namespace MariEngine;
 
-public struct Coord3
+public struct Coord3(int x, int y, int z)
 {
-    public int X { get; set; }
-    public int Y { get; set; }
-    public int Z { get; set; }
-
-    public Coord3(int x, int y, int z)
-    {
-        X = x;
-        Y = y;
-        Z = z;
-    }
+    public int X { get; set; } = x;
+    public int Y { get; set; } = y;
+    public int Z { get; set; } = z;
 
     public override string ToString()
     {

@@ -4,16 +4,10 @@ using Microsoft.Xna.Framework;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 
-public class SubRoom
+public class SubRoom(Room room, Coord position)
 {
-    public Coord Position { get; private set; }
-    public Room Room { get; private set; }
-
-    public SubRoom(Room room, Coord position)
-    {
-        Room = room;
-        Position = position;
-    }
+    public Coord Position { get; private set; } = position;
+    public Room Room { get; private set; } = room;
 
     public bool NextTo(SubRoom subRoom) => (subRoom.Position - Position).SqrMagnitude == 1;
 }

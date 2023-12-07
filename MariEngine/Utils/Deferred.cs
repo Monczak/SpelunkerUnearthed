@@ -1,17 +1,10 @@
 ﻿namespace MariEngine.Utils;
 
-public class Deferred<T>
+public class Deferred<T>(T value)
 {
-    private T current;
-    private T actual;
+    private T actual = value;
 
-    public T Get() => current;
+    public T Get() => value;
     public void Set(T value) => actual = value;
-    public void Update() => current = actual;
-
-    public Deferred(T value)
-    {
-        current = value;
-        actual = value;
-    }
+    public void Update() => value = actual;
 }

@@ -2,10 +2,4 @@ using System;
 
 namespace MariEngine.Loading;
 
-public class ResourceLoadingException : Exception
-{
-    public ResourceLoadingException(string message) : base(message)
-    {
-        
-    }
-}
+public class ResourceLoadingException(string message) : Exception(message);

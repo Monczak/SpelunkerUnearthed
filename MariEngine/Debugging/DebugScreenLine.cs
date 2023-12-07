@@ -1,16 +1,9 @@
 ﻿namespace MariEngine.Debugging;
 
-public class DebugScreenLine
+public class DebugScreenLine(DebugScreenLine.InfoRetriever retriever)
 {
     public delegate string InfoRetriever();
 
-    private readonly InfoRetriever retriever;
-
-    public DebugScreenLine(InfoRetriever retriever)
-    {
-        this.retriever = retriever;
-    }
-    
     public string GetLine() => GetText();
 
     protected virtual string GetText()
@@ -19,17 +12,11 @@ public class DebugScreenLine
     }
 }
 
-public class DebugScreenLine<T> : DebugScreenLine
+public class DebugScreenLine<T>(DebugScreenLine<T>.InfoRetriever retriever) : DebugScreenLine(null)
 {
     private T param;
     
     public new delegate string InfoRetriever(T param);
-    private readonly InfoRetriever retriever;
-    
-    public DebugScreenLine(InfoRetriever retriever) : base(null)
-    {
-        this.retriever = retriever;
-    }
 
     protected override string GetText()
     {

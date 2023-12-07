@@ -3,21 +3,13 @@ using Microsoft.Xna.Framework;
 
 namespace MariEngine;
 
-public struct Coord
+public struct Coord(int x, int y)
 {
-    public int X { get; set; }
-    public int Y { get; set; }
+    public int X { get; set; } = x;
+    public int Y { get; set; } = y;
 
-    public Coord(int x, int y)
+    public Coord(Vector2 v) : this((int)MathF.Floor(v.X), (int)MathF.Floor(v.Y))
     {
-        X = x;
-        Y = y;
-    }
-    
-    public Coord(Vector2 v)
-    {
-        X = (int)MathF.Floor(v.X);
-        Y = (int)MathF.Floor(v.Y);
     }
 
     public Coord(float x, float y) : this(new Vector2(x, y))

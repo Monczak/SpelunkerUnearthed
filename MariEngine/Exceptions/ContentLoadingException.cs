@@ -2,9 +2,4 @@
 
 namespace MariEngine.Exceptions;
 
-public class ContentLoadingException : Exception
-{
-    public ContentLoadingException(string message) : base(message)
-    {
-    }
-}
+public class ContentLoadingException(string message) : Exception(message);

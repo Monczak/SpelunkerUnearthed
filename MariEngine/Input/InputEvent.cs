@@ -2,16 +2,10 @@
 
 namespace MariEngine.Input;
 
-public class InputEvent
+public class InputEvent(string name, Keys key)
 {
-    public string Name { get; init; }
-    public Keys Key { get; set; }
-
-    public InputEvent(string name, Keys key)
-    {
-        Name = name;
-        Key = key;
-    }
+    public string Name { get; init; } = name;
+    public Keys Key { get; set; } = key;
 
     public override int GetHashCode()
     {

@@ -5,18 +5,12 @@ using Microsoft.Xna.Framework.Graphics;
 namespace MariEngine.Rendering;
 
 [Exclusive]
-public abstract class Renderer : Component
+public abstract class Renderer(GraphicsDevice graphicsDevice, Camera camera) : Component
 {
-    protected Camera camera;
-    protected GraphicsDevice graphicsDevice;
+    protected Camera camera = camera;
+    protected GraphicsDevice graphicsDevice = graphicsDevice;
 
     public int Layer { get; set; } = 0;
-
-    protected Renderer(GraphicsDevice graphicsDevice, Camera camera)
-    {
-        this.graphicsDevice = graphicsDevice;
-        this.camera = camera;
-    }
 
     internal void DoRender(SpriteBatch spriteBatch)
     {

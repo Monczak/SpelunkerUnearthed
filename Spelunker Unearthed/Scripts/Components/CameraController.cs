@@ -39,10 +39,18 @@ public class CameraController : Component
         if (Smoothing == 0)
             CurrentPosition = TargetPosition;
         else
-            CurrentPosition = Vector2.Lerp(camera.WorldPosition, TargetPosition,
+            CurrentPosition = Vector2.Lerp(CurrentPosition, TargetPosition,
             Smoothing * (float)gameTime.ElapsedGameTime.TotalSeconds);
 
-        camera.WorldPosition = CurrentPosition + Vector2.One * 0.0001f; // This manages to fix graphical issues somehow (lines between tiles, tile graphics warping, etc.)
+        // This manages to fix graphical issues somehow (lines between tiles, tile graphics warping, etc.)
+        Vector2 mantissa = CurrentPosition - Vector2.Round(CurrentPosition);
+        const float threshold = 0.0001f;
+        if (mantissa.X < threshold || mantissa.Y < threshold)
+            CurrentPosition += Vector2.One * threshold / 2;
+        
+        camera.WorldPosition = CurrentPosition;
+        
+
     }
 
     private void RestrictToBounds(Bounds restrictBounds)

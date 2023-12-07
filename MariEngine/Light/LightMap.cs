@@ -17,7 +17,6 @@ namespace MariEngine.Light;
 public class LightMap : Component
 {
     private Tilemap tilemap;
-    private TilemapRenderer tilemapRenderer;
     public Color AmbientLight { get; set; }
     
     private Dictionary<LightSource, LightSourceData> lightSources;
@@ -78,7 +77,6 @@ public class LightMap : Component
 
     public void AttachTilemapRenderer(TilemapRenderer renderer)
     {
-        tilemapRenderer = renderer;
     }
 
     protected override void Update(GameTime gameTime)

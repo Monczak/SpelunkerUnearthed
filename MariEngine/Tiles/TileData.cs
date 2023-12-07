@@ -2,18 +2,11 @@
 
 namespace MariEngine.Tiles;
 
-public struct TileData
-{
-    public string ForegroundColor { get; init; }
-    public string BackgroundColor { get; init; }
-    public char Character { get; init; }
-
-    public string[] Tags { get; init; }
-    
-    public string[] Behaviors { get; init; }
-    
-    public TileLightData? Light { get; init; }
-    public float LightAttenuation { get; init; }
-    
-    public string[] CollisionGroups { get; init; }
-}
+public record struct TileData(string ForegroundColor,
+    string BackgroundColor,
+    char Character,
+    string[] Tags,
+    string[] Behaviors,
+    TileLightData? Light,
+    float LightAttenuation,
+    string[] CollisionGroups);

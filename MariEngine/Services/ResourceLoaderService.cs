@@ -13,11 +13,11 @@ public abstract class ResourceLoaderService<TItem, TProxyData> : Service where T
 {
     protected abstract string ContentPath { get; }
 
-    public Dictionary<string, TItem> Content { get; private set; }
+    public SortedDictionary<string, TItem> Content { get; private set; }
 
     public virtual void LoadContent(INamingConvention namingConvention = null)
     {
-        Content = new Dictionary<string, TItem>();
+        Content = new SortedDictionary<string, TItem>();
 
         var deserializer = new DeserializerBuilder()
             .WithNamingConvention(namingConvention ?? PascalCaseNamingConvention.Instance)

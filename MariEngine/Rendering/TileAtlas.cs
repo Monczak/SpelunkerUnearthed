@@ -19,7 +19,7 @@ public class TileAtlas : Service
     private GraphicsDevice graphicsDevice;
     private SpriteBatch spriteBatch;
 
-    private Dictionary<string, Tile> tiles;
+    private IDictionary<string, Tile> tileDict;
     
     public int TileSize { get; private set; }
 
@@ -48,9 +48,9 @@ public class TileAtlas : Service
         );
     }
 
-    public void SetTiles(Dictionary<string, Tile> tileDict)
+    public void SetTiles(IDictionary<string, Tile> tileDict)
     {
-        tiles = tileDict;
+        this.tileDict = tileDict;
     }
 
     public void Resize(int newTileSize)
@@ -61,15 +61,15 @@ public class TileAtlas : Service
 
     public void CreateAtlas()
     {
-        InitializeRenderTargets(tiles);
-        ReserveCoords(tiles);
-        DrawBackgrounds(tiles.Values);
-        DrawForegrounds(tiles.Values);
+        InitializeRenderTargets(tileDict);
+        ReserveCoords(tileDict);
+        DrawBackgrounds(tileDict.Values);
+        DrawForegrounds(tileDict.Values);
         
         Logger.Log($"Created 2x {atlasSize.X}x{atlasSize.Y} ({atlasSize.X * TileSize}x{atlasSize.Y * TileSize}) tile atlas");
     }
 
-    private void InitializeRenderTargets(Dictionary<string, Tile> tiles)
+    private void InitializeRenderTargets(IDictionary<string, Tile> tiles)
     {
         atlasSize = CalculateAtlasSize(tiles.Count);
 
@@ -92,7 +92,7 @@ public class TileAtlas : Service
         );
     }
 
-    private void ReserveCoords(Dictionary<string, Tile> tiles)
+    private void ReserveCoords(IDictionary<string, Tile> tiles)
     {
         tileAtlasCoords = new Dictionary<string, Coord>();
         List<string> ids = new List<string>(tiles.Keys);

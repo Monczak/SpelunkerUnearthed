@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using FmodForFoxes;
 using FontStashSharp;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -24,6 +25,8 @@ namespace SpelunkerUnearthed;
 
 public class SpelunkerUnearthedGame : Game
 {
+    private readonly INativeFmodLibrary nativeFmodLibrary = new DesktopNativeFmodLibrary();
+    
     private GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch;
 
@@ -49,6 +52,8 @@ public class SpelunkerUnearthedGame : Game
 
     protected override void Initialize()
     {
+        FmodManager.Init(nativeFmodLibrary, FmodInitMode.CoreAndStudio, "Content");
+        
         FontSystemDefaults.FontResolutionFactor = 4.0f;
         FontSystemDefaults.KernelWidth = 4;
         FontSystemDefaults.KernelHeight = 4;
@@ -133,10 +138,20 @@ public class SpelunkerUnearthedGame : Game
         
         scene = new TestScene(Window, graphics);
         scene.Load();
+        
+        base.LoadContent();
+    }
+    
+    protected override void UnloadContent()
+    {
+        FmodManager.Unload();
+        base.UnloadContent();
     }
 
     protected override void Update(GameTime gameTime)
     {
+        FmodManager.Update();
+        
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();

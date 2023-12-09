@@ -19,6 +19,9 @@
 #begin Fonts/Monospace.ttf
 /copy:Fonts/Monospace.ttf
 
+#begin Sounds/reverbfart.ogg
+/copy:Sounds/reverbfart.ogg
+
 #begin Tiles/Basalt.yml
 /copy:Tiles/Basalt.yml
 

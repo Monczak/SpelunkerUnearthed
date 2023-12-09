@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Channels;
 using System.Threading.Tasks;
+using FMOD;
+using FmodForFoxes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MariEngine;
@@ -21,6 +24,7 @@ using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
 using SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 using SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
 using SpelunkerUnearthed.Scripts.TileEntities;
+using Channel = FmodForFoxes.Channel;
 
 namespace SpelunkerUnearthed.Scripts.Scenes;
 
@@ -40,8 +44,14 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
     
     private DebugScreenLine<Biome> biomeDebugLine = new(biome => $"Biome: {biome?.Name ?? "none"}");
 
+    private Channel channel;
+
     public override void Load()
     {
+        var sound = CoreSystem.LoadStreamedSound("Sounds/reverbfart.ogg");
+        channel = sound.Play();
+        channel.Looping = true;
+        
         LoadEntities();
 
         const int seed = 0;

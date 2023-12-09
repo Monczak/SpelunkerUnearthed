@@ -5,6 +5,7 @@
         <RollForward>Major</RollForward>
         <PublishReadyToRun>false</PublishReadyToRun>
         <TieredCompilation>false</TieredCompilation>
+        <RootNamespace>SpelunkerUnearthed</RootNamespace>
     </PropertyGroup>
     <PropertyGroup>
         <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -19,6 +20,8 @@
         <EmbeddedResource Include="Icon.bmp" />
     </ItemGroup>
     <ItemGroup>
+        <PackageReference Include="FmodForFoxes" Version="3.1.0" />
+        <PackageReference Include="FmodForFoxes.Desktop" Version="3.1.0" />
         <PackageReference Include="FontStashSharp.MonoGame" Version="1.2.8" />
         <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
         <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.303" />
@@ -27,6 +30,88 @@
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\MariEngine\MariEngine.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Remove="fmod.dll" />
+      <ContentWithTargetPath Include="Lib\fmod.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <TargetPath>fmod.dll</TargetPath>
+      </ContentWithTargetPath>
+      <None Remove="fmodL.dll" />
+      <ContentWithTargetPath Include="Lib\fmodL.dll"> 
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <TargetPath>fmodL.dll</TargetPath>
+      </ContentWithTargetPath>
+      <None Remove="fmodstudio.dll" />
+      <ContentWithTargetPath Include="Lib\fmodstudio.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <TargetPath>fmodstudio.dll</TargetPath>
+      </ContentWithTargetPath>
+      <None Remove="fmodstudioL.dll" />
+      <ContentWithTargetPath Include="Lib\fmodstudioL.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <TargetPath>fmodstudioL.dll</TargetPath>
+      </ContentWithTargetPath>
+      <None Remove="libfmod.so" />
+      <ContentWithTargetPath Include="Lib\libfmod.so">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <TargetPath>libfmod.so</TargetPath>
+      </ContentWithTargetPath>
+      <None Remove="libfmod.so.13" />
+      <ContentWithTargetPath Include="Lib\libfmod.so.13">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <TargetPath>libfmod.so.13</TargetPath>
+      </ContentWithTargetPath>
+      <None Remove="libfmod.so.13.19" />
+      <ContentWithTargetPath Include="Lib\libfmod.so.13.19">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <TargetPath>libfmod.so.13.19</TargetPath>
+      </ContentWithTargetPath>
+      <None Remove="libfmodL.so" />
+      <ContentWithTargetPath Include="Lib\libfmodL.so">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <TargetPath>libfmodL.so</TargetPath>
+      </ContentWithTargetPath>
+      <None Remove="libfmodL.so.13" />
+      <ContentWithTargetPath Include="Lib\libfmodL.so.13">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <TargetPath>libfmodL.so.13</TargetPath>
+      </ContentWithTargetPath>
+      <None Remove="libfmodL.so.13.19" />
+      <ContentWithTargetPath Include="Lib\libfmodL.so.13.19">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <TargetPath>libfmodL.so.13.19</TargetPath>
+      </ContentWithTargetPath>
+      <None Remove="libfmodstudio.so" />
+      <ContentWithTargetPath Include="Lib\libfmodstudio.so">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <TargetPath>libfmodstudio.so</TargetPath>
+      </ContentWithTargetPath>
+      <None Remove="libfmodstudio.so.13" />
+      <ContentWithTargetPath Include="Lib\libfmodstudio.so.13">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <TargetPath>libfmodstudio.so.13</TargetPath>
+      </ContentWithTargetPath>
+      <None Remove="libfmodstudio.so.13.19" />
+      <ContentWithTargetPath Include="Lib\libfmodstudio.so.13.19">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <TargetPath>libfmodstudio.so.13.19</TargetPath>
+      </ContentWithTargetPath>
+      <None Remove="libfmodstudioL.so" />
+      <ContentWithTargetPath Include="Lib\libfmodstudioL.so">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <TargetPath>libfmodstudioL.so</TargetPath>
+      </ContentWithTargetPath>
+      <None Remove="libfmodstudioL.so.13" />
+      <ContentWithTargetPath Include="Lib\libfmodstudioL.so.13">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <TargetPath>libfmodstudioL.so.13</TargetPath>
+      </ContentWithTargetPath>
+      <None Remove="libfmodstudioL.so.13.19" />
+      <ContentWithTargetPath Include="Lib\libfmodstudioL.so.13.19">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <TargetPath>libfmodstudioL.so.13.19</TargetPath>
+      </ContentWithTargetPath>
     </ItemGroup>
     <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
         <Message Text="Restoring dotnet tools" Importance="High" />

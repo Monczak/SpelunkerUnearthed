@@ -20,6 +20,7 @@ using SpelunkerUnearthed.Scripts.Scenes;
 using SpelunkerUnearthed.Scripts.TileEntities;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
+using ContentPaths = SpelunkerUnearthed.Scripts.ContentPaths;
 
 namespace SpelunkerUnearthed;
 
@@ -44,7 +45,7 @@ public class SpelunkerUnearthedGame : Game
     public SpelunkerUnearthedGame()
     {
         graphics = new GraphicsDeviceManager(this);
-        Content.RootDirectory = "Content";
+        Content.RootDirectory = MariEngine.ContentPaths.Content;
         IsMouseVisible = true;
 
         Window.AllowUserResizing = true;
@@ -52,7 +53,7 @@ public class SpelunkerUnearthedGame : Game
 
     protected override void Initialize()
     {
-        FmodManager.Init(nativeFmodLibrary, FmodInitMode.CoreAndStudio, "Content");
+        FmodManager.Init(nativeFmodLibrary, FmodInitMode.CoreAndStudio, ContentPaths.Audio);
         
         FontSystemDefaults.FontResolutionFactor = 4.0f;
         FontSystemDefaults.KernelWidth = 4;

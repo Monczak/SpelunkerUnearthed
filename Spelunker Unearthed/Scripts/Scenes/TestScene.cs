@@ -48,7 +48,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
     public override void Load()
     {
-        var sound = CoreSystem.LoadStreamedSound("Sounds/reverbfart.ogg");
+        var sound = CoreSystem.LoadStreamedSound("reverbfart.ogg");
         channel = sound.Play();
         channel.Looping = true;
         

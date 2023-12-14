@@ -15,6 +15,7 @@ using MariEngine.Logging;
 using MariEngine.Rendering;
 using MariEngine.Services;
 using MariEngine.Tiles;
+using SpelunkerUnearthed.Scripts.Managers;
 using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
 using SpelunkerUnearthed.Scripts.MapGeneration.Features;
 using SpelunkerUnearthed.Scripts.Scenes;
@@ -67,6 +68,7 @@ public class SpelunkerUnearthedGame : Game
         ServiceRegistry.RegisterService(new RandomProvider());
         ServiceRegistry.RegisterService(new TileLoader());
         ServiceRegistry.RegisterService(new InputManager());
+        ServiceRegistry.RegisterService(new AudioManager());
         ServiceRegistry.RegisterService(new BiomeLoader());
         ServiceRegistry.RegisterService(new FeatureLoader());
         ServiceRegistry.RegisterService(new Events());
@@ -85,6 +87,9 @@ public class SpelunkerUnearthedGame : Game
         InitializeDebugScreen();
 
         InitializeInputs();
+
+        ServiceRegistry.Get<AudioManager>().LoadBank(this, "Master");
+        ServiceRegistry.Get<AudioManager>().LoadBank(this, "Master.strings");
         
         base.Initialize();
     }
@@ -147,14 +152,13 @@ public class SpelunkerUnearthedGame : Game
     
     protected override void UnloadContent()
     {
+        ServiceRegistry.Get<AudioManager>().UnloadAllBanks(this);
         FmodManager.Unload();
         base.UnloadContent();
     }
 
     protected override void Update(GameTime gameTime)
     {
-        FmodManager.Update();
-        
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
@@ -164,6 +168,7 @@ public class SpelunkerUnearthedGame : Game
         
         ServiceRegistry.UpdateServices();
         scene.Update(gameTime);
+        FmodManager.Update();
 
         updateTimeStopwatch.Stop();
         potentialUpdateTimeDebugLine.SetParams(updateTimeStopwatch.Elapsed);

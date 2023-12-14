@@ -42,6 +42,8 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
     private CameraController cameraController;
 
+    private AmbienceController ambienceController;
+
     private Gizmos gizmos;
     
     private DebugScreenLine<Biome> biomeDebugLine = new(biome => $"Biome: {biome?.Name ?? "none"}");
@@ -49,6 +51,8 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
     public override void Load()
     {
         LoadEntities();
+        
+        ServiceRegistry.Get<AudioManager>().LoadBank(this, "Ambience");
 
         const int seed = 0;
         ServiceRegistry.Get<RandomProvider>().Request(Constants.BiomeGenRng).Seed(seed);
@@ -61,13 +65,12 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         });
         
         ServiceRegistry.Get<DebugScreen>().AddLine(biomeDebugLine);
-        
-        ServiceRegistry.Get<Events>().Bind(this, "Test", new Action<string>(data => Logger.Log(data)));
     }
 
     public override void Unload()
     {
         ServiceRegistry.Get<Events>().UnbindAll(this);
+        ServiceRegistry.Get<AudioManager>().UnloadAllBanks(this);
     }
 
     private void TestBiomeGeneration()
@@ -119,6 +122,11 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         Entity managersEntity = new("Managers");
         caveSystemManager = new CaveSystemManager();
         managersEntity.AttachComponent(caveSystemManager);
+
+        Entity controllersEntity = new("Controllers");
+        ambienceController = new AmbienceController();
+        controllersEntity.AttachComponent(ambienceController);
+        AddEntity(controllersEntity);
 
         Entity cameraControllerEntity = new("Camera Controller");
         cameraController = new CameraController(Camera) { Smoothing = 10f };
@@ -172,5 +180,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
         cameraController.TrackTileEntity(player);
         cameraController.SetBounds(100, tilemapEntity.GetComponent<CameraBounds>());
+        
+        ambienceController.Play();
     }
 }

@@ -46,14 +46,8 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
     
     private DebugScreenLine<Biome> biomeDebugLine = new(biome => $"Biome: {biome?.Name ?? "none"}");
 
-    private Channel channel;
-
     public override void Load()
     {
-        var sound = CoreSystem.LoadStreamedSound("reverbfart.ogg");
-        channel = sound.Play();
-        channel.Looping = true;
-        
         LoadEntities();
 
         const int seed = 0;

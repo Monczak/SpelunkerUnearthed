@@ -13,33 +13,6 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin Audio/Ambience/Glaciers Sanity0.ogg
-/copy:Audio/Ambience/Glaciers Sanity0.ogg
-
-#begin Audio/Ambience/Glaciers.ogg
-/copy:Audio/Ambience/Glaciers.ogg
-
-#begin Audio/Ambience/Lush Caves Sanity0.ogg
-/copy:Audio/Ambience/Lush Caves Sanity0.ogg
-
-#begin Audio/Ambience/Lush Caves.ogg
-/copy:Audio/Ambience/Lush Caves.ogg
-
-#begin Audio/Ambience/Radioactive Wasteland Sanity0.ogg
-/copy:Audio/Ambience/Radioactive Wasteland Sanity0.ogg
-
-#begin Audio/Ambience/Radioactive Wasteland.ogg
-/copy:Audio/Ambience/Radioactive Wasteland.ogg
-
-#begin Audio/Ambience/Volcano Sanity0.ogg
-/copy:Audio/Ambience/Volcano Sanity0.ogg
-
-#begin Audio/Ambience/Volcano.ogg
-/copy:Audio/Ambience/Volcano.ogg
-
-#begin Audio/reverbfart.ogg
-/copy:Audio/reverbfart.ogg
-
 #begin Fonts/Hack-Regular.ttf
 /copy:Fonts/Hack-Regular.ttf
 

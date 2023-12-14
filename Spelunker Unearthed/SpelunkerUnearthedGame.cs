@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using FMOD.Studio;
 using FmodForFoxes;
 using FontStashSharp;
 using Microsoft.Xna.Framework;
@@ -55,7 +56,7 @@ public class SpelunkerUnearthedGame : Game
 
     protected override void Initialize()
     {
-        FmodManager.Init(nativeFmodLibrary, FmodInitMode.CoreAndStudio, ContentPaths.Audio);
+        FmodManager.Init(nativeFmodLibrary, FmodInitMode.CoreAndStudio, ContentPaths.Audio, studioInitFlags: INITFLAGS.LIVEUPDATE);
         
         FontSystemDefaults.FontResolutionFactor = 4.0f;
         FontSystemDefaults.KernelWidth = 4;

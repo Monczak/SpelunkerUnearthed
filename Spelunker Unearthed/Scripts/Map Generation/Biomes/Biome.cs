@@ -18,6 +18,8 @@ public class Biome : Resource<BiomeData>
     public NumberProvider RandomFillAmountProvider { get; private set; }
     public NumberProvider SmoothIterationsProvider { get; private set; }
     
+    public int BiomeAmbience { get; private set; }
+    
     protected override void BuildFromData(BiomeData data)
     {
         Name = data.Name;
@@ -26,5 +28,6 @@ public class Biome : Resource<BiomeData>
         GroundTileProvider = ParameterProviderRegistry.GetTileProvider(data.GroundProvider);
         RandomFillAmountProvider = ParameterProviderRegistry.GetNumberProvider(data.FillProvider);
         SmoothIterationsProvider = ParameterProviderRegistry.GetNumberProvider(data.SmoothProvider);
+        BiomeAmbience = data.BiomeAmbience;
     }
 }

@@ -119,10 +119,10 @@
     </Target>
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
         <Message Text="Building FMOD banks" Importance="High"/>       
-        <Exec Command="pwsh -File '$(SolutionDir)Tools/BuildFMODBanks.ps1' '$(SolutionDir)FMOD/Spelunker Unearthed Audio/Spelunker Unearthed Audio.fspro'" />
+        <Exec Command='pwsh -File "$(SolutionDir)Tools/BuildFMODBanks.ps1" "$(SolutionDir)FMOD/Spelunker Unearthed Audio/Spelunker Unearthed Audio.fspro"' />
     </Target>
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
         <Message Text="Copying FMOD banks" Importance="High"/>
-        <Exec Command="pwsh -File '$(SolutionDir)Tools/CopyFMODBanks.ps1' '$(SolutionDir)FMOD/Spelunker Unearthed Audio/Build/Desktop' '$(ProjectDir)$(OutDir)Content/Audio'" />
+        <Exec Command='pwsh -File "$(SolutionDir)Tools/CopyFMODBanks.ps1" "$(SolutionDir)FMOD/Spelunker Unearthed Audio/Build/Desktop" "$(ProjectDir)$(OutDir)Content/Audio"' />
     </Target>
 </Project>

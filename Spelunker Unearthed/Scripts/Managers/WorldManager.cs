@@ -83,8 +83,24 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
         Logger.Log($"Cave generation: light map baking completed", stopwatch);
         
         IsGenerating = false;
+        
+        Logger.Log($"Cave generation: finishing up", stopwatch);
+        SpawnPlayer(playerController);
 
         Logger.Log($"Cave generation completed", stopwatch);
+    }
+
+    private void SpawnPlayer(PlayerController playerController)
+    {
+        foreach (Room room in CaveSystemManager.CurrentLevel.Rooms)
+        {
+            if ((room.Flags & RoomFlags.Entrance) != 0)
+            {
+                playerController.OwnerEntity.Position = RoomMath.RoomPosToTilemapPos(CaveSystemManager.CurrentLevel, room,
+                    room.PointsOfInterest[PointOfInterestType.PlayerSpawnPoint][0].Position, BaseRoomSize);
+                break;
+            }
+        }
     }
 
     private void SetupRoomCameraBounds()
@@ -122,9 +138,6 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
             };
             
             roomMapGenerator.GenerateRoomMap(room, parameters, RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, room.Position, BaseRoomSize), CaveSystemManager.CaveSystem.BiomeMap, BaseRoomSize);
-
-            if ((room.Flags & RoomFlags.Entrance) != 0)
-                playerController.OwnerEntity.Position = RoomMath.RoomPosToTilemapPos(CaveSystemManager.CurrentLevel, room, room.PointsOfInterest[PointOfInterestType.PlayerSpawnPoint][0].Position, BaseRoomSize);
         }
     }
 

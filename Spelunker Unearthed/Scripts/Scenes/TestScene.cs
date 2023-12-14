@@ -50,9 +50,9 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
     public override void Load()
     {
-        LoadEntities();
-        
         ServiceRegistry.Get<AudioManager>().LoadBank(this, "Ambience");
+        
+        LoadEntities();
 
         const int seed = 0;
         ServiceRegistry.Get<RandomProvider>().Request(Constants.BiomeGenRng).Seed(seed);
@@ -175,6 +175,8 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
         worldManager = new WorldManager(caveSystemManager, tilemap, playerController, gizmos);
         worldManager.AddProcessor(new RoomConnectionProcessor(worldManager.BaseRoomSize, gizmos), 0);
+        
+        player.AttachComponent(new PlayerBiomeWatcher(worldManager, ambienceController));
 
         managersEntity.AttachComponent(worldManager);
 

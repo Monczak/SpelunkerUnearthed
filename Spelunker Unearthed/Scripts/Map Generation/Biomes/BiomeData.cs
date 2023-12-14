@@ -7,4 +7,5 @@ public record struct BiomeData(string Name,
     ParameterProviderData WallProvider,
     ParameterProviderData GroundProvider,
     ParameterProviderData FillProvider,
-    ParameterProviderData SmoothProvider);
+    ParameterProviderData SmoothProvider,
+    int BiomeAmbience);

@@ -25,3 +25,5 @@ SmoothProvider:
   Type: "Constant"
   Options:
     Value: 3
+    
+BiomeAmbience: 1

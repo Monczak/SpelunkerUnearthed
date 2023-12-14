@@ -5,6 +5,7 @@ using MariEngine;
 using MariEngine.Collision;
 using MariEngine.Components;
 using MariEngine.Debugging;
+using MariEngine.Events;
 using MariEngine.Input;
 using MariEngine.Light;
 using MariEngine.Logging;

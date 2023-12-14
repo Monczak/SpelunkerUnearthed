@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Input;
 using MariEngine;
 using MariEngine.Components;
 using MariEngine.Debugging;
+using MariEngine.Events;
 using MariEngine.Input;
 using MariEngine.Logging;
 using MariEngine.Rendering;
@@ -68,6 +69,7 @@ public class SpelunkerUnearthedGame : Game
         ServiceRegistry.RegisterService(new InputManager());
         ServiceRegistry.RegisterService(new BiomeLoader());
         ServiceRegistry.RegisterService(new FeatureLoader());
+        ServiceRegistry.RegisterService(new Events());
         
         ServiceRegistry.RegisterService(new TexturePool(graphics.GraphicsDevice));
         

@@ -17,6 +17,7 @@ public abstract class Scene(GameWindow window, GraphicsDeviceManager graphics)
     protected GraphicsDeviceManager graphics = graphics;
 
     public abstract void Load();
+    public abstract void Unload();
 
     public void AddEntity(Entity entity)
     {

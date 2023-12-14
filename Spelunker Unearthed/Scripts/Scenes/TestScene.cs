@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Channels;
@@ -11,6 +12,7 @@ using MariEngine;
 using MariEngine.Collision;
 using MariEngine.Components;
 using MariEngine.Debugging;
+using MariEngine.Events;
 using MariEngine.Light;
 using MariEngine.Logging;
 using MariEngine.Rendering;
@@ -65,6 +67,13 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         });
         
         ServiceRegistry.Get<DebugScreen>().AddLine(biomeDebugLine);
+        
+        ServiceRegistry.Get<Events>().Bind(this, "Test", new Action<string>(data => Logger.Log(data)));
+    }
+
+    public override void Unload()
+    {
+        ServiceRegistry.Get<Events>().UnbindAll(this);
     }
 
     private void TestBiomeGeneration()
@@ -109,22 +118,23 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         Entity debugEntity = new("Debug");
         gizmos = new Gizmos();
         debugEntity.AttachComponent(gizmos);
-        debugEntity.AttachComponent(new GizmoRenderer(graphics.GraphicsDevice, Camera) { Layer = 100, Enabled = false });
+        debugEntity.AttachComponent(new GizmoRenderer(graphics.GraphicsDevice, Camera)
+            { Layer = 100, Enabled = false });
         AddEntity(debugEntity);
 
         Entity managersEntity = new("Managers");
         caveSystemManager = new CaveSystemManager();
         managersEntity.AttachComponent(caveSystemManager);
-        
+
         Entity cameraControllerEntity = new("Camera Controller");
         cameraController = new CameraController(Camera) { Smoothing = 10f };
         cameraControllerEntity.AttachComponent(cameraController);
         AddEntity(cameraControllerEntity);
-        
+
         Entity tilemapEntity = new("Tilemap");
         tilemap = new Tilemap(64, 64);
         tilemap.AddLayer(Tilemap.GroundLayer);
-        
+
         tilemapEntity.AttachComponent(new Transform());
         tilemapEntity.AttachComponent(tilemap);
 
@@ -138,9 +148,9 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
         tilemapRenderer = new TilemapRenderer(graphics.GraphicsDevice, Camera);
         tilemapEntity.AttachComponent(tilemapRenderer);
-        
+
         lightMap.AttachTilemapRenderer(tilemapRenderer);
-        
+
         tilemapEntity.AttachComponent(new TilemapCollider());
 
         RoomMapGenerator roomMapGenerator = new();
@@ -153,19 +163,19 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
             Tile = ServiceRegistry.Get<TileLoader>().Get("Player")
         };
         tilemap.AddTileEntity(player);
-        
+
         playerController = new PlayerController();
         player.AttachComponent(playerController);
-        
+
         player.AttachComponent(new LightEmitter { LightSource = new PointLight(new Color(237, 222, 138), 1f, 30) });
 
         AddEntity(tilemapEntity);
-        
+
         worldManager = new WorldManager(caveSystemManager, tilemap, playerController, gizmos);
         worldManager.AddProcessor(new RoomConnectionProcessor(worldManager.BaseRoomSize, gizmos), 0);
-        
+
         managersEntity.AttachComponent(worldManager);
-        
+
         cameraController.TrackTileEntity(player);
         cameraController.SetBounds(100, tilemapEntity.GetComponent<CameraBounds>());
     }

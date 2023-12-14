@@ -48,9 +48,9 @@ public class TileAtlas : Service
         );
     }
 
-    public void SetTiles(IDictionary<string, Tile> tileDict)
+    public void SetTiles(IDictionary<string, Tile> tiles)
     {
-        this.tileDict = tileDict;
+        tileDict = tiles;
     }
 
     public void Resize(int newTileSize)

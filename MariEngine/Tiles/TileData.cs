@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace MariEngine.Tiles;
+﻿namespace MariEngine.Tiles;
 
 public record struct TileData(string ForegroundColor,
     string BackgroundColor,

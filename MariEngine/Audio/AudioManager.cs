@@ -1,11 +1,10 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using FmodForFoxes.Studio;
 using MariEngine.Logging;
 using MariEngine.Services;
 
-namespace SpelunkerUnearthed.Scripts.Managers;
+namespace MariEngine.Audio;
 
 public class AudioManager : Service
 {

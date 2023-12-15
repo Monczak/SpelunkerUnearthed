@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using FmodForFoxes.Studio;
+using MariEngine.Audio;
 using MariEngine.Components;
 using MariEngine.Services;
 using SpelunkerUnearthed.Scripts.Managers;
@@ -23,6 +24,7 @@ public class AmbienceController : Component
     
     protected override void OnDestroy()
     {
+        ambienceEvent.Stop();
         ambienceEvent.Dispose();
     }
 }

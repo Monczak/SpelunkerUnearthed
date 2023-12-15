@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using FmodForFoxes;
 using MariEngine.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -26,6 +27,8 @@ public abstract class Scene(GameWindow window, GraphicsDeviceManager graphics)
 
     public virtual void Update(GameTime gameTime)
     {
+        FmodManager.Update();
+        
         foreach (Entity entity in Entities)
         {
             entity.Update(gameTime);

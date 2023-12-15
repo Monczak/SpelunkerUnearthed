@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MariEngine;
+using MariEngine.Audio;
 using MariEngine.Components;
 using MariEngine.Debugging;
 using MariEngine.Events;
@@ -24,16 +25,12 @@ using SpelunkerUnearthed.Scripts.TileEntities;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using ContentPaths = SpelunkerUnearthed.Scripts.ContentPaths;
+using Game = MariEngine.Game;
 
 namespace SpelunkerUnearthed;
 
 public class SpelunkerUnearthedGame : Game
 {
-    private readonly INativeFmodLibrary nativeFmodLibrary = new DesktopNativeFmodLibrary();
-    
-    private GraphicsDeviceManager graphics;
-    private SpriteBatch spriteBatch;
-
     private DebugScreen debugScreen;
     private DebugScreenLine<TimeSpan> updateTimeDebugLine;
     private DebugScreenLine<TimeSpan> potentialUpdateTimeDebugLine;
@@ -45,10 +42,8 @@ public class SpelunkerUnearthedGame : Game
     
     private Scene scene;
 
-    public SpelunkerUnearthedGame()
+    public SpelunkerUnearthedGame() : base(new DesktopNativeFmodLibrary())
     {
-        graphics = new GraphicsDeviceManager(this);
-        Content.RootDirectory = MariEngine.ContentPaths.Content;
         IsMouseVisible = true;
 
         Window.AllowUserResizing = true;
@@ -56,7 +51,7 @@ public class SpelunkerUnearthedGame : Game
 
     protected override void Initialize()
     {
-        FmodManager.Init(nativeFmodLibrary, FmodInitMode.CoreAndStudio, ContentPaths.Audio, studioInitFlags: INITFLAGS.LIVEUPDATE);
+        InitializeAudio(ContentPaths.Audio);
         
         FontSystemDefaults.FontResolutionFactor = 4.0f;
         FontSystemDefaults.KernelWidth = 4;
@@ -74,7 +69,7 @@ public class SpelunkerUnearthedGame : Game
         ServiceRegistry.RegisterService(new FeatureLoader());
         ServiceRegistry.RegisterService(new Events());
         
-        ServiceRegistry.RegisterService(new TexturePool(graphics.GraphicsDevice));
+        ServiceRegistry.RegisterService(new TexturePool(Graphics.GraphicsDevice));
         
         // TODO: Load this from a config file
         ServiceRegistry.Get<FontProvider>().AddFont("Tiles", "Hack-Regular");
@@ -133,9 +128,9 @@ public class SpelunkerUnearthedGame : Game
 
     protected override void LoadContent()
     {
-        spriteBatch = new SpriteBatch(GraphicsDevice);
+        SpriteBatch = new SpriteBatch(GraphicsDevice);
         
-        ServiceRegistry.RegisterService(new TileAtlas(GraphicsDevice, spriteBatch, 16));
+        ServiceRegistry.RegisterService(new TileAtlas(GraphicsDevice, SpriteBatch, 16));
 
         ServiceRegistry.Get<TileLoader>().LoadContent();
         
@@ -145,7 +140,7 @@ public class SpelunkerUnearthedGame : Game
         ServiceRegistry.Get<BiomeLoader>().LoadContent();
         ServiceRegistry.Get<FeatureLoader>().LoadContent();
         
-        scene = new TestScene(Window, graphics);
+        scene = new TestScene(Window, Graphics);
         scene.Load();
         
         base.LoadContent();
@@ -154,7 +149,7 @@ public class SpelunkerUnearthedGame : Game
     protected override void UnloadContent()
     {
         ServiceRegistry.Get<AudioManager>().UnloadAllBanks(this);
-        FmodManager.Unload();
+        UnloadAudio();
         base.UnloadContent();
     }
 
@@ -169,7 +164,6 @@ public class SpelunkerUnearthedGame : Game
         
         ServiceRegistry.UpdateServices();
         scene.Update(gameTime);
-        FmodManager.Update();
 
         updateTimeStopwatch.Stop();
         potentialUpdateTimeDebugLine.SetParams(updateTimeStopwatch.Elapsed);
@@ -185,10 +179,10 @@ public class SpelunkerUnearthedGame : Game
         
         GraphicsDevice.Clear(Color.Black);
         
-        scene.Render(spriteBatch);
+        scene.Render(SpriteBatch);
         
         if (debugScreen.Enabled)
-            debugScreen.Render(spriteBatch);
+            debugScreen.Render(SpriteBatch);
         
         drawTimeStopwatch.Stop();
         potentialDrawTimeDebugLine.SetParams(drawTimeStopwatch.Elapsed);

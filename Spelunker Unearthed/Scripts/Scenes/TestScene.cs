@@ -10,6 +10,8 @@ using MariEngine.Events;
 using MariEngine.Light;
 using MariEngine.Services;
 using MariEngine.Tiles;
+using MariEngine.UI;
+using MariEngine.UI.Nodes.Layouts;
 using SpelunkerUnearthed.Scripts.Components;
 using SpelunkerUnearthed.Scripts.Managers;
 using SpelunkerUnearthed.Scripts.MapGeneration;
@@ -37,11 +39,18 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
     
     private DebugScreenLine<Biome> biomeDebugLine = new(biome => $"Biome: {biome?.Name ?? "none"}");
 
+    private Canvas canvas;
+
     public override void Load()
     {
         ServiceRegistry.Get<AudioManager>().LoadBank(this, "Ambience");
         
         LoadEntities();
+        
+        cameraController.TrackTileEntity(playerController.OwnerEntity);
+        cameraController.SetBounds(100, tilemap.GetComponent<CameraBounds>());
+        
+        ambienceController.Play();
 
         const int seed = 0;
         ServiceRegistry.Get<RandomProvider>().Request(Constants.BiomeGenRng).Seed(seed);
@@ -54,12 +63,6 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         });
         
         ServiceRegistry.Get<DebugScreen>().AddLine(biomeDebugLine);
-    }
-
-    public override void Unload()
-    {
-        ServiceRegistry.Get<Events>().UnbindAll(this);
-        ServiceRegistry.Get<AudioManager>().UnloadAllBanks(this);
     }
 
     private void TestBiomeGeneration()
@@ -169,9 +172,12 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
         managersEntity.AttachComponent(worldManager);
 
-        cameraController.TrackTileEntity(player);
-        cameraController.SetBounds(100, tilemapEntity.GetComponent<CameraBounds>());
+        Entity uiEntity = new("UI");
+        canvas = new Canvas();
+        uiEntity.AttachComponent(canvas);
+        uiEntity.AttachComponent(new CanvasRenderer(graphics.GraphicsDevice, Camera));
+        AddEntity(uiEntity);
         
-        ambienceController.Play();
+        canvas.Root.AddChild(new ColumnLayout());
     }
 }

@@ -5,7 +5,7 @@ using MariEngine.Services;
 
 namespace MariEngine.Events;
 
-public class Events : Service
+public class EventManager : Service
 {
     private readonly Dictionary<string, Dictionary<object, List<Delegate>>> handlers = new();
     

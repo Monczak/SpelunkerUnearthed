@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FmodForFoxes;
+using MariEngine.Audio;
+using MariEngine.Events;
 using MariEngine.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MariEngine.Logging;
+using MariEngine.Services;
 
 namespace MariEngine;
 
@@ -18,7 +21,12 @@ public abstract class Scene(GameWindow window, GraphicsDeviceManager graphics)
     protected GraphicsDeviceManager graphics = graphics;
 
     public abstract void Load();
-    public abstract void Unload();
+
+    public virtual void Unload()
+    {
+        ServiceRegistry.Get<EventManager>().UnbindAll(this);
+        ServiceRegistry.Get<AudioManager>().UnloadAllBanks(this);
+    }
 
     public void AddEntity(Entity entity)
     {

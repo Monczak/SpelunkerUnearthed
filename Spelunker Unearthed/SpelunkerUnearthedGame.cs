@@ -67,7 +67,7 @@ public class SpelunkerUnearthedGame : Game
         ServiceRegistry.RegisterService(new AudioManager());
         ServiceRegistry.RegisterService(new BiomeLoader());
         ServiceRegistry.RegisterService(new FeatureLoader());
-        ServiceRegistry.RegisterService(new Events());
+        ServiceRegistry.RegisterService(new EventManager());
         
         ServiceRegistry.RegisterService(new TexturePool(Graphics.GraphicsDevice));
         
@@ -86,6 +86,8 @@ public class SpelunkerUnearthedGame : Game
 
         ServiceRegistry.Get<AudioManager>().LoadBank(this, "Master");
         ServiceRegistry.Get<AudioManager>().LoadBank(this, "Master.strings");
+
+        Window.ClientSizeChanged += (_, _) => ServiceRegistry.Get<EventManager>().Notify("ClientSizeChanged");
         
         base.Initialize();
     }

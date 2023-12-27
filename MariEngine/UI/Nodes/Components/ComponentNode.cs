@@ -1,9 +1,11 @@
+using System;
+
 namespace MariEngine.UI.Nodes.Components;
 
 public abstract class ComponentNode : CanvasNode
 {
-    protected abstract Coord Size { get; }
-
-    public override int? PreferredWidth => Size.X;
-    public override int? PreferredHeight => Size.Y;
+    public override void AddChild(CanvasNode node)
+    {
+        throw new Exception("Component nodes cannot have children.");
+    }
 }

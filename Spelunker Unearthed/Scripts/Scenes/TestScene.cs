@@ -178,6 +178,16 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         uiEntity.AttachComponent(new CanvasRenderer(graphics.GraphicsDevice, Camera));
         AddEntity(uiEntity);
         
-        canvas.Root.AddChild(new ColumnLayout());
+        canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column });
+        canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, FlexGrow = 2 });
+        canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column });
+
+        foreach (var child in canvas.Root.Children)
+        {
+            child.AddChild(new FlexLayoutNode());
+            child.AddChild(new FlexLayoutNode());
+        }
+        
+        canvas.GetComponent<CanvasRenderer>().Redraw();
     }
 }

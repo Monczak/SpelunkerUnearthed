@@ -31,6 +31,7 @@ public class CanvasRenderer : Renderer
     private void OnClientSizeChanged()
     {
         InitializeBuffer();
+        Redraw();
     }
 
     private void InitializeBuffer()
@@ -38,23 +39,35 @@ public class CanvasRenderer : Renderer
         Coord screenSize = new(graphicsDevice.PresentationParameters.BackBufferWidth, graphicsDevice.PresentationParameters.BackBufferHeight);
         screenSize /= ServiceRegistry.Get<TileAtlas>().TileSize;
         tileBuffer = new TileBuffer(screenSize + Coord.One * overscan * 2);
-        
-        foreach (Coord coord in tileBuffer.Coords)
-        {
-            tileBuffer[coord] = ServiceRegistry.Get<TileLoader>().Get("Player");
-        }
     }
 
     protected override void OnAttach()
     {
         canvas = GetComponent<Canvas>();
         testTexture = ServiceRegistry.Get<TexturePool>().RequestTexture(Coord.One, out _);
-        testTexture.SetData(new[] { Color.Aqua });
+        testTexture.SetData([Color.Aqua]);
     }
 
     public void Redraw()
     {
-        var layout = LayoutEngine.CalculateLayout(canvas.Root);
+        canvas.Root.Padding = Coord.One * overscan;
+        
+        var layout = LayoutEngine.CalculateLayout(canvas.Root, new Coord(tileBuffer.Width, tileBuffer.Height));
+        foreach (var (node, bounds) in layout)
+        {
+            string tileId = LayoutEngine.DepthMap[node] switch
+            {
+                0 => "Nothing",
+                1 => "Stone",
+                2 => "Player",
+                3 => "Scoria",
+                _ => "Packed Ice",
+            };
+            foreach (Coord coord in bounds.Coords)
+            {
+                tileBuffer[coord] = ServiceRegistry.Get<TileLoader>().Get(tileId);
+            }
+        }
     }
 
     protected override void Render(SpriteBatch spriteBatch)

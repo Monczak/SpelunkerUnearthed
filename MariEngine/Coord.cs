@@ -43,9 +43,11 @@ public struct Coord(int x, int y)
 
     public static Coord operator *(Coord coord1, Coord coord2) => new(coord1.X * coord2.X, coord1.Y * coord2.Y);
     public static Coord operator *(Coord coord1, int scale) => new(coord1.X * scale, coord1.Y * scale);
+    public static Coord operator *(Coord coord1, float scale) => new(coord1.X * scale, coord1.Y * scale);
 
     public static Coord operator /(Coord coord1, Coord coord2) => new(coord1.X / coord2.X, coord1.Y / coord2.Y);
     public static Coord operator /(Coord coord1, int divisor) => new(coord1.X / divisor, coord1.Y / divisor);
+    public static Coord operator /(Coord coord1, float divisor) => new(coord1.X / divisor, coord1.Y / divisor);
 
     public static Vector2 operator *(Vector2 v, Coord c) => new(v.X * c.X, v.Y * c.Y);
     public static Vector2 operator *(Coord c, Vector2 v) => new(v.X * c.X, v.Y * c.Y);

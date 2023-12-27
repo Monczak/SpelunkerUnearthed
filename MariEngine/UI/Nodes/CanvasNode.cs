@@ -1,17 +1,18 @@
+using System;
 using System.Collections.Generic;
+using MariEngine.UI.Nodes.Components;
 
 namespace MariEngine.UI.Nodes;
 
 public abstract class CanvasNode
 {
+    public float FlexGrow { get; set; } = 1;
+    
     public CanvasNode Parent { get; internal set; }
     private readonly List<CanvasNode> children = [];
     public IEnumerable<CanvasNode> Children => children.AsReadOnly();
 
-    public virtual int? PreferredWidth { get; } = null;
-    public virtual int? PreferredHeight { get; } = null;
-
-    public void AddChild(CanvasNode node)
+    public virtual void AddChild(CanvasNode node)
     {
         node.Parent = this;
         children.Add(node);

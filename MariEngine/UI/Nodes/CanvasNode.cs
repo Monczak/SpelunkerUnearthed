@@ -10,7 +10,7 @@ public abstract class CanvasNode
     
     public CanvasNode Parent { get; internal set; }
     private readonly List<CanvasNode> children = [];
-    public IEnumerable<CanvasNode> Children => children.AsReadOnly();
+    public IReadOnlyList<CanvasNode> Children => children.AsReadOnly();
 
     public virtual void AddChild(CanvasNode node)
     {

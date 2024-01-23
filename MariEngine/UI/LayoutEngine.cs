@@ -39,13 +39,6 @@ public static class LayoutEngine
             LayoutNode layoutNode => UiMath.ApplyPadding(boundsMap[layoutNode], layoutNode.Padding),
             _ => boundsMap[node],
         };
-
-        Coord usableSize = usableBounds.Size;
-        foreach (var child in node.Children.Where(child => child.HasPreferredSize))
-        {
-            usableSize -= new Coord(child.PreferredWidth ?? 0, child.PreferredHeight ?? 0);
-        }
-        
         
         var totalFlexGrow = node.Children.Where(child => !child.HasPreferredSize).Sum(child => child.FlexGrow);
         Vector2 error = Vector2.Zero;
@@ -53,12 +46,35 @@ public static class LayoutEngine
         if (node is FlexLayoutNode flexLayoutNode)
         {
             var flexDirection = flexLayoutNode.FlexDirection;
-            Coord childPos = usableBounds.TopLeft;
-            for (int i = 0; i < node.Children.Count; i++)
+            
+            Coord usableSize = usableBounds.Size;
+            for (int i = 0; i < flexLayoutNode.Children.Count; i++)
             {
-                var child = node.Children[i];
-                float flexGapBefore = MathF.Ceiling(i == 0 ? 0 : flexLayoutNode.FlexGap / 2.0f);
-                float flexGapAfter = MathF.Ceiling(i == node.Children.Count - 1 ? 0 : flexLayoutNode.FlexGap / 2.0f);
+                var child = flexLayoutNode.Children[i];
+                if (child.HasPreferredSize)
+                {
+                    usableSize -= flexDirection switch
+                    {
+                        FlexDirection.Row => Coord.UnitX * (child.PreferredWidth ?? 0),
+                        FlexDirection.Column => Coord.UnitY * (child.PreferredHeight ?? 0),
+                        _ => throw new ArgumentOutOfRangeException()
+                    }; 
+                    
+                    var (flexGapBefore, flexGapAfter) = CalculateFlexGap(flexLayoutNode, i);
+                    usableSize -= flexDirection switch
+                    {
+                        FlexDirection.Row => Coord.UnitX * (flexGapBefore + flexGapAfter),
+                        FlexDirection.Column => Coord.UnitY * (flexGapBefore + flexGapAfter),
+                        _ => throw new ArgumentOutOfRangeException()
+                    };
+                }
+            }
+            
+            Coord childPos = usableBounds.TopLeft;
+            for (int i = 0; i < flexLayoutNode.Children.Count; i++)
+            {
+                var child = flexLayoutNode.Children[i];
+                var (flexGapBefore, flexGapAfter) = CalculateFlexGap(flexLayoutNode, i);
 
                 float flexGap = flexGapBefore + flexGapAfter;
                 
@@ -66,22 +82,19 @@ public static class LayoutEngine
                 {
                     FlexDirection.Row => new Vector2(
                         child.PreferredWidth is not null ? (float)child.PreferredWidth : usableSize.X / totalFlexGrow * child.FlexGrow - flexGap,
-                        usableSize.Y
+                        child.PreferredHeight is not null ? (float)child.PreferredHeight : usableSize.Y
                     ),
                     FlexDirection.Column => new Vector2(
-                        usableSize.X,
+                        child.PreferredWidth is not null ? (float)child.PreferredWidth : usableSize.X,
                         child.PreferredHeight is not null ? (float)child.PreferredHeight : usableSize.Y / totalFlexGrow * child.FlexGrow - flexGap
                     ),
                     _ => throw new ArgumentOutOfRangeException()
                 };
                 
                 error += childSize - Vector2.Floor(childSize);
-                if (error.X >= 0.5 || error.Y >= 0.5)
-                {
-                    var roundedError = Vector2.Round(error);
-                    childSize += roundedError;
-                    error -= roundedError;
-                }
+                var roundedError = Vector2.Round(error);
+                childSize += roundedError;
+                error -= roundedError;
                 
                 childPos += flexDirection switch
                 {
@@ -102,5 +115,12 @@ public static class LayoutEngine
                 CalculateLayoutForNode(child, depth + 1);
             }
         }
+    }
+
+    private static (float flexGapBefore, float flexGapAfter) CalculateFlexGap(FlexLayoutNode node, int indexInParent)
+    {
+        float flexGapBefore = MathF.Ceiling(indexInParent == 0 ? 0 : node.FlexGap / 2.0f);
+        float flexGapAfter = MathF.Ceiling(indexInParent == node.Children.Count - 1 ? 0 : node.FlexGap / 2.0f);
+        return (flexGapBefore, flexGapAfter);
     }
 }

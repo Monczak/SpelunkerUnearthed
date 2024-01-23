@@ -178,9 +178,9 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         uiEntity.AttachComponent(new CanvasRenderer(graphics.GraphicsDevice, Camera));
         AddEntity(uiEntity);
         
-        canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column });
-        canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, FlexGrow = 5 });
-        canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column });
+        canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, PreferredWidth = 5 });
+        canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, PreferredWidth = 20, PreferredHeight = 20});
+        canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, PreferredWidth = 5 });
 
         foreach (var child in canvas.Root.Children)
         {

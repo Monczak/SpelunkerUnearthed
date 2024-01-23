@@ -65,7 +65,8 @@ public class CanvasRenderer : Renderer
             };
             foreach (Coord coord in bounds.Coords)
             {
-                tileBuffer[coord] = ServiceRegistry.Get<TileLoader>().Get(tileId);
+                if (tileBuffer.IsInBounds(coord))
+                    tileBuffer[coord] = ServiceRegistry.Get<TileLoader>().Get(tileId);
             }
         }
     }

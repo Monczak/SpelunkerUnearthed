@@ -49,59 +49,108 @@ public static class LayoutEngine
     private static void PerformFlexLayout(int depth, FlexLayoutNode flexLayoutNode, CoordBounds usableBounds)
     {
         var usableSize = AdjustForPreferredSizes(flexLayoutNode, usableBounds);
-        CalculateLayoutForChildren(depth, flexLayoutNode, usableBounds.TopLeft, usableSize);
+        
+        CalculateLayoutForChildren(depth, flexLayoutNode, usableBounds, usableSize);
     }
 
-    private static void CalculateLayoutForChildren(int depth, FlexLayoutNode flexLayoutNode, Coord startPos,
+    private static void CalculateLayoutForChildren(int depth, FlexLayoutNode flexLayoutNode, CoordBounds usableBounds,
         Coord usableSize)
     {
         var flexDirection = flexLayoutNode.FlexDirection;
+        var contentAlignment = flexLayoutNode.ContentAlignment;
         var totalFlexGrow = flexLayoutNode.Children.Where(child => !child.HasPreferredSize).Sum(child => child.FlexGrow);
         
         Vector2 error = Vector2.Zero;
-        Coord childPos = startPos;
-        for (int i = 0; i < flexLayoutNode.Children.Count; i++)
-        {
-            var child = flexLayoutNode.Children[i];
-            var (flexGapBefore, flexGapAfter) = CalculateFlexGap(flexLayoutNode, i);
 
-            float flexGap = flexGapBefore + flexGapAfter;
-                
-            Vector2 childSize = flexDirection switch
-            {
-                FlexDirection.Row => new Vector2(
-                    child.PreferredWidth is not null ? (float)child.PreferredWidth : usableSize.X / totalFlexGrow * child.FlexGrow - flexGap,
-                    child.PreferredHeight is not null ? (float)child.PreferredHeight : usableSize.Y
-                ),
-                FlexDirection.Column => new Vector2(
-                    child.PreferredWidth is not null ? (float)child.PreferredWidth : usableSize.X,
-                    child.PreferredHeight is not null ? (float)child.PreferredHeight : usableSize.Y / totalFlexGrow * child.FlexGrow - flexGap
-                ),
-                _ => throw new ArgumentOutOfRangeException()
-            };
-                
-            error += childSize - Vector2.Floor(childSize);
-            var roundedError = Vector2.Round(error);
-            childSize += roundedError;
-            error -= roundedError;
-                
-            childPos += flexDirection switch
-            {
-                FlexDirection.Row => Coord.UnitX * flexGapBefore,
-                FlexDirection.Column => Coord.UnitY * flexGapBefore,
-                _ => throw new ArgumentOutOfRangeException()
-            };
-                
-            boundsMap[child] = new CoordBounds(childPos, (Coord)childSize);
-                
-            childPos += flexDirection switch
-            {
-                FlexDirection.Row => Coord.UnitX * (childSize.X + flexGapAfter),
-                FlexDirection.Column => Coord.UnitY * (childSize.Y + flexGapAfter),
-                _ => throw new ArgumentOutOfRangeException()
-            };
-                
+        var childSizes = new Vector2[flexLayoutNode.Children.Count];
+        var flexGaps = new (float before, float after)[flexLayoutNode.Children.Count];
+
+        CalculateFlexGaps();
+        CalculateChildSizes();
+        CalculateChildPositions();
+        
+        foreach (var child in flexLayoutNode.Children)
             CalculateLayoutForNode(child, depth + 1);
+        
+        return;
+
+        void CalculateFlexGaps()
+        {
+            for (int i = 0; i < flexLayoutNode.Children.Count; i++)
+            { 
+                flexGaps[i] = CalculateFlexGap(flexLayoutNode, i);
+            }
+        }
+
+        void CalculateChildSizes()
+        {
+            for (int i = 0; i < flexLayoutNode.Children.Count; i++)
+            {
+                var child = flexLayoutNode.Children[i];
+                var (flexGapBefore, flexGapAfter) = flexGaps[i];
+                float flexGap = flexGapBefore + flexGapAfter;
+
+                Vector2 childSize = flexDirection switch
+                {
+                    FlexDirection.Row => new Vector2(
+                        child.PreferredWidth is not null
+                            ? (float)child.PreferredWidth
+                            : usableSize.X / totalFlexGrow * child.FlexGrow - flexGap,
+                        child.PreferredHeight is not null ? (float)child.PreferredHeight : usableSize.Y
+                    ),
+                    FlexDirection.Column => new Vector2(
+                        child.PreferredWidth is not null ? (float)child.PreferredWidth : usableSize.X,
+                        child.PreferredHeight is not null
+                            ? (float)child.PreferredHeight
+                            : usableSize.Y / totalFlexGrow * child.FlexGrow - flexGap
+                    ),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+
+                error += childSize - Vector2.Floor(childSize);
+                var roundedError = Vector2.Round(error);
+                childSize += roundedError;
+                error -= roundedError;
+
+                childSizes[i] = childSize;
+            }
+        }
+
+        void CalculateChildPositions()
+        {
+            Coord childPos = (flexDirection, contentAlignment) switch
+            {
+                (FlexDirection.Row or FlexDirection.Column, FlexContentAlignment.Start or FlexContentAlignment.SpaceBetween) => usableBounds.TopLeft,
+                (FlexDirection.Row, FlexContentAlignment.End) => usableBounds.TopRight - Coord.UnitX * (childSizes.Zip(flexGaps).Sum(sizeGaps => sizeGaps.First.X + sizeGaps.Second.before + sizeGaps.Second.after) - 1),    // TODO: Are we sure about subtracting 1 here?
+                (FlexDirection.Column, FlexContentAlignment.End) => usableBounds.BottomLeft - Coord.UnitY * (childSizes.Zip(flexGaps).Sum(sizeGaps => sizeGaps.First.Y + sizeGaps.Second.before + sizeGaps.Second.after) - 1),
+                
+                (FlexDirection.Row, FlexContentAlignment.Center) => (usableBounds.TopLeft + usableBounds.TopRight - Coord.UnitX * (childSizes.Zip(flexGaps).Sum(sizeGaps => sizeGaps.First.X + sizeGaps.Second.before + sizeGaps.Second.after) - 1)) / 2,
+                (FlexDirection.Column, FlexContentAlignment.Center) => (usableBounds.TopLeft + usableBounds.BottomLeft - Coord.UnitY * (childSizes.Zip(flexGaps).Sum(sizeGaps => sizeGaps.First.Y + sizeGaps.Second.before + sizeGaps.Second.after) - 1)) / 2,
+                
+                _ => throw new NotImplementedException()
+            };
+            
+            // TODO: Add support for SpaceBetween (later SpaceAround and SpaceEvenly)
+            for (int i = 0; i < flexLayoutNode.Children.Count; i++)
+            {
+                var (flexGapBefore, flexGapAfter) = flexGaps[i];
+                var child = flexLayoutNode.Children[i];
+                childPos += flexDirection switch
+                {
+                    FlexDirection.Row => Coord.UnitX * flexGapBefore,
+                    FlexDirection.Column => Coord.UnitY * flexGapBefore,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+                
+                boundsMap[child] = new CoordBounds(childPos, (Coord)childSizes[i]);
+                
+                childPos += flexDirection switch
+                {
+                    FlexDirection.Row => Coord.UnitX * (childSizes[i].X + flexGapAfter),
+                    FlexDirection.Column => Coord.UnitY * (childSizes[i].Y + flexGapAfter),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+            }
         }
     }
 

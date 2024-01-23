@@ -17,10 +17,11 @@ public abstract class CanvasNode
     private readonly List<CanvasNode> children = [];
     public IReadOnlyList<CanvasNode> Children => children.AsReadOnly();
 
-    public virtual void AddChild(CanvasNode node)
+    public virtual CanvasNode AddChild(CanvasNode node)
     {
         node.Parent = this;
         children.Add(node);
+        return node;
     }
 
     public void RemoveChild(CanvasNode node)

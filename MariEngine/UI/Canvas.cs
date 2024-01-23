@@ -6,5 +6,5 @@ namespace MariEngine.UI;
 
 public class Canvas : Component
 {
-    public LayoutNode Root { get; } = new FlexLayoutNode();
+    public FlexLayoutNode Root { get; } = new FlexLayoutNode();
 }

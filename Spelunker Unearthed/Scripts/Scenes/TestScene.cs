@@ -177,16 +177,24 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         uiEntity.AttachComponent(canvas);
         uiEntity.AttachComponent(new CanvasRenderer(graphics.GraphicsDevice, Camera));
         AddEntity(uiEntity);
-        
-        canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, PreferredWidth = 5 });
-        canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, PreferredWidth = 20, PreferredHeight = 20});
-        canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, PreferredWidth = 5 });
 
-        foreach (var child in canvas.Root.Children)
-        {
-            child.AddChild(new FlexLayoutNode());
-            child.AddChild(new FlexLayoutNode());
-        }
+        canvas.Root.ContentAlignment = FlexContentAlignment.Center;
+        
+        var col1 = canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, PreferredWidth = 5, ContentAlignment = FlexContentAlignment.Center });
+        col1.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });
+        col1.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });
+        
+        var squareContainer = canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, PreferredWidth = 20 });
+        squareContainer.AddChild(new FlexLayoutNode());
+        var square = squareContainer.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, PreferredWidth = 20, PreferredHeight = 20 });
+        squareContainer.AddChild(new FlexLayoutNode());
+        
+        square.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });
+        square.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });
+        
+        var col2 = canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, PreferredWidth = 5, ContentAlignment = FlexContentAlignment.Center });
+        col2.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });
+        col2.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });
         
         canvas.GetComponent<CanvasRenderer>().Redraw();
     }

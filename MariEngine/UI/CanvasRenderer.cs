@@ -61,7 +61,7 @@ public class CanvasRenderer : Renderer
                 1 => "Stone",
                 2 => "Player",
                 3 => "Scoria",
-                _ => "Packed Ice",
+                _ => "PackedIce",
             };
             foreach (Coord coord in bounds.Coords)
             {

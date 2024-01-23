@@ -179,7 +179,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         AddEntity(uiEntity);
         
         canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column });
-        canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, FlexGrow = 2 });
+        canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, FlexGrow = 5 });
         canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column });
 
         foreach (var child in canvas.Root.Children)

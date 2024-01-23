@@ -1,4 +1,6 @@
-﻿namespace MariEngine.UI.Nodes.Layouts;
+﻿using Microsoft.Xna.Framework;
+
+namespace MariEngine.UI.Nodes.Layouts;
 
 public class FlexLayoutNode : LayoutNode
 {

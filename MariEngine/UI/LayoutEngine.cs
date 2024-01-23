@@ -39,8 +39,15 @@ public static class LayoutEngine
             LayoutNode layoutNode => UiMath.ApplyPadding(boundsMap[layoutNode], layoutNode.Padding),
             _ => boundsMap[node],
         };
+
+        Coord usableSize = usableBounds.Size;
+        foreach (var child in node.Children.Where(child => child.HasPreferredSize))
+        {
+            usableSize -= new Coord(child.PreferredWidth ?? 0, child.PreferredHeight ?? 0);
+        }
         
-        var totalFlexGrow = node.Children.Sum(child => child.FlexGrow);
+        
+        var totalFlexGrow = node.Children.Where(child => !child.HasPreferredSize).Sum(child => child.FlexGrow);
         Vector2 error = Vector2.Zero;
 
         if (node is FlexLayoutNode flexLayoutNode)
@@ -57,12 +64,17 @@ public static class LayoutEngine
                 
                 Vector2 childSize = flexDirection switch
                 {
-                    FlexDirection.Row => new Vector2(usableBounds.Size.X / totalFlexGrow * child.FlexGrow - flexGap,
-                        usableBounds.Size.Y),
-                    FlexDirection.Column => new Vector2(usableBounds.Size.X,
-                        usableBounds.Size.Y / totalFlexGrow * child.FlexGrow - flexGap),
+                    FlexDirection.Row => new Vector2(
+                        child.PreferredWidth is not null ? (float)child.PreferredWidth : usableSize.X / totalFlexGrow * child.FlexGrow - flexGap,
+                        usableSize.Y
+                    ),
+                    FlexDirection.Column => new Vector2(
+                        usableSize.X,
+                        child.PreferredHeight is not null ? (float)child.PreferredHeight : usableSize.Y / totalFlexGrow * child.FlexGrow - flexGap
+                    ),
                     _ => throw new ArgumentOutOfRangeException()
                 };
+                
                 error += childSize - Vector2.Floor(childSize);
                 if (error.X >= 0.5 || error.Y >= 0.5)
                 {

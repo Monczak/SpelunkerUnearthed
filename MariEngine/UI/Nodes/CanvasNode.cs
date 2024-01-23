@@ -7,6 +7,11 @@ namespace MariEngine.UI.Nodes;
 public abstract class CanvasNode
 {
     public float FlexGrow { get; set; } = 1;
+        
+    public int? PreferredWidth { get; set; }
+    public int? PreferredHeight { get; set; }
+
+    public bool HasPreferredSize => PreferredWidth is not null || PreferredHeight is not null;
     
     public CanvasNode Parent { get; internal set; }
     private readonly List<CanvasNode> children = [];

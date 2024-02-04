@@ -19,6 +19,9 @@
 #begin Fonts/Monospace.ttf
 /copy:Fonts/Monospace.ttf
 
+#begin Fonts/whitrabt.ttf
+/copy:Fonts/whitrabt.ttf
+
 #begin Tiles/Basalt.yml
 /copy:Tiles/Basalt.yml
 

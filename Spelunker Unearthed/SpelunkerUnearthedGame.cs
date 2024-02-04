@@ -76,6 +76,7 @@ public class SpelunkerUnearthedGame : Game
         ServiceRegistry.Get<FontProvider>().AddFont("Tiles", "Monospace");
         ServiceRegistry.Get<FontProvider>().AddFont("Monospace", "Hack-Regular");
         ServiceRegistry.Get<FontProvider>().AddFont("Monospace", "Monospace");
+        ServiceRegistry.Get<FontProvider>().AddFont("UiFont", "whitrabt");
         
         debugScreen = new DebugScreen();
         ServiceRegistry.RegisterService(debugScreen);

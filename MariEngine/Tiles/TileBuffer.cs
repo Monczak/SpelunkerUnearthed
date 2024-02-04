@@ -44,6 +44,8 @@ public class TileBuffer(int width, int height) : IEnumerable<Tile>
         return x >= 0 && x < Width && y >= 0 && y < Height;
     }
 
+    public TileBufferFragment GetFragment(CoordBounds bounds) => new(this, bounds);
+    
     public IEnumerator<Tile> GetEnumerator() => ((IEnumerable<Tile>)map).GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator()

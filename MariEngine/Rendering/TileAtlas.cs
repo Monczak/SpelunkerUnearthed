@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using FontStashSharp;
+using MariEngine.Events;
 using MariEngine.Logging;
 using MariEngine.Services;
 using MariEngine.Tiles;
@@ -14,7 +15,8 @@ public class TileAtlas : Service
 {
     private RenderTarget2D backgroundRenderTarget, foregroundRenderTarget;
 
-    private SpriteFontBase font;
+    private SpriteFontBase worldFont;
+    private SpriteFontBase uiFont;
 
     private GraphicsDevice graphicsDevice;
     private SpriteBatch spriteBatch;
@@ -39,7 +41,7 @@ public class TileAtlas : Service
         backgroundTexture.SetData(new[] { Color.White });
     }
 
-    private Vector2 CalculateTextOffset(char character)
+    private Vector2 CalculateTextOffset(SpriteFontBase font, char character)
     {
         Vector2 charSize = font.MeasureString(character.ToString());
         return new Vector2(
@@ -56,6 +58,7 @@ public class TileAtlas : Service
     public void Resize(int newTileSize)
     {
         TileSize = newTileSize;
+        ServiceRegistry.Get<EventManager>().Notify("TileAtlasResized", newTileSize);
         CreateAtlas();
     }
 
@@ -128,7 +131,8 @@ public class TileAtlas : Service
 
     private void DrawForegrounds(IEnumerable<Tile> tiles)
     {
-        font = ServiceRegistry.Get<FontProvider>().GetFont("Tiles", TileSize);
+        worldFont = ServiceRegistry.Get<FontProvider>().GetFont("Tiles", TileSize);
+        uiFont = ServiceRegistry.Get<FontProvider>().GetFont("UiFont", TileSize);
         
         graphicsDevice.SetRenderTarget(foregroundRenderTarget);
         graphicsDevice.Clear(Color.Transparent);
@@ -138,7 +142,8 @@ public class TileAtlas : Service
         foreach (Tile tile in tiles)
         {
             Coord coord = tileAtlasCoords[tile.Id];
-            spriteBatch.DrawString(font, tile.Character.ToString(), (Vector2)coord * TileSize + CalculateTextOffset(tile.Character), tile.ForegroundColor);
+            var font = tile.Type is TileType.Ui ? uiFont : worldFont;
+            spriteBatch.DrawString(font, tile.Character.ToString(), (Vector2)coord * TileSize + CalculateTextOffset(font, tile.Character), tile.ForegroundColor);
         }
 
         spriteBatch.End();

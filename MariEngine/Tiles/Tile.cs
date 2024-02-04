@@ -24,6 +24,8 @@ public class Tile : Resource<TileData>
     public HashSet<TileBehavior> Behaviors { get; private set; }
 
     public CollisionGroup CollisionGroup { get; private set; }
+    
+    public TileType Type { get; private set; }
 
     public Tile()
     {
@@ -46,6 +48,8 @@ public class Tile : Resource<TileData>
         CollisionGroup = tile.CollisionGroup;
 
         Behaviors = new HashSet<TileBehavior>(tile.Behaviors);
+
+        Type = tile.Type;
     }
 
     public void OnPlaced()
@@ -95,6 +99,15 @@ public class Tile : Resource<TileData>
         if (data.Light is not null)
         {
             LightSource = new PointLight(ColorUtils.FromHex(data.Light.Value.Color), data.Light.Value.Intensity, data.Light.Value.Radius);
+        }
+
+        if (data.Type is null)
+        {
+            Type = TileType.World;
+        }
+        else
+        {
+            Type = Enum.Parse<TileType>(data.Type);
         }
         
         Behaviors = new HashSet<TileBehavior>();

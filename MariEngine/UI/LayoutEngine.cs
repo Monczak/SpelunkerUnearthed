@@ -44,6 +44,10 @@ public static class LayoutEngine
         {
             PerformFlexLayout(depth, flexLayoutNode, usableBounds);
         }
+        else if (node is ComponentNode componentNode)
+        {
+            boundsMap[componentNode] = usableBounds;
+        }
     }
 
     private static void PerformFlexLayout(int depth, FlexLayoutNode flexLayoutNode, CoordBounds usableBounds)

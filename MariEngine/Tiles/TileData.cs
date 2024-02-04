@@ -7,4 +7,5 @@ public record struct TileData(string ForegroundColor,
     string[] Behaviors,
     TileLightData? Light,
     float LightAttenuation,
-    string[] CollisionGroups);
+    string[] CollisionGroups,
+    string Type);

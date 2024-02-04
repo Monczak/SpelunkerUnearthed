@@ -1,4 +1,8 @@
-﻿using MariEngine.Tiles;
+﻿using System.Collections.Generic;
+using FMOD;
+using MariEngine.Logging;
+using MariEngine.Services;
+using MariEngine.Tiles;
 using MariEngine.UI.Nodes;
 using MariEngine.UI.Nodes.Components;
 using MariEngine.UI.Nodes.Layouts;
@@ -7,23 +11,70 @@ namespace MariEngine.UI;
 
 public class CanvasRendererVisitor : ICanvasRendererVisitor
 {
-    public void Visit(TileBufferFragment buffer, CanvasNode node, CoordBounds bounds)
+    public void Visit(CanvasNode node, TileBufferFragment buffer)
     {
-        
+        Logger.LogDebug("Visit CanvasNode");
     }
 
-    public void Visit(TileBufferFragment buffer, LayoutNode node, CoordBounds bounds)
+    public void Visit(LayoutNode node, TileBufferFragment buffer)
     {
-        
+        Logger.LogDebug("Visit LayoutNode");
     }
 
-    public void Visit(TileBufferFragment buffer, ComponentNode node, CoordBounds bounds)
+    public void Visit(ComponentNode node, TileBufferFragment buffer)
     {
-        
+        Logger.LogDebug("Visit ComponentNode");
     }
 
-    public void Visit(TileBufferFragment buffer, TextComponent node, CoordBounds bounds)
+    // TODO: Add support for text alignment
+    public void Visit(TextComponent node, TileBufferFragment buffer)
     {
-        
+        var coord = Coord.Zero;
+        int i = -1;
+        var characters = new Queue<char>(node.Text);
+
+        var lineBreakOpportunities = new Queue<int>();
+        for (int j = 1; j < node.Text.Length; j++)
+        {
+            if (IsLineBreakOpportunity(node.Text[j]) && !IsLineBreakOpportunity(node.Text[j - 1]))
+                lineBreakOpportunities.Enqueue(j);
+        }
+        lineBreakOpportunities.Enqueue(node.Text.Length);
+
+        lineBreakOpportunities.TryDequeue(out var currentLineBreakOpportunity);
+        while (characters.TryDequeue(out var c))
+        {
+            i++;
+            lineBreakOpportunities.TryPeek(out var nextLineBreakOpportunity);
+            if (i == currentLineBreakOpportunity)
+            {
+                var wordLength = nextLineBreakOpportunity - currentLineBreakOpportunity;
+                lineBreakOpportunities.TryDequeue(out currentLineBreakOpportunity);
+                if (coord.X + wordLength > buffer.Bounds.Size.X || c == '\n')
+                {
+                    LineBreak(ref coord);
+                    continue;
+                }
+            }
+            
+            if (buffer.IsInBounds(coord))
+            {
+                buffer[coord] = ServiceRegistry.Get<TileLoader>().Get($"Character_{c}");
+                coord += Coord.UnitX;
+            }
+        }
+
+        return;
+
+        void LineBreak(ref Coord coord)
+        {
+            coord.X = 0;
+            coord.Y += node.LineSpacing + 1;
+        }
+
+        bool IsLineBreakOpportunity(char c)
+        {
+            return c is ' ' or '\n';
+        }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using MariEngine.Tiles;
 using MariEngine.UI.Nodes.Components;
 
 namespace MariEngine.UI.Nodes;
@@ -40,5 +41,10 @@ public abstract class CanvasNode
     {
         Detach();
         newParent.AddChild(this);
+    }
+
+    public virtual void Accept(ICanvasRendererVisitor rendererVisitor, TileBufferFragment buffer)
+    {
+        rendererVisitor.Visit(this, buffer);
     }
 }

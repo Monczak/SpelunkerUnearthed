@@ -9,7 +9,7 @@ public static class ColorUtils
     {
         if (hexColor[0] == '#') hexColor = hexColor[1..];
 
-        byte[] rgb = Convert.FromHexString(hexColor);
-        return new Color(rgb[0], rgb[1], rgb[2]);
+        byte[] rgba = Convert.FromHexString(hexColor);
+        return new Color(rgba[0], rgba[1], rgba[2], rgba.Length == 4 ? rgba[3] : 255);
     }
 }

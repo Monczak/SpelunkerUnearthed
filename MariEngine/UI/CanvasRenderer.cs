@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using MariEngine.Events;
+using MariEngine.Logging;
 using MariEngine.Rendering;
 using MariEngine.Services;
 using MariEngine.Tiles;
@@ -11,7 +12,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MariEngine.UI;
 
-public class CanvasRenderer : Renderer
+public partial class CanvasRenderer : Renderer
 {
     private Canvas canvas;
     private TileBuffer tileBuffer;
@@ -19,16 +20,20 @@ public class CanvasRenderer : Renderer
 
     private int overscan;
 
-    public CanvasRenderer(GraphicsDevice graphicsDevice, Camera camera, int overscan = 1) : base(graphicsDevice, camera)
+    private ICanvasRendererVisitor rendererVisitor;
+
+    public CanvasRenderer(GraphicsDevice graphicsDevice, Camera camera, int overscan = 1, ICanvasRendererVisitor rendererVisitor = null) : base(graphicsDevice, camera)
     {
         this.overscan = overscan;
+        this.rendererVisitor = rendererVisitor ?? new CanvasRendererVisitor();
         
         InitializeBuffer();
         
-        ServiceRegistry.Get<EventManager>().Bind(this, "ClientSizeChanged", OnClientSizeChanged);
+        ServiceRegistry.Get<EventManager>().Bind(this, "ClientSizeChanged", Reinitialize);
+        ServiceRegistry.Get<EventManager>().Bind(this, "TileAtlasResized", new Action<int>(_ => Reinitialize()));
     }
 
-    private void OnClientSizeChanged()
+    private void Reinitialize()
     {
         InitializeBuffer();
         Redraw();
@@ -37,7 +42,10 @@ public class CanvasRenderer : Renderer
     private void InitializeBuffer()
     {
         Coord screenSize = new(graphicsDevice.PresentationParameters.BackBufferWidth, graphicsDevice.PresentationParameters.BackBufferHeight);
+        Logger.LogDebug(screenSize);
+        Logger.LogDebug(ServiceRegistry.Get<TileAtlas>().TileSize);
         screenSize /= ServiceRegistry.Get<TileAtlas>().TileSize;
+        Logger.LogDebug(screenSize);
         tileBuffer = new TileBuffer(screenSize + Coord.One * overscan * 2);
     }
 
@@ -55,19 +63,21 @@ public class CanvasRenderer : Renderer
         var layout = LayoutEngine.CalculateLayout(canvas.Root, new Coord(tileBuffer.Width, tileBuffer.Height));
         foreach (var (node, bounds) in layout)
         {
-            string tileId = LayoutEngine.DepthMap[node] switch
-            {
-                0 => "Nothing",
-                1 => "Stone",
-                2 => "Player",
-                3 => "Scoria",
-                _ => "PackedIce",
-            };
-            foreach (Coord coord in bounds.Coords)
-            {
-                if (tileBuffer.IsInBounds(coord))
-                    tileBuffer[coord] = ServiceRegistry.Get<TileLoader>().Get(tileId);
-            }
+            // string tileId = LayoutEngine.DepthMap[node] switch
+            // {
+            //     0 => "Nothing",
+            //     1 => "Stone",
+            //     2 => "Player",
+            //     3 => "Scoria",
+            //     _ => "PackedIce",
+            // };
+            // foreach (Coord coord in bounds.Coords)
+            // {
+            //     if (tileBuffer.IsInBounds(coord))
+            //         tileBuffer[coord] = ServiceRegistry.Get<TileLoader>().Get(tileId);
+            // }
+            
+            node.Accept(rendererVisitor, tileBuffer.GetFragment(bounds));
         }
     }
 

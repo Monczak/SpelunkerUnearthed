@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using MariEngine.Loading;
 using MariEngine.Tiles;
 using YamlDotNet.Serialization;
@@ -9,11 +10,9 @@ public class TileLoader : ResourceLoaderService<Tile, TileData>
 {
     protected override string ContentPath => ContentPaths.Tiles;
 
-    public override void LoadContent(INamingConvention convention = null)
+    private IEnumerable<Tile> GetSpecialTiles()
     {
-        base.LoadContent(convention);
-        
-        Tile nothingTile = ResourceBuilder.Build<Tile, TileData>("Nothing", new TileData
+        yield return ResourceBuilder.Build<Tile, TileData>("Nothing", new TileData
         {
             ForegroundColor = "#000000",
             BackgroundColor = "#000000",
@@ -22,6 +21,28 @@ public class TileLoader : ResourceLoaderService<Tile, TileData>
             Behaviors = null,
             LightAttenuation = 0,
         });
-        Content.Add(nothingTile.Id, nothingTile);
+    }
+
+    private IEnumerable<Tile> GetUiTextTiles()
+    {
+        return "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz 1234567890!@#$%^&*()-=_+[]{};':\",.<>/?\\|"
+            .Select(character => ResourceBuilder.Build<Tile, TileData>($"Character_{character}", new TileData
+            {
+                ForegroundColor = "#ffffff",
+                BackgroundColor = "#00000000",
+                Character = character,
+                Tags = null,
+                Behaviors = null,
+                LightAttenuation = 0,
+                Type = "Ui"
+            }));
+    }
+
+    public override void LoadContent(INamingConvention convention = null)
+    {
+        base.LoadContent(convention);
+
+        foreach (var tile in GetSpecialTiles()) Content.Add(tile.Id, tile);
+        foreach (var tile in GetUiTextTiles()) Content.Add(tile.Id, tile);
     }
 }

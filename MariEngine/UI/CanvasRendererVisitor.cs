@@ -59,7 +59,7 @@ public class CanvasRendererVisitor : ICanvasRendererVisitor
             
             if (buffer.IsInBounds(coord))
             {
-                buffer[coord] = ServiceRegistry.Get<TileLoader>().Get($"Character_{c}");
+                buffer[coord] = ServiceRegistry.Get<TileLoader>().GetCharacter(c);
                 coord += Coord.UnitX;
             }
         }

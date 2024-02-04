@@ -128,6 +128,7 @@ public static class LayoutEngine
                 (FlexDirection.Row, FlexContentAlignment.End) => usableBounds.TopRight - Coord.UnitX * (childSizes.Zip(flexGaps).Sum(sizeGaps => sizeGaps.First.X + sizeGaps.Second.before + sizeGaps.Second.after) - 1),    // TODO: Are we sure about subtracting 1 here?
                 (FlexDirection.Column, FlexContentAlignment.End) => usableBounds.BottomLeft - Coord.UnitY * (childSizes.Zip(flexGaps).Sum(sizeGaps => sizeGaps.First.Y + sizeGaps.Second.before + sizeGaps.Second.after) - 1),
                 
+                // TODO: Fix off by one errors here
                 (FlexDirection.Row, FlexContentAlignment.Center) => (usableBounds.TopLeft + usableBounds.TopRight - Coord.UnitX * (childSizes.Zip(flexGaps).Sum(sizeGaps => sizeGaps.First.X + sizeGaps.Second.before + sizeGaps.Second.after) - 1)) / 2,
                 (FlexDirection.Column, FlexContentAlignment.Center) => (usableBounds.TopLeft + usableBounds.BottomLeft - Coord.UnitY * (childSizes.Zip(flexGaps).Sum(sizeGaps => sizeGaps.First.Y + sizeGaps.Second.before + sizeGaps.Second.after) - 1)) / 2,
                 

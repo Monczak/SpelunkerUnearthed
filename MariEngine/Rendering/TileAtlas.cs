@@ -24,6 +24,9 @@ public class TileAtlas : Service
     private IDictionary<string, Tile> tileDict;
     
     public int TileSize { get; private set; }
+    private int tileMarginSize = 1;
+
+    private int TileSizeWithMargin => TileSize + tileMarginSize * 2;
 
     private Coord atlasSize;
 
@@ -38,7 +41,7 @@ public class TileAtlas : Service
         TileSize = tileSize;
         
         backgroundTexture = new Texture2D(graphicsDevice, 1, 1);
-        backgroundTexture.SetData(new[] { Color.White });
+        backgroundTexture.SetData([Color.White]);
     }
 
     private Vector2 CalculateTextOffset(SpriteFontBase font, char character)
@@ -78,8 +81,8 @@ public class TileAtlas : Service
 
         backgroundRenderTarget = new RenderTarget2D(
             graphicsDevice,
-            atlasSize.X * TileSize,
-            atlasSize.Y * TileSize,
+            atlasSize.X * TileSizeWithMargin,
+            atlasSize.Y * TileSizeWithMargin,
             false,
             graphicsDevice.PresentationParameters.BackBufferFormat,
             graphicsDevice.PresentationParameters.DepthStencilFormat
@@ -87,8 +90,8 @@ public class TileAtlas : Service
 
         foregroundRenderTarget = new RenderTarget2D(
             graphicsDevice,
-            atlasSize.X * TileSize,
-            atlasSize.Y * TileSize,
+            atlasSize.X * TileSizeWithMargin,
+            atlasSize.Y * TileSizeWithMargin,
             false,
             graphicsDevice.PresentationParameters.BackBufferFormat,
             graphicsDevice.PresentationParameters.DepthStencilFormat
@@ -98,7 +101,7 @@ public class TileAtlas : Service
     private void ReserveCoords(IDictionary<string, Tile> tiles)
     {
         tileAtlasCoords = new Dictionary<string, Coord>();
-        List<string> ids = new List<string>(tiles.Keys);
+        List<string> ids = [..tiles.Keys];
         for (int y = 0; y < atlasSize.Y; y++)
         {
             for (int x = 0; x < atlasSize.X; x++)
@@ -121,7 +124,7 @@ public class TileAtlas : Service
         foreach (Tile tile in tiles)
         {
             Coord coord = tileAtlasCoords[tile.Id];
-            spriteBatch.Draw(backgroundTexture, new Rectangle(coord.X * TileSize, coord.Y * TileSize, TileSize, TileSize), tile.BackgroundColor);
+            spriteBatch.Draw(backgroundTexture, new Rectangle(coord.X * TileSizeWithMargin, coord.Y * TileSizeWithMargin, TileSizeWithMargin, TileSizeWithMargin), tile.BackgroundColor);
         }
 
         spriteBatch.End();
@@ -143,7 +146,7 @@ public class TileAtlas : Service
         {
             Coord coord = tileAtlasCoords[tile.Id];
             var font = tile.Type is TileType.Ui ? uiFont : worldFont;
-            spriteBatch.DrawString(font, tile.Character.ToString(), (Vector2)coord * TileSize + CalculateTextOffset(font, tile.Character), tile.ForegroundColor);
+            spriteBatch.DrawString(font, tile.Character.ToString(), (Vector2)coord * TileSizeWithMargin + Vector2.One * tileMarginSize + CalculateTextOffset(font, tile.Character), tile.ForegroundColor);
         }
 
         spriteBatch.End();
@@ -162,7 +165,7 @@ public class TileAtlas : Service
     public void DrawTile(SpriteBatch localSpriteBatch, Vector2 pos, string tileId, Color tint)
     {
         Coord atlasCoord = tileAtlasCoords[tileId];
-        localSpriteBatch.Draw(backgroundRenderTarget, pos, new Rectangle(atlasCoord.X * TileSize, atlasCoord.Y * TileSize, TileSize, TileSize), tint);
-        localSpriteBatch.Draw(foregroundRenderTarget, pos, new Rectangle(atlasCoord.X * TileSize, atlasCoord.Y * TileSize, TileSize, TileSize), tint);
+        localSpriteBatch.Draw(backgroundRenderTarget, pos, new Rectangle(atlasCoord.X * TileSizeWithMargin + tileMarginSize, atlasCoord.Y * TileSizeWithMargin + tileMarginSize, TileSize, TileSize), tint);
+        localSpriteBatch.Draw(foregroundRenderTarget, pos, new Rectangle(atlasCoord.X * TileSizeWithMargin + tileMarginSize, atlasCoord.Y * TileSizeWithMargin + tileMarginSize, TileSize, TileSize), tint);
     }
 }

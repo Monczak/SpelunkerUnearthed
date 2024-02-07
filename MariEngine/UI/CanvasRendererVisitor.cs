@@ -18,7 +18,13 @@ public class CanvasRendererVisitor : ICanvasRendererVisitor
 
     public void Visit(LayoutNode node, TileBufferFragment buffer)
     {
-        Logger.LogDebug("Visit LayoutNode");
+        if (node.Background is not null)
+        {
+            foreach (Coord coord in buffer.Bounds.Coords)
+            {
+                buffer.SetAbsolute(coord, node.Background.GetNineSlice(buffer.Bounds, coord));
+            }
+        }
     }
 
     public void Visit(ComponentNode node, TileBufferFragment buffer)
@@ -72,9 +78,6 @@ public class CanvasRendererVisitor : ICanvasRendererVisitor
             coord.Y += node.LineSpacing + 1;
         }
 
-        bool IsLineBreakOpportunity(char c)
-        {
-            return c is ' ' or '\n';
-        }
+        bool IsLineBreakOpportunity(char c) => c is ' ' or '\n';
     }
 }

@@ -9,7 +9,7 @@ using MariEngine.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MariEngine.Rendering;
+namespace MariEngine.Tiles;
 
 public class TileAtlas : Service
 {

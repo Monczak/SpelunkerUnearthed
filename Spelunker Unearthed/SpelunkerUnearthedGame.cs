@@ -63,6 +63,7 @@ public class SpelunkerUnearthedGame : Game
         ServiceRegistry.RegisterService(new FontProvider());
         ServiceRegistry.RegisterService(new RandomProvider());
         ServiceRegistry.RegisterService(new TileLoader());
+        ServiceRegistry.RegisterService(new SpriteLoader());
         ServiceRegistry.RegisterService(new InputManager());
         ServiceRegistry.RegisterService(new AudioManager());
         ServiceRegistry.RegisterService(new BiomeLoader());
@@ -136,6 +137,7 @@ public class SpelunkerUnearthedGame : Game
         ServiceRegistry.RegisterService(new TileAtlas(GraphicsDevice, SpriteBatch, 16));
 
         ServiceRegistry.Get<TileLoader>().LoadContent();
+        ServiceRegistry.Get<SpriteLoader>().LoadContent();
         
         ServiceRegistry.Get<TileAtlas>().SetTiles(ServiceRegistry.Get<TileLoader>().Content);
         ServiceRegistry.Get<TileAtlas>().CreateAtlas();

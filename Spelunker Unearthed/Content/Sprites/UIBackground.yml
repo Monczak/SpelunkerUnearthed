@@ -1,0 +1,8 @@
+﻿Tiles:
+  - "aaa"
+  - "aba"
+  - "aaa"
+Keys:
+  a: Basalt
+  b: Nothing
+NineSliceCornerSize: 1

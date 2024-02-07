@@ -1,5 +1,6 @@
 ﻿using System;
 using MariEngine.Services;
+using MariEngine.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

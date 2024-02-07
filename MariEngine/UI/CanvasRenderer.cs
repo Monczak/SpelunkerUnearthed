@@ -42,10 +42,7 @@ public partial class CanvasRenderer : Renderer
     private void InitializeBuffer()
     {
         Coord screenSize = new(graphicsDevice.PresentationParameters.BackBufferWidth, graphicsDevice.PresentationParameters.BackBufferHeight);
-        Logger.LogDebug(screenSize);
-        Logger.LogDebug(ServiceRegistry.Get<TileAtlas>().TileSize);
         screenSize /= ServiceRegistry.Get<TileAtlas>().TileSize;
-        Logger.LogDebug(screenSize);
         tileBuffer = new TileBuffer(screenSize + Coord.One * overscan * 2);
     }
 

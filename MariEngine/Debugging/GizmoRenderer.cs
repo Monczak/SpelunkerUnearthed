@@ -15,7 +15,7 @@ public class GizmoRenderer : Renderer
     public GizmoRenderer(GraphicsDevice graphicsDevice, Camera camera) : base(graphicsDevice, camera)
     {
         gizmoTexture = new Texture2D(graphicsDevice, 1, 1, false, SurfaceFormat.Color);
-        gizmoTexture.SetData(new[] { Color.White });
+        gizmoTexture.SetData([Color.White]);
         
         ServiceRegistry.Get<InputManager>().OnPressed("ToggleGizmos", ToggleEnabled);
     }

@@ -49,7 +49,7 @@ public class Room
         Distance = distance;
         Flags = flags;
 
-        Connections = new HashSet<SubRoomConnection>();
+        Connections = [];
         SubRooms = new Dictionary<Coord, SubRoom>();
         for (int y = position.Y; y < position.Y + size.Y; y++)
         {
@@ -81,7 +81,7 @@ public class Room
     public void AddPointOfInterest(PointOfInterest poi)
     {
         if (!PointsOfInterest.ContainsKey(poi.PoiType))
-            PointsOfInterest[poi.PoiType] = new List<PointOfInterest>();
+            PointsOfInterest[poi.PoiType] = [];
         PointsOfInterest[poi.PoiType].Add(poi);
     }
 

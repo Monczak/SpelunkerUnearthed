@@ -15,34 +15,21 @@ using Random = MariEngine.Utils.Random;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration;
 
-public class RoomMapGenerator : Component
+public class RoomMapGenerator(IEnumerable<IRoomMapProcessor> processors)
 {
-    private Tilemap tilemap;
     private TileBuffer wallBuffer;
     private TileBuffer groundBuffer;
 
     private Random random;
-
-    private List<IRoomMapProcessor> processors = new();
-
-    protected override void OnAttach()
-    {
-        tilemap = GetComponent<Tilemap>();
-    }
-
-    public void AddProcessor<T>(T processor) where T : IRoomMapProcessor
-    {
-        processors.Add(processor);
-    }   
     
-    public void GenerateRoomMap(Room room, RoomMapGenerationParameters parameters, Coord pastePosition, BiomeMap biomeMap, int baseTilemapSize = 16)
+    public (TileBuffer walls, TileBuffer ground) GenerateRoomMap(Room room, RoomMapGenerationParameters parameters, Coord pastePosition, BiomeMap biomeMap, int baseTilemapSize = 16)
     {
         random = ServiceRegistry.Get<RandomProvider>().Request(Constants.MapGenRng);
 
-        BuildRoomMap(room, parameters, pastePosition, biomeMap, baseTilemapSize);
+        return BuildRoomMap(room, parameters, pastePosition, biomeMap, baseTilemapSize);
     }
 
-    private void BuildRoomMap(Room room, RoomMapGenerationParameters parameters, Coord pastePosition, BiomeMap biomeMap, int baseTilemapSize)
+    private (TileBuffer walls, TileBuffer ground) BuildRoomMap(Room room, RoomMapGenerationParameters parameters, Coord pastePosition, BiomeMap biomeMap, int baseTilemapSize)
     {
         wallBuffer = new TileBuffer(room.Size * baseTilemapSize);
         groundBuffer = new TileBuffer(room.Size * baseTilemapSize);
@@ -61,9 +48,8 @@ public class RoomMapGenerator : Component
         {
             processor.ProcessRoomMap(wallBuffer, room);
         }
-        
-        tilemap.PasteAt(wallBuffer, pastePosition, Tilemap.BaseLayer);
-        tilemap.PasteAt(groundBuffer, pastePosition, Tilemap.GroundLayer);
+
+        return (wallBuffer, groundBuffer);
     }
 
     private void MakeGround(Coord basePos, BiomeMap biomeMap)

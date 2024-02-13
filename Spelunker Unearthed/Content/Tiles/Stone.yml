@@ -9,3 +9,4 @@ LightAttenuation: 0.5
 #Light:
 #  Color: "#0f0f0f"
 #  Radius: 3
+#  Intensity: 1

@@ -11,8 +11,8 @@ public class InputManager : Service
 {
     private Dictionary<string, InputEvent> inputEvents = new();
 
-    private HashSet<Keys> pressedKeys = new();
-    private HashSet<Keys> previousPressedKeys = new();
+    private HashSet<Keys> pressedKeys = [];
+    private HashSet<Keys> previousPressedKeys = [];
 
     private Dictionary<InputEvent, HashSet<InputHandler>> pressedHandlers = new();
     private Dictionary<InputEvent, HashSet<InputHandler>> releasedHandlers = new();
@@ -22,8 +22,8 @@ public class InputManager : Service
     public void RegisterEvent(InputEvent inputEvent)
     {
         inputEvents[inputEvent.Name] = inputEvent;
-        pressedHandlers[inputEvent] = new HashSet<InputHandler>();
-        releasedHandlers[inputEvent] = new HashSet<InputHandler>();
+        pressedHandlers[inputEvent] = [];
+        releasedHandlers[inputEvent] = [];
     }
 
     public void BindKey(string inputName, Keys newKey)
@@ -58,7 +58,7 @@ public class InputManager : Service
     public override void Update()
     {
         var state = Keyboard.GetState();
-        pressedKeys = new HashSet<Keys>(state.GetPressedKeys());
+        pressedKeys = [..state.GetPressedKeys()];
 
         foreach (InputEvent inputEvent in inputEvents.Values)
         {
@@ -75,6 +75,6 @@ public class InputManager : Service
             }
         }
 
-        previousPressedKeys = new HashSet<Keys>(pressedKeys);
+        previousPressedKeys = [..pressedKeys];
     }
 }

@@ -26,7 +26,10 @@ public class RandomProvider : Service
 
     public Random Request(string name)
     {
-        if (localRandoms.TryGetValue(name, out var random)) return random;
+        if (localRandoms.TryGetValue(name, out var random))
+        {
+            return random;
+        }
         
         localRandoms[name] = new Random();
         return localRandoms[name];

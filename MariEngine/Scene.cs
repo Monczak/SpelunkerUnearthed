@@ -13,7 +13,7 @@ namespace MariEngine;
 
 public abstract class Scene(GameWindow window, GraphicsDeviceManager graphics)
 {
-    public List<Entity> Entities { get; } = new();
+    public List<Entity> Entities { get; } = [];
     public Camera Camera { get; } = new(window, graphics);
 
     private readonly PriorityQueue<Renderer, int> rendererQueue = new();

@@ -7,5 +7,5 @@ public interface IFeature
 {
     CoordBounds Bounds { get; }
 
-    TileBuffer Generate(Tilemap tilemap);
+    TileBuffer Generate(TileBuffer map);
 }

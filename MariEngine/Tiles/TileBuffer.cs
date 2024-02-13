@@ -82,4 +82,16 @@ public class TileBuffer(int width, int height) : IEnumerable<Tile>
         foreach (Coord coord in Coords)
             this[coord] = buffer[coord];
     }
+    
+    public void PasteAt(TileBuffer buffer, Coord position, bool maskNulls = true)
+    {
+        foreach (Coord coord in buffer.Coords)
+        {
+            Coord actualCoord = coord + position;
+            if (!IsInBounds(actualCoord)) continue;
+            if (maskNulls && buffer[coord] is null) continue;
+
+            this[actualCoord] = buffer[coord];
+        }
+    }
 }

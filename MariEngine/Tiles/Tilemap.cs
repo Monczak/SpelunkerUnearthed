@@ -16,7 +16,7 @@ public class Tilemap : Component
     public const int BaseLayer = 0;
     public const int GroundLayer = -1;
 
-    private List<int> layerIds = new();
+    private List<int> layerIds = [];
     
     public HashSet<TileEntity> TileEntities { get; }
     
@@ -43,8 +43,8 @@ public class Tilemap : Component
         layers = new SortedDictionary<int, TileBuffer>(new DescendingComparer<int>());
         AddLayer(BaseLayer);
 
-        TileEntities = new HashSet<TileEntity>();
-        BehaviorsToUpdate = new HashSet<TileBehavior>();
+        TileEntities = [];
+        BehaviorsToUpdate = [];
     }
 
     protected override void OnAttach()
@@ -74,7 +74,7 @@ public class Tilemap : Component
     public void AddLayer(int layerId)
     {
         layers.Add(layerId, new TileBuffer(Width, Height));
-        layerIds = new List<int>(layers.Keys);
+        layerIds = [..layers.Keys];
     }
 
     public void Resize(Coord newSize)

@@ -7,7 +7,7 @@ public abstract class ProceduralFeature : IFeature
 {
     public abstract CoordBounds Bounds { get; protected set; }
 
-    public TileBuffer Generate(Tilemap tilemap) => GenerateFeature(tilemap);
+    public TileBuffer Generate(TileBuffer map) => GenerateFeature(map);
 
-    protected abstract TileBuffer GenerateFeature(Tilemap tilemap);
+    protected abstract TileBuffer GenerateFeature(TileBuffer map);
 }

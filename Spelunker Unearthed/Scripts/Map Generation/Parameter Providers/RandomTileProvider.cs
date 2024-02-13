@@ -15,7 +15,7 @@ public class RandomTileProvider : TileProvider
 
     protected override void BuildFromData(ParameterProviderData data)
     {
-        tiles = new List<(Tile, float)>();
+        tiles = [];
         if (data.Options["Tiles"] is not Dictionary<object, object> tileWeights)
             throw new ResourceLoadingException("Could not load tile weights.");
 

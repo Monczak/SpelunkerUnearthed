@@ -6,7 +6,7 @@ namespace MariEngine.Utils;
 
 public static class DrawingUtils
 {
-    private static readonly ThreadLocal<List<Coord>> Coords = new(() => new List<Coord>());
+    private static readonly ThreadLocal<List<Coord>> Coords = new(() => []);
     
     public static void BresenhamLine(List<Coord> coordList, Coord start, Coord end, bool endPreemptively = false)
     {

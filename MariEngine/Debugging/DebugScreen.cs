@@ -12,7 +12,7 @@ public class DebugScreen : Service
 {
     public bool Enabled { get; set; }
     
-    internal List<DebugScreenLine> Lines { get; private set; } = new();
+    internal List<DebugScreenLine> Lines { get; private set; } = [];
     
     public void AddLine(DebugScreenLine line)
     {

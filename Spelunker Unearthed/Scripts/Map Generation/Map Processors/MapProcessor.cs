@@ -8,5 +8,5 @@ public abstract class MapProcessor(int baseRoomSize)
 {
     protected int BaseRoomSize { get; } = baseRoomSize;
 
-    public abstract void ProcessMap(Tilemap map, CaveSystemLevel level);
+    public abstract void ProcessMap(TileBuffer map, CaveSystemLevel level);
 }

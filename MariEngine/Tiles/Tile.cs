@@ -47,7 +47,7 @@ public class Tile : Resource<TileData>
 
         CollisionGroup = tile.CollisionGroup;
 
-        Behaviors = new HashSet<TileBehavior>(tile.Behaviors);
+        Behaviors = [..tile.Behaviors];
 
         Type = tile.Type;
     }
@@ -110,6 +110,6 @@ public class Tile : Resource<TileData>
             Type = Enum.Parse<TileType>(data.Type);
         }
         
-        Behaviors = new HashSet<TileBehavior>();
+        Behaviors = [];
     }
 }

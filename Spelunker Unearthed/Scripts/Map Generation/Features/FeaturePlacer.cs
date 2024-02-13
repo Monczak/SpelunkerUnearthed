@@ -4,8 +4,8 @@ namespace SpelunkerUnearthed.Scripts.MapGeneration.Features;
 
 public static class FeaturePlacer
 {
-    public static void Place(IFeature feature, Tilemap tilemap, int layerId)
+    public static void Place(IFeature feature, TileBuffer map, int layerId)
     {
-        tilemap.PasteAt(feature.Generate(tilemap), feature.Bounds.TopLeft, layerId);
+        map.PasteAt(feature.Generate(map), feature.Bounds.TopLeft);
     }
 }

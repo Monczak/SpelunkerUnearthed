@@ -18,7 +18,7 @@ public static class RandomWalk
 
     private static List<Coord> FindCandidates(Coord pos, bool diagonalsAllowed = false)
     {
-        List<Coord> candidates = new();
+        List<Coord> candidates = [];
 
         for (int dx = -1; dx <= 1; dx++)
         {
@@ -48,7 +48,7 @@ public static class RandomWalk
         random ??= ServiceRegistry.Get<RandomProvider>().Request(Constants.GeneralPurposeRng);
         
         Coord currentPos = startPos;
-        HashSet<Coord> path = new() { currentPos };
+        HashSet<Coord> path = [currentPos];
 
         while (currentPos != goalPos)
         {

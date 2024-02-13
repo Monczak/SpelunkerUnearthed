@@ -10,7 +10,7 @@ namespace SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 
 public class CaveSystemLevel
 {
-    public List<Room> Rooms { get; private set; } = new();
+    public List<Room> Rooms { get; private set; } = [];
 
     private Dictionary<Coord, Room> map = new();
 
@@ -46,9 +46,9 @@ public class CaveSystemLevel
         if (roomQueue.Count == 0) return;
         Room room = roomQueue.Dequeue();
         
-        HashSet<((Coord pos, AttachNode node), float weight)> placements = new();
+        HashSet<((Coord pos, AttachNode node), float weight)> placements = [];
 
-        var newRoomSize = PickRoomSize();
+        var newRoomSize = PickRoomSizeAndPlacements();
 
         while (placements.Count > 0)
         {
@@ -74,12 +74,12 @@ public class CaveSystemLevel
             }
 
             if (random.NextFloat() < decisionEngine.GetBranchingProbability(room))
-                newRoomSize = PickRoomSize();
+                newRoomSize = PickRoomSizeAndPlacements();
             else
                 break;
         }
 
-        Coord PickRoomSize()
+        Coord PickRoomSizeAndPlacements()
         {
             placements.Clear();
             
@@ -98,7 +98,7 @@ public class CaveSystemLevel
 
     private List<(Coord pos, AttachNode node)> GetNewRoomPlacements(Room room, Coord newRoomSize)
     {
-        List<(Coord pos, AttachNode node)> positions = new();
+        List<(Coord pos, AttachNode node)> positions = [];
         foreach (AttachNode node in room.AttachNodes)
         {
             foreach (Coord position in node.GetRoomPositions(newRoomSize))

@@ -14,7 +14,7 @@ public class EventManager : Service
         if (!handlers.ContainsKey(eventName))
             handlers[eventName] = new Dictionary<object, List<Delegate>>();
         if (!handlers[eventName].ContainsKey(context))
-            handlers[eventName][context] = new List<Delegate>();
+            handlers[eventName][context] = [];
         
         handlers[eventName][context].Add(handler);
     }

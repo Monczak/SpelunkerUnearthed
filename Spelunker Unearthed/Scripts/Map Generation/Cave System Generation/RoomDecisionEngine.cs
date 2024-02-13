@@ -22,7 +22,7 @@ public abstract class RoomDecisionEngine
 
     public Coord PickRoomSize(Room sourceRoom)
     {
-        List<(Coord size, float weight)> sizes = new();
+        List<(Coord size, float weight)> sizes = [];
         for (int y = MinRoomSize.Y; y <= MaxRoomSize.Y; y++)
         {
             for (int x = MinRoomSize.X; x <= MaxRoomSize.X; x++)

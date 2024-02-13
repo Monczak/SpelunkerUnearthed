@@ -41,5 +41,5 @@ public class Feature : Resource<FeatureData>, IFeature
         Bounds = new CoordBounds(Coord.Zero, new Coord(width, height));
     }
     
-    public TileBuffer Generate(Tilemap tilemap) => buffer;
+    public TileBuffer Generate(TileBuffer map) => buffer;
 }

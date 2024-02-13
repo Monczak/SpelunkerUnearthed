@@ -20,6 +20,7 @@ public class CanvasRendererVisitor : ICanvasRendererVisitor
     {
         if (node.Background is not null)
         {
+            // TODO: Support non-9-sliced sprites
             foreach (Coord coord in buffer.Bounds.Coords)
             {
                 buffer.SetAbsolute(coord, node.Background.GetNineSlice(buffer.Bounds, coord));

@@ -15,41 +15,41 @@ namespace SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
 
 public class RoomConnectionProcessor(int baseRoomSize, Gizmos gizmos) : MapProcessor(baseRoomSize)
 {
-    public override void ProcessMap(Tilemap tilemap, CaveSystemLevel level)
+    public override void ProcessMap(TileBuffer map, CaveSystemLevel level)
     {
         var connections = level.Rooms
             .SelectMany(room => room.Connections)
             .DistinctBy(conn => conn, new SubRoomConnectionBidirectionalEqualityComparer());
         foreach (var connection in connections)
         {
-            HandleConnection(tilemap, level, connection);
+            HandleConnection(map, level, connection);
         }       
     }
 
-    private void HandleConnection(Tilemap tilemap, CaveSystemLevel level, SubRoomConnection connection)
+    private void HandleConnection(TileBuffer map, CaveSystemLevel level, SubRoomConnection connection)
     {
         Coord fromPoint = RoomMath.TransformRoomPos(level, connection.From.Position, BaseRoomSize) + Coord.One * BaseRoomSize / 2;
         Coord toPoint = RoomMath.TransformRoomPos(level, connection.To.Position, BaseRoomSize) + Coord.One * BaseRoomSize / 2;
         Coord midpoint = (fromPoint + toPoint) / 2;
 
-        var (from, to) = FindConnectionCoords(tilemap, level, connection.From.Room, connection.To.Room, midpoint);
-        (from, to) = StraightenLine(tilemap, from, to, connection.Direction);
+        var (from, to) = FindConnectionCoords(map, level, connection.From.Room, connection.To.Room, midpoint);
+        (from, to) = StraightenLine(map, from, to, connection.Direction);
 
-        FeaturePlacer.Place(new Tunnel(from, to, 1), tilemap, Tilemap.BaseLayer);
+        FeaturePlacer.Place(new Tunnel(from, to, 1), map, Tilemap.BaseLayer);
         
-        gizmos.DrawLine(tilemap.CoordToWorldPoint(from) + Vector2.One * 0.5f, tilemap.CoordToWorldPoint(to) + Vector2.One * 0.5f, Color.Coral, lifetime: 10000);
+        // gizmos.DrawLine(map.CoordToWorldPoint(from) + Vector2.One * 0.5f, map.CoordToWorldPoint(to) + Vector2.One * 0.5f, Color.Coral, lifetime: 10000);
     }
 
-    private (Coord from, Coord to) FindConnectionCoords(Tilemap tilemap, CaveSystemLevel level, Room room1,
+    private (Coord from, Coord to) FindConnectionCoords(TileBuffer map, CaveSystemLevel level, Room room1,
         Room room2, Coord refCoord) =>
-        (GetNearestNothingTilePos(tilemap, level, room1, refCoord), GetNearestNothingTilePos(tilemap, level, room2, refCoord));
+        (GetNearestNothingTilePos(map, level, room1, refCoord), GetNearestNothingTilePos(map, level, room2, refCoord));
 
-    private Coord GetNearestNothingTilePos(Tilemap tilemap, CaveSystemLevel level, Room room, Coord refCoord)
+    private Coord GetNearestNothingTilePos(TileBuffer map, CaveSystemLevel level, Room room, Coord refCoord)
     {
         var bounds = GetRoomBoundsOnTilemap(level, room);
         
         return bounds.Coords
-            .Where(c => !Tags.HasTag(tilemap.Get(c, Tilemap.BaseLayer).Tags, "Wall"))
+            .Where(c => !Tags.HasTag(map[c].Tags, "Wall"))
             .MinBy(c => (refCoord - c).SqrMagnitude);
     }
 
@@ -61,7 +61,7 @@ public class RoomConnectionProcessor(int baseRoomSize, Gizmos gizmos) : MapProce
         );
     }
 
-    private (Coord from, Coord to) StraightenLine(Tilemap tilemap, Coord from, Coord to, Direction connectionDirection, int lookahead = 3)
+    private (Coord from, Coord to) StraightenLine(TileBuffer map, Coord from, Coord to, Direction connectionDirection, int lookahead = 3)
     {
         Coord delta = to - from;
         float angle = MathUtils.DiamondAngle((Vector2)delta);
@@ -88,7 +88,7 @@ public class RoomConnectionProcessor(int baseRoomSize, Gizmos gizmos) : MapProce
             for (int i = start; step < 0 ? i >= end : i <= end; i += step)
             {
                 coord = (direction & Direction.Horizontal) != 0 ? new Coord(i, otherCoord) : new Coord(otherCoord, i);
-                if (!Tags.HasTag(tilemap.Get(coord, Tilemap.BaseLayer).Tags, "Wall"))
+                if (!Tags.HasTag(map[coord].Tags, "Wall"))
                     return coord;
             }
 
@@ -114,7 +114,7 @@ public class RoomConnectionProcessor(int baseRoomSize, Gizmos gizmos) : MapProce
                 for (int sweep = sweepStart; sweep <= sweepEnd; sweep++)
                 {
                     Coord coord = isVertical ? new Coord(ortho, sweep) : new Coord(sweep, ortho);
-                    if (Tags.HasTag(tilemap.Get(coord, Tilemap.BaseLayer).Tags, "Wall"))
+                    if (Tags.HasTag(map[coord].Tags, "Wall"))
                         wallCount++;
                 }
 

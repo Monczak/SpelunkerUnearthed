@@ -11,7 +11,7 @@ public class Gizmos : Component
 {
     private object lockObj = new();
     
-    internal List<GizmoShape> Shapes { get; private set; } = new();
+    internal List<GizmoShape> Shapes { get; private set; } = [];
     
     public void DrawRectangle(Vector2 position, Vector2 size, Color color, float? lifetime = null)
     {

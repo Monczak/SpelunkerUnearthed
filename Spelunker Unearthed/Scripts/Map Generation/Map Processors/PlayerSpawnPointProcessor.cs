@@ -15,7 +15,7 @@ public class PlayerSpawnPointProcessor : IRoomMapProcessor
         Random random = ServiceRegistry.Get<RandomProvider>().Request(Constants.MapGenRng);
         Coord spawnPoint = Coord.Zero;
 
-        List<Coord> coordList = new(roomMap.Coords);
+        List<Coord> coordList = [..roomMap.Coords];
         while (coordList.Count > 0)
         {
             int i = random.Next(coordList.Count);

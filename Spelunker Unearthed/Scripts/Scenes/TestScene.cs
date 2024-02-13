@@ -18,6 +18,7 @@ using SpelunkerUnearthed.Scripts.Components;
 using SpelunkerUnearthed.Scripts.Managers;
 using SpelunkerUnearthed.Scripts.MapGeneration;
 using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
+using SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 using SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
 using SpelunkerUnearthed.Scripts.TileEntities;
 
@@ -43,6 +44,8 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
     private Canvas canvas;
 
+    private CaveSystemLevel currentLevel;
+
     public override void Load()
     {
         ServiceRegistry.Get<AudioManager>().LoadBank(this, "Ambience");
@@ -59,9 +62,13 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         ServiceRegistry.Get<RandomProvider>().Request(Constants.MapGenRng).Seed(seed);
         ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGenRng).Seed(seed);
 
-        worldManager.StartCaveSystemLevelGenerationTask().ContinueWith(_ =>
+        worldManager.StartGenerateWorldTask().ContinueWith(_ =>
         {
-            // TestBiomeGeneration();
+            currentLevel = caveSystemManager.CaveSystem.Levels[0];
+            worldManager.StartLoadLevelTask(0).ContinueWith(_ =>
+            {
+                // TestBiomeGeneration();
+            });
         });
         
         ServiceRegistry.Get<DebugScreen>().AddLine(biomeDebugLine);
@@ -95,10 +102,10 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
         if (!worldManager.IsGenerating)
         {
-            worldManager.DrawLevel(0);
+            // worldManager.DrawLevel(0);
             
             // TODO: Maybe set this as a toggle?
-            cameraController.SetBounds(0, worldManager.GetRoomCameraBounds(playerController.OwnerEntity.Position));
+            cameraController.SetBounds(0, worldManager.GetRoomCameraBounds(currentLevel, playerController.OwnerEntity.Position));
             
             biomeDebugLine.SetParams(caveSystemManager.CaveSystem.BiomeMap.GetBiome(playerController.OwnerEntity.Position));
         }
@@ -148,10 +155,6 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         lightMap.AttachTilemapRenderer(tilemapRenderer);
 
         tilemapEntity.AttachComponent(new TilemapCollider());
-
-        RoomMapGenerator roomMapGenerator = new();
-        roomMapGenerator.AddProcessor(new PlayerSpawnPointProcessor()); // TODO: Load all processors using reflection
-        tilemapEntity.AttachComponent(roomMapGenerator);
         tilemapEntity.AttachComponent(new TilemapCameraBounds());
 
         TileEntity player = new TileEntity("Player")
@@ -169,6 +172,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
         worldManager = new WorldManager(caveSystemManager, tilemap, playerController, gizmos);
         worldManager.AddProcessor(new RoomConnectionProcessor(worldManager.BaseRoomSize, gizmos), 0);
+        worldManager.AddRoomMapProcessor(new PlayerSpawnPointProcessor(), 0); // TODO: Load all processors using reflection
         
         player.AttachComponent(new PlayerBiomeWatcher(worldManager, ambienceController));
 
@@ -196,12 +200,12 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         // col2.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });
         // col2.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });
 
-        var container1 = canvas.Root.AddChild(new FlexLayoutNode
-            { Background = ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"), Padding = Coord.One });
-        var container2 = canvas.Root.AddChild(new FlexLayoutNode());
-
-        var text = container1.AddChild(new TextComponent("According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway. Because bees don't care what humans think is impossible.") { WordWrap = WordWrap.Wrap, LineSpacing = 1 });
-        var text2 = container2.AddChild(new TextComponent("Test 123"));
+        // var container1 = canvas.Root.AddChild(new FlexLayoutNode
+        //     { Background = ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"), Padding = Coord.One });
+        // var container2 = canvas.Root.AddChild(new FlexLayoutNode());
+        //
+        // var text = container1.AddChild(new TextComponent("According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway. Because bees don't care what humans think is impossible.") { WordWrap = WordWrap.Wrap, LineSpacing = 1 });
+        // var text2 = container2.AddChild(new TextComponent("Test 123"));
         
         canvas.GetComponent<CanvasRenderer>().Redraw();
     }

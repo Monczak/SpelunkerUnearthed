@@ -21,8 +21,8 @@ public class LightMap : Component
     
     private Dictionary<LightSource, LightSourceData> lightSources;
 
-    private HashSet<LightSourceData> dirtyLightSources = new();
-    private HashSet<LightSourceData> toRemove = new();
+    private HashSet<LightSourceData> dirtyLightSources = [];
+    private HashSet<LightSourceData> toRemove = [];
 
     private Vector3[,] map;
 
@@ -64,8 +64,8 @@ public class LightMap : Component
     {
         tilemap = GetComponent<Tilemap>();
         lightSources = new Dictionary<LightSource, LightSourceData>();
-        toRemove = new HashSet<LightSourceData>();
-        dirtyLightSources = new HashSet<LightSourceData>();
+        toRemove = [];
+        dirtyLightSources = [];
 
         map = new Vector3[tilemap.Width, tilemap.Height];
     }

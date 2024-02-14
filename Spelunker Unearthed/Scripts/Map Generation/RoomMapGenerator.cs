@@ -20,11 +20,11 @@ public class RoomMapGenerator(IEnumerable<IRoomMapProcessor> processors)
     private TileBuffer wallBuffer;
     private TileBuffer groundBuffer;
 
-    private Random random;
+    private DeterministicRandom random;
     
     public (TileBuffer walls, TileBuffer ground) GenerateRoomMap(Room room, RoomMapGenerationParameters parameters, Coord pastePosition, BiomeMap biomeMap, int baseTilemapSize = 16)
     {
-        random = ServiceRegistry.Get<RandomProvider>().Request(Constants.MapGenRng);
+        random = ServiceRegistry.Get<RandomProvider>().RequestDeterministic(Constants.MapGenRng);
 
         return BuildRoomMap(room, parameters, pastePosition, biomeMap, baseTilemapSize);
     }
@@ -65,7 +65,7 @@ public class RoomMapGenerator(IEnumerable<IRoomMapProcessor> processors)
         foreach (Coord coord in wallBuffer.Coords)
         {
             Coord worldPos = coord + basePos;
-            wallBuffer[coord] = random.NextFloat() < biomeMap.GetRandomFillAmount(worldPos) 
+            wallBuffer[coord] = random.WithPosition(worldPos).NextFloat() < biomeMap.GetRandomFillAmount(worldPos) 
                 ? biomeMap.GetWall(worldPos) 
                 : negativeTile;
         }
@@ -92,7 +92,7 @@ public class RoomMapGenerator(IEnumerable<IRoomMapProcessor> processors)
         {
             if (IsInRing(coord, borderSize, gradientSize))
             {
-                if (random.NextFloat() < fillPercent)
+                if (random.WithPosition(coord).NextFloat() < fillPercent)
                     wallBuffer[coord] = biomeMap.GetWall(coord + basePos);
             }
         }

@@ -59,7 +59,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
         const int seed = 0;
         ServiceRegistry.Get<RandomProvider>().Request(Constants.BiomeGenRng).Seed(seed);
-        ServiceRegistry.Get<RandomProvider>().Request(Constants.MapGenRng).Seed(seed);
+        ServiceRegistry.Get<RandomProvider>().RequestDeterministic(Constants.MapGenRng).Seed(seed);
         ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGenRng).Seed(seed);
 
         worldManager.StartGenerateWorldTask().ContinueWith(_ =>

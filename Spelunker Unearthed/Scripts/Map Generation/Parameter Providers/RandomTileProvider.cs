@@ -31,6 +31,8 @@ public class RandomTileProvider : TileProvider
 
     public override Tile Get(Coord worldPos)
     {
-        return ServiceRegistry.Get<RandomProvider>().Request(Constants.MapGenRng).PickWeighted(tiles, out _);
+        return ServiceRegistry.Get<RandomProvider>().RequestDeterministic(Constants.MapGenRng)
+            .WithPosition(worldPos)
+            .PickWeighted(tiles, out _);
     }
 }

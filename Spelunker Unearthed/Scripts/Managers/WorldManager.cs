@@ -127,12 +127,12 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
         Logger.Log($"Loading level", stopwatch);
         tilemap.Resize(new Coord(walls.Width, walls.Height));
         tilemap.GetComponent<Transform>().Position = level.BoundingBox.ExactCenter * BaseRoomSize;
-        
-        foreach (Coord coord in walls.Coords)
+
+        Parallel.ForEach(walls.Coords, coord =>
         {
             tilemap.Place(walls[coord], coord, Tilemap.BaseLayer);
             tilemap.Place(ground[coord], coord, Tilemap.GroundLayer);
-        }
+        });
         
         SetupRoomCameraBounds(level);
         
@@ -175,14 +175,13 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
 
     private void GenerateRooms(TileBuffer walls, TileBuffer ground, CaveSystemLevel level)
     {
-        // TODO: Figure out a way to parallelize this (random providers are not parallelizable)
-        foreach (Coord coord in walls.Coords)
+        Parallel.ForEach(walls.Coords, coord =>
         {
             walls[coord] = CaveSystemManager.CaveSystem.BiomeMap.GetWall(coord);
             ground[coord] = CaveSystemManager.CaveSystem.BiomeMap.GetGround(coord);
-        }
-        
-        foreach (Room room in level.Rooms)
+        });
+
+        Parallel.ForEach(level.Rooms, room =>
         {
             RoomMapGenerationParameters parameters = new RoomMapGenerationParameters
             {
@@ -191,14 +190,14 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
                 BorderGradientSize = 2,
                 BorderGradientFillAmount = 0.6f,
             };
-            
+
             var pastePosition = RoomMath.TransformRoomPos(level, room.Position, BaseRoomSize);
             var (roomWalls, roomGround) = new RoomMapGenerator(roomMapProcessors.Values)
                 .GenerateRoomMap(room, parameters, pastePosition, CaveSystemManager.CaveSystem.BiomeMap, BaseRoomSize);
-            
+
             walls.PasteAt(roomWalls, pastePosition);
             ground.PasteAt(roomGround, pastePosition);
-        }
+        });
     }
 
     public Room GetRoom(CaveSystemLevel level, Coord tilemapPos)

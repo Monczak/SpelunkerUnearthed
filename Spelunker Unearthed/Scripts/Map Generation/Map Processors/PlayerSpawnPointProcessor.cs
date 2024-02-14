@@ -12,13 +12,13 @@ public class PlayerSpawnPointProcessor : IRoomMapProcessor
 {
     public void ProcessRoomMap(TileBuffer roomMap, Room room)
     {
-        Random random = ServiceRegistry.Get<RandomProvider>().Request(Constants.MapGenRng);
+        var random = ServiceRegistry.Get<RandomProvider>().RequestDeterministic(Constants.MapGenRng);
         Coord spawnPoint = Coord.Zero;
 
         List<Coord> coordList = [..roomMap.Coords];
         while (coordList.Count > 0)
         {
-            int i = random.Next(coordList.Count);
+            int i = random.WithPosition(room.Position).Next(coordList.Count);
             Coord coord = coordList[i];
             coordList.RemoveAt(i);
 

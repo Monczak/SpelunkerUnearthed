@@ -12,7 +12,9 @@ public class RandomProvider : Service
 {
     private readonly Random globalRandom = new();
 
-    private readonly Dictionary<string, Random> localRandoms = new();
+    private readonly Dictionary<string, IRandom> localRandoms = new();
+
+    private object lockObj = new();
 
     public void Seed(int seed) => globalRandom.Seed(seed);
     public int Next() => globalRandom.Next();
@@ -26,12 +28,31 @@ public class RandomProvider : Service
 
     public Random Request(string name)
     {
-        if (localRandoms.TryGetValue(name, out var random))
+        lock (lockObj)
         {
-            return random;
+            if (localRandoms.TryGetValue(name, out var random) && random is Random pickedRandom)
+            {
+                return pickedRandom;
+            }
+
+            var theRandom = new Random();
+            localRandoms[name] = theRandom;
+            return theRandom;
         }
-        
-        localRandoms[name] = new Random();
-        return localRandoms[name];
+    }
+
+    public DeterministicRandom RequestDeterministic(string name)
+    {
+        lock (lockObj)
+        {
+            if (localRandoms.TryGetValue(name, out var random) && random is DeterministicRandom pickedRandom)
+            {
+                return pickedRandom;
+            }
+
+            var theRandom = new DeterministicRandom();
+            localRandoms[name] = theRandom;
+            return theRandom;
+        }
     }
 }

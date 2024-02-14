@@ -6,10 +6,11 @@ using Microsoft.Xna.Framework;
 
 namespace MariEngine.Utils;
 
-public class Random
+public class Random : IRandom
 {
     private System.Random random;
-
+    private int seed;
+    
     public Random()
     {
         random = new System.Random();
@@ -19,13 +20,15 @@ public class Random
 
     public Random(int seed)
     {
+        this.seed = seed;
         random = new System.Random(seed);
         CalculatePermutation(out permutation);
         CalculateGradients(out gradients);
     }
 
-    public Random Seed(int seed)
+    public IRandom Seed(int seed)
     {
+        this.seed = seed;
         random = new System.Random(seed);
         CalculatePermutation(out permutation);
         CalculateGradients(out gradients);

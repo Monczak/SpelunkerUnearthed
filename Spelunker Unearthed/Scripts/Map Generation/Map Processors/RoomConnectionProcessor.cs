@@ -68,7 +68,7 @@ public class RoomConnectionProcessor(int baseRoomSize, Gizmos gizmos) : MapProce
 
         Direction dir = angle switch
         {
-            < 0.5f or > 3.5f => Direction.Right,
+            < 0.5f or >= 3.5f => Direction.Right,
             >= 0.5f and < 1.5f => Direction.Down,
             >= 1.5f and < 2.5f => Direction.Left,
             >= 2.5f and < 3.5f => Direction.Up,

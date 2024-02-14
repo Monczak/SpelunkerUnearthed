@@ -43,7 +43,7 @@ public static class RandomWalk
         return MathF.Abs(MathUtils.Cross(end - start, point - end)) / (end - start).Length();
     }
     
-    public static List<Coord> WalkTo(Coord startPos, Coord goalPos, Properties properties, WeightChooser weightChooser, Random random = null, int pathLengthLimit = 1000)
+    public static List<Coord> WalkTo(Coord startPos, Coord goalPos, Properties properties, WeightChooser weightChooser, IRandom random = null, int pathLengthLimit = 1000)
     {
         random ??= ServiceRegistry.Get<RandomProvider>().Request(Constants.GeneralPurposeRng);
         
@@ -66,6 +66,8 @@ public static class RandomWalk
             if (!properties.CanSelfIntersect)
                 candidates = candidates.Where(pair => !path.Contains(pair.pos)).ToList();
 
+            if (random is DeterministicRandom deterministicRandom)
+                random = deterministicRandom.WithPosition(currentPos);
             currentPos = random.PickWeighted(candidates, out _);
             path.Add(currentPos);
 

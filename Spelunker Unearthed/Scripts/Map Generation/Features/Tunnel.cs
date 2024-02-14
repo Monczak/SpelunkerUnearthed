@@ -20,7 +20,7 @@ public class Tunnel(Coord from, Coord to, int stencilSize) : ProceduralFeature
             DeviationPenalty = 100,
             DistanceCost = 100
         }, pos => map.IsInBounds(pos) ? 1 : 0,
-            random: ServiceRegistry.Get<RandomProvider>().Request(Constants.MapGenRng));
+            random: ServiceRegistry.Get<RandomProvider>().RequestDeterministic(Constants.MapGenRng));
 
         HashSet<Coord> digPositions = [];
         foreach (Coord position in positions)

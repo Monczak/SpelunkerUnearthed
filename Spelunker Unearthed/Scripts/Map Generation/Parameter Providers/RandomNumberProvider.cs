@@ -1,5 +1,4 @@
 using MariEngine;
-using MariEngine.Loading;
 using MariEngine.Services;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.ParameterProviders;
@@ -12,7 +11,9 @@ public class RandomNumberProvider : NumberProvider
     
     public override float Get(Coord worldPos)
     {
-        return ServiceRegistry.Get<RandomProvider>().Request(rngId).NextFloat(min, max);
+        return ServiceRegistry.Get<RandomProvider>().RequestDeterministic(rngId)
+            .WithPosition(worldPos)
+            .NextFloat(min, max);
     }
 
     protected override void BuildFromData(ParameterProviderData data)

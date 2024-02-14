@@ -18,7 +18,9 @@ public class PerlinTileProvider : TileProvider
     
     public override Tile Get(Coord worldPos)
     {
-        float noise = ServiceRegistry.Get<RandomProvider>().Request(rngId).Perlin01((Vector2)worldPos * frequency);
+        float noise = ServiceRegistry.Get<RandomProvider>().RequestDeterministic(Constants.MapGenRng)
+            .WithPosition(worldPos)
+            .Perlin01((Vector2)worldPos * frequency);
         foreach (var (threshold, tile) in tileThresholds)
         {
             if (noise < threshold)

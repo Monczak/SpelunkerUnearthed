@@ -1,56 +1,66 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using MariEngine.Logging;
 
 namespace MariEngine.Utils;
 
-public class DeterministicRandom : IRandom
+public class DeterministicRandom : RandomBase
 {
     private int seed;
-    private Coord position;
+    private ThreadLocal<Coord> position = new();
 
+    public DeterministicRandom()
+    {
+        CalculatePermutation();
+        CalculateGradients();
+    }
+    
     public DeterministicRandom WithPosition(Coord position)
     {
-        this.position = position;
+        this.position.Value = position;
         return this;
     }
 
-    public IRandom Seed(int seed)
+    public override RandomBase Seed(int seed)
     {
         this.seed = seed;
+        CalculatePermutation();
+        CalculateGradients();
         return this;
     }
 
-    public int Next()
+    public override int Next()
     {
-        return PseudoRandomUtils.Hash(position.X ^ PseudoRandomUtils.Hash(position.Y)) ^ PseudoRandomUtils.Hash(seed);
+        return PseudoRandomUtils.Hash(position.Value.X ^ PseudoRandomUtils.Hash(position.Value.Y)) ^ PseudoRandomUtils.Hash(seed);
     }
 
-    public int Next(int maxValue)
+    public override int Next(int maxValue)
     {
         return Next() % maxValue;
     }
 
-    public int Next(int minInclusive, int maxExclusive)
+    public override int Next(int minInclusive, int maxExclusive)
     {
         return Next(maxExclusive - minInclusive) + minInclusive;
     }
 
-    public float NextFloat()
+    public override float NextFloat()
     {
         return (float)Next() / int.MaxValue;
     }
 
-    public float NextFloat(float maxValue)
+    public override float NextFloat(float maxValue)
     {
         return NextFloat() * maxValue;
     }
     
-    public float NextFloat(float minInclusive, float maxExclusive)
+    public override float NextFloat(float minInclusive, float maxExclusive)
     {
         return NextFloat(maxExclusive - minInclusive) + minInclusive;
     }
 
-    public IList<T> Shuffle<T>(IList<T> list)
+    public override IList<T> Shuffle<T>(IList<T> list)
     {
         int n = list.Count;  
         while (n > 1) 
@@ -63,7 +73,7 @@ public class DeterministicRandom : IRandom
         return list;
     }
 
-    public TItem PickWeighted<TItem>(ICollection<(TItem item, float weight)> items, out bool picked, bool remove = false)
+    public override TItem PickWeighted<TItem>(ICollection<(TItem item, float weight)> items, out bool picked, bool remove = false)
     {
         float weightSum = 0;
         foreach (var (item, weight) in items)

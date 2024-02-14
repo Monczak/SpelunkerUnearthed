@@ -12,9 +12,9 @@ public class RandomProvider : Service
 {
     private readonly Random globalRandom = new();
 
-    private readonly Dictionary<string, IRandom> localRandoms = new();
+    private readonly Dictionary<string, RandomBase> localRandoms = new();
 
-    private object lockObj = new();
+    private readonly object lockObj = new();
 
     public void Seed(int seed) => globalRandom.Seed(seed);
     public int Next() => globalRandom.Next();

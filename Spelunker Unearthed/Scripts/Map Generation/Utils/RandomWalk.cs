@@ -43,7 +43,7 @@ public static class RandomWalk
         return MathF.Abs(MathUtils.Cross(end - start, point - end)) / (end - start).Length();
     }
     
-    public static List<Coord> WalkTo(Coord startPos, Coord goalPos, Properties properties, WeightChooser weightChooser, IRandom random = null, int pathLengthLimit = 1000)
+    public static List<Coord> WalkTo(Coord startPos, Coord goalPos, Properties properties, WeightChooser weightChooser, RandomBase random = null, int pathLengthLimit = 1000)
     {
         random ??= ServiceRegistry.Get<RandomProvider>().Request(Constants.GeneralPurposeRng);
         

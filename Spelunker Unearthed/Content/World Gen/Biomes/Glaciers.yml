@@ -9,7 +9,6 @@ WallProvider:
       PackedIce: 0.7
       Stone: 1
     Frequency: 0.05 0.05
-    Rng: MapGenRng
 
 GroundProvider:
   Type: "Basic"

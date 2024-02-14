@@ -65,7 +65,8 @@ public class RoomMapGenerator(IEnumerable<IRoomMapProcessor> processors)
         foreach (Coord coord in wallBuffer.Coords)
         {
             Coord worldPos = coord + basePos;
-            wallBuffer[coord] = random.WithPosition(worldPos).NextFloat() < biomeMap.GetRandomFillAmount(worldPos) 
+            var x = random.WithPosition(worldPos).NextFloat();
+            wallBuffer[coord] = x < biomeMap.GetRandomFillAmount(worldPos) 
                 ? biomeMap.GetWall(worldPos) 
                 : negativeTile;
         }

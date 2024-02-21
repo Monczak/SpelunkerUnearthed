@@ -2,10 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using MariEngine.Exceptions;
+using MariEngine.Persistence;
 
 namespace MariEngine.Tiles;
 
-public class TileBuffer(int width, int height) : IEnumerable<Tile>
+public class TileBuffer(int width, int height) : IEnumerable<Tile>, ISaveable<TileBuffer>
 {
     private readonly Tile[] map = new Tile[width * height];
     
@@ -93,5 +94,16 @@ public class TileBuffer(int width, int height) : IEnumerable<Tile>
 
             this[actualCoord] = buffer[coord];
         }
+    }
+
+    // TODO: Figure out a way to serialize/deserialize tile buffers
+    public byte[] Serialize()
+    {
+        throw new NotImplementedException();
+    }
+
+    public static TileBuffer Deserialize(byte[] data)
+    {
+        throw new NotImplementedException();
     }
 }

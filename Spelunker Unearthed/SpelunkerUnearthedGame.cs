@@ -14,6 +14,7 @@ using MariEngine.Debugging;
 using MariEngine.Events;
 using MariEngine.Input;
 using MariEngine.Logging;
+using MariEngine.Persistence;
 using MariEngine.Rendering;
 using MariEngine.Services;
 using MariEngine.Tiles;
@@ -69,6 +70,7 @@ public class SpelunkerUnearthedGame : Game
         ServiceRegistry.RegisterService(new BiomeLoader());
         ServiceRegistry.RegisterService(new FeatureLoader());
         ServiceRegistry.RegisterService(new EventManager());
+        ServiceRegistry.RegisterService(new SaveLoadSystem("Saves"));
         
         ServiceRegistry.RegisterService(new TexturePool(Graphics.GraphicsDevice));
         
@@ -90,6 +92,19 @@ public class SpelunkerUnearthedGame : Game
         ServiceRegistry.Get<AudioManager>().LoadBank(this, "Master.strings");
 
         Window.ClientSizeChanged += (_, _) => ServiceRegistry.Get<EventManager>().Notify("ClientSizeChanged");
+        
+        // TODO: DEBUG - remove this
+        using (var context = ServiceRegistry.Get<SaveLoadSystem>().LoadSaveFile("TestSave"))
+        {
+            var testSaveable = new TestSaveable { Number = 5, Text = "This is some random text" };
+            context.Save(testSaveable, "TestData/TestSaveable");
+        }
+        
+        using (var context = ServiceRegistry.Get<SaveLoadSystem>().LoadSaveFile("TestSave"))
+        {
+            var testSaveable = context.Load<TestSaveable>("TestData/TestSaveable");
+            Logger.LogDebug($"{testSaveable.Number} - {testSaveable.Text}");
+        }
         
         base.Initialize();
     }

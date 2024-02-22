@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.IO;
+using System.Text;
 using YamlDotNet.Serialization;
 
 namespace MariEngine.Persistence;
@@ -8,13 +9,14 @@ public struct TestSaveable : ISaveable<TestSaveable>
     public int Number { get; init; }
     public string Text { get; init; }
     
-    public byte[] Serialize()
+    public void Serialize(Stream stream)
     {
-        return Encoding.Default.GetBytes(new SerializerBuilder().Build().Serialize(this));
+        stream.Write(Encoding.Default.GetBytes(new SerializerBuilder().Build().Serialize(this)));
     }
 
-    public static TestSaveable Deserialize(byte[] data)
+    public static TestSaveable Deserialize(Stream stream)
     {
-        return new DeserializerBuilder().Build().Deserialize<TestSaveable>(Encoding.Default.GetString(data));
+        var reader = new StreamReader(stream);
+        return new DeserializerBuilder().Build().Deserialize<TestSaveable>(reader.ReadToEnd());
     }
 }

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.Serialization;
 using MariEngine.Exceptions;
 using MariEngine.Persistence;
 
@@ -97,12 +100,12 @@ public class TileBuffer(int width, int height) : IEnumerable<Tile>, ISaveable<Ti
     }
 
     // TODO: Figure out a way to serialize/deserialize tile buffers
-    public byte[] Serialize()
+    public void Serialize(Stream stream)
     {
         throw new NotImplementedException();
     }
 
-    public static TileBuffer Deserialize(byte[] data)
+    public static TileBuffer Deserialize(Stream stream)
     {
         throw new NotImplementedException();
     }

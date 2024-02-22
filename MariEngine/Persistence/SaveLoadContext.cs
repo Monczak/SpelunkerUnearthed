@@ -64,8 +64,8 @@ public class SaveLoadContext : IDisposable
         if (node.IsGroup)
             throw new InvalidOperationException("The specified path does not point to a DataNode with saved data.");
 
-        var data = File.ReadAllBytes(GetFilePath(node));
-        return T.Deserialize(data);
+        using var stream = File.OpenRead(GetFilePath(node));
+        return T.Deserialize(stream);
     }
 
     public void Dispose()
@@ -85,13 +85,15 @@ public class SaveLoadContext : IDisposable
         while (dataToSave.TryDequeue(out var dataInfo))
         {
             var (node, data) = dataInfo;
-            var serializedData = data.Serialize();
+            using var serializedData = new MemoryStream();
+            data.Serialize(serializedData);
 
             var nodePath = GetFilePath(node);
             Directory.CreateDirectory(Path.GetDirectoryName(nodePath) ?? throw new InvalidOperationException("Node directory was null?"));
             
             using var file = File.Create(nodePath);
-            file.Write(serializedData);
+            serializedData.Seek(0, SeekOrigin.Begin);
+            serializedData.CopyTo(file);
         }
     }
 }

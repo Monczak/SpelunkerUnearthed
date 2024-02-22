@@ -1,13 +1,14 @@
 ﻿using System;
+using System.IO;
 
 namespace MariEngine.Persistence;
 
 public interface ISaveable
 {
-    byte[] Serialize();
+    void Serialize(Stream stream);
 }
 
 public interface ISaveable<out T> : ISaveable
 {
-    static virtual T Deserialize(byte[] data) => throw new NotImplementedException();
+    static virtual T Deserialize(Stream stream) => throw new NotImplementedException();
 }

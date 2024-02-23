@@ -17,7 +17,10 @@ public class SubRoom
         Room = room;
     }
 
+    // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Local (required for YAML serialization)
     public Coord Position { get; private set; }
+    
+    // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Local (required for YAML serialization)
     public Room Room { get; private set; }
 
     public bool NextTo(SubRoom subRoom) => (subRoom.Position - Position).SqrMagnitude == 1;

@@ -3,10 +3,10 @@ using Microsoft.Xna.Framework;
 
 namespace MariEngine;
 
-public struct Bounds(Vector2 topLeft, Vector2 size)
+public readonly struct Bounds(Vector2 topLeft, Vector2 size)
 {
-    public Vector2 TopLeft { get; set; } = topLeft;
-    public Vector2 Size { get; set; } = size;
+    public Vector2 TopLeft { get; private init; } = topLeft;
+    public Vector2 Size { get; private init; } = size;
 
     public Vector2 TopRight => TopLeft + Vector2.UnitX * Size;
     public Vector2 BottomLeft => TopLeft + Vector2.UnitY * Size;

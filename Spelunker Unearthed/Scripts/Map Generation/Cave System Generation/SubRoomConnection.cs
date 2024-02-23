@@ -16,9 +16,13 @@ public class SubRoomConnection
         Direction = direction;
     }
 
+    // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Local (required for YAML serialization)
     public SubRoom From { get; private set; }
+    
+    // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Local (required for YAML serialization)
     public SubRoom To { get; private set; }
 
+    // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Local (required for YAML serialization)
     public Direction Direction { get; private set; }
 
     public SubRoomConnection Reversed => new(To, From, Direction.Reversed());

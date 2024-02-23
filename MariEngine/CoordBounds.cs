@@ -7,8 +7,8 @@ namespace MariEngine;
 
 public struct CoordBounds(Coord topLeft, Coord size)
 {
-    public Coord TopLeft { get; set; } = topLeft;
-    public Coord Size { get; set; } = size;
+    public Coord TopLeft { get; private init; } = topLeft;
+    public Coord Size { get; private init; } = size;
 
     private Coord? topRight = null;
     private Coord? bottomLeft = null;

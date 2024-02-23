@@ -74,10 +74,17 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
             var level = CaveSystemManager.CaveSystem.Levels[index];
             var (walls, ground) = GenerateCaveSystemLevel(level);
 
-            // using (var context = ServiceRegistry.Get<SaveLoadSystem>().LoadSaveFile("TestSave"))
-            // {
-            //     context.Save(walls, "Walls");
-            // }
+            using (var context = ServiceRegistry.Get<SaveLoadSystem>().LoadSaveFile("TestSave"))
+            {
+                context.Save(walls, "Walls");
+                context.Save(ground, "Ground");
+            }
+            
+            using (var context = ServiceRegistry.Get<SaveLoadSystem>().LoadSaveFile("TestSave"))
+            {
+                walls = context.Load<TileBuffer>("Walls");
+                ground = context.Load<TileBuffer>("Ground");
+            }
             
             LoadLevel(level, walls, ground);
             IsGenerating = false;

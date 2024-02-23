@@ -6,6 +6,9 @@ using System.Linq;
 using System.Runtime.Serialization;
 using MariEngine.Exceptions;
 using MariEngine.Persistence;
+using MariEngine.Services;
+using MariEngine.Utils;
+using YamlDotNet.Serialization;
 
 namespace MariEngine.Tiles;
 
@@ -99,14 +102,49 @@ public class TileBuffer(int width, int height) : IEnumerable<Tile>, ISaveable<Ti
         }
     }
 
-    // TODO: Figure out a way to serialize/deserialize tile buffers
+    private struct TileBufferInfo
+    {
+        public required int Width { get; init; }
+        public required int Height { get; init; }
+        public required Dictionary<string, string> Keys { get; init; }
+        public required string Map { get; init; }
+    }
+
+    // TODO: Improve serialization/deserialization (for now it's text-based, switch to an adaptable binary format)
     public void Serialize(Stream stream)
     {
-        throw new NotImplementedException();
+        var writer = new StreamWriter(stream);
+        var keys = ShortKeyGen.GetKeys(map.Select(tile => tile.Id));
+        var serializedData = new SerializerBuilder()
+            .Build()
+            .Serialize(new TileBufferInfo
+            {
+                Width = width,
+                Height = height,
+                Map = string.Join("|", map.Select(tile => keys[tile.Id])),
+                Keys = keys.ToDictionary(pair => pair.Value, pair => pair.Key)
+            });
+        writer.Write(serializedData);
+        writer.Flush();
     }
 
     public static TileBuffer Deserialize(Stream stream)
     {
-        throw new NotImplementedException();
+        var reader = new StreamReader(stream);
+        var data = new DeserializerBuilder()
+            .Build()
+            .Deserialize<TileBufferInfo>(reader.ReadToEnd());
+
+        var buffer = new TileBuffer(data.Width, data.Height);
+        var tileIds = data.Map.Split("|").Select(id => data.Keys[id]).ToList();
+
+        if (tileIds.Count != buffer.Width * buffer.Height)
+            throw new InvalidDataException($"Serialized map data length does not match buffer size (expected {buffer.Width * buffer.Height}, got {tileIds.Count}).");
+        
+        int i = 0;
+        foreach (Coord coord in buffer.Coords)
+            buffer[coord] = ServiceRegistry.Get<TileLoader>().Get(tileIds[i++]);
+
+        return buffer;
     }
 }

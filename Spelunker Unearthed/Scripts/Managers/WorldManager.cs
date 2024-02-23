@@ -65,7 +65,7 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
     }
 
     // TODO: Load level from file instead of generating
-    public Task StartLoadLevelTask(int index)
+    public Task<CaveSystemLevel> StartLoadLevelTask(int index)
     {
         if (IsGenerating) return null;
         return Task.Run(() =>
@@ -73,28 +73,26 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
             IsGenerating = true;
             var level = CaveSystemManager.CaveSystem.Levels[index];
             var (walls, ground) = GenerateCaveSystemLevel(level);
-
+            
             // TODO: DEBUG - remove this
             using (var context = ServiceRegistry.Get<SaveLoadSystem>().LoadSaveFile("TestSave"))
             {
                 context.Save(walls, "Walls");
                 context.Save(ground, "Ground");
+                context.Save(level, "Level");
             }
             
             using (var context = ServiceRegistry.Get<SaveLoadSystem>().LoadSaveFile("TestSave"))
             {
                 walls = context.Load<TileBuffer>("Walls");
                 ground = context.Load<TileBuffer>("Ground");
+                level = context.Load<CaveSystemLevel>("Level");
             }
             
             LoadLevel(level, walls, ground);
             IsGenerating = false;
-        }).ContinueWith(task =>
-        {
-            if (task.IsFaulted)
-            {
-                Logger.LogError($"Level loading failed: {task.Exception}");
-            }
+
+            return level;
         });
     }
 

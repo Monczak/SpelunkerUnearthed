@@ -2,12 +2,24 @@ using MariEngine;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 
-public class SubRoomConnection(SubRoom from, SubRoom to, Direction direction)
+public class SubRoomConnection
 {
-    public SubRoom From { get; } = from;
-    public SubRoom To { get; } = to;
+    // ReSharper disable once UnusedMember.Global (YAML serialization)
+    public SubRoomConnection()
+    {
+    }
 
-    public Direction Direction { get; } = direction;
+    public SubRoomConnection(SubRoom from, SubRoom to, Direction direction)
+    {
+        From = from;
+        To = to;
+        Direction = direction;
+    }
+
+    public SubRoom From { get; private set; }
+    public SubRoom To { get; private set; }
+
+    public Direction Direction { get; private set; }
 
     public SubRoomConnection Reversed => new(To, From, Direction.Reversed());
 

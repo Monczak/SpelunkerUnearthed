@@ -64,11 +64,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
         worldManager.StartGenerateWorldTask().ContinueWith(_ =>
         {
-            currentLevel = caveSystemManager.CaveSystem.Levels[0];
-            worldManager.StartLoadLevelTask(0).ContinueWith(_ =>
-            {
-                // TestBiomeGeneration();
-            });
+            worldManager.StartLoadLevelTask(0).ContinueWith(task => currentLevel = task.Result);
         });
         
         ServiceRegistry.Get<DebugScreen>().AddLine(biomeDebugLine);

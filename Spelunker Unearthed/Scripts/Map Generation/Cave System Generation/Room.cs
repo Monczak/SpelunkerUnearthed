@@ -1,7 +1,11 @@
+using System;
 using System.Collections.Generic;
 using MariEngine;
 using MariEngine.Logging;
 using Microsoft.Xna.Framework;
+using YamlDotNet.Core;
+using YamlDotNet.Core.Events;
+using YamlDotNet.Serialization;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 
@@ -12,14 +16,13 @@ public class Room
     public int Distance { get; private set; }
     public RoomFlags Flags { get; private set; }
 
-    public Dictionary<PointOfInterestType, List<PointOfInterest>> PointsOfInterest { get; }
+    public Dictionary<PointOfInterestType, List<PointOfInterest>> PointsOfInterest { get; private init; }
     
     public Vector2 Center => (Vector2)Position + (Vector2)Size / 2;
     
+    public Dictionary<Coord, SubRoom> SubRooms { get; private init; }
     
-    public Dictionary<Coord, SubRoom> SubRooms { get; private set; }
-    
-    public HashSet<SubRoomConnection> Connections { get; private set; }
+    [YamlIgnore] public HashSet<SubRoomConnection> Connections { get; internal set; }
 
     public IEnumerable<Coord> RoomCoords => SubRooms.Keys;
     public CoordBounds Bounds => new(Position, Size);
@@ -42,6 +45,12 @@ public class Room
         }
     }
 
+    // ReSharper disable once UnusedMember.Global (YAML serialization)
+    public Room()
+    {
+        
+    }
+    
     public Room(Coord position, Coord size, int distance, RoomFlags flags = RoomFlags.None)
     {
         Position = position;
@@ -87,4 +96,59 @@ public class Room
 
     public void AddPointOfInterest(PointOfInterestType type, Coord coord) =>
         AddPointOfInterest(new PointOfInterest(type, coord));
+
+    public class YamlConverter : IYamlTypeConverter
+    {
+        public bool Accepts(Type type)
+        {
+            return type == typeof(Room);
+        }
+
+        public object ReadYaml(IParser parser, Type type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void WriteYaml(IEmitter emitter, object value, Type type)
+        {
+            var room = (Room)value!;
+            emitter.Emit(new MappingStart());
+            
+            emitter.Emit(new Scalar(nameof(room.Position)));
+            emitter.Emit(new Scalar(room.Position.ToString()));
+            
+            emitter.Emit(new Scalar(nameof(room.Size)));
+            emitter.Emit(new Scalar(room.Size.ToString()));
+            
+            emitter.Emit(new Scalar(nameof(room.Distance)));
+            emitter.Emit(new Scalar(room.Distance.ToString()));
+            
+            emitter.Emit(new Scalar(nameof(room.Flags)));
+            emitter.Emit(new Scalar(room.Flags.ToString()));
+            
+            emitter.Emit(new Scalar(nameof(room.PointsOfInterest)));
+            emitter.Emit(new MappingStart());
+            foreach (var (poiType, poiList) in room.PointsOfInterest)
+            {
+                emitter.Emit(new Scalar(poiType.ToString()));
+                emitter.Emit(new SequenceStart(null, null, true, SequenceStyle.Any));
+                foreach (var poi in poiList)
+                {
+                    emitter.Emit(new Scalar(poi.Position.ToString()));
+                }
+                emitter.Emit(new SequenceEnd());
+            }
+            emitter.Emit(new MappingEnd());
+            
+            emitter.Emit(new Scalar(nameof(room.SubRooms)));
+            emitter.Emit(new SequenceStart(null, null, true, SequenceStyle.Any));
+            foreach (var (pos, subRoom) in room.SubRooms)
+            {
+                emitter.Emit(new Scalar(pos.ToString()));
+            }
+            emitter.Emit(new SequenceEnd());
+            
+            emitter.Emit(new MappingEnd());
+        }
+    }
 }

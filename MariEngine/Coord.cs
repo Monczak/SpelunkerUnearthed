@@ -1,5 +1,8 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using YamlDotNet.Core;
+using YamlDotNet.Core.Events;
+using YamlDotNet.Serialization;
 
 namespace MariEngine;
 
@@ -18,7 +21,14 @@ public struct Coord(int x, int y)
     
     public override string ToString()
     {
-        return $"({X}, {Y})";
+        return $"{X} {Y}";
+    }
+
+    public Coord(string str) : this(0, 0)
+    {
+        var coords = str.Split(" ");
+        X = int.Parse(coords[0]);
+        Y = int.Parse(coords[1]);
     }
 
     public static explicit operator Vector2(Coord coord) => new(coord.X, coord.Y);
@@ -111,4 +121,24 @@ public struct Coord(int x, int y)
     
     public static Coord Max(Coord coord1, Coord coord2) =>
         new(Math.Max(coord1.X, coord2.X), Math.Max(coord1.Y, coord2.Y));
+    
+    public class YamlConverter : IYamlTypeConverter
+    {
+        public bool Accepts(Type type)
+        {
+            return type == typeof(Coord);
+        }
+
+        public object ReadYaml(IParser parser, Type type)
+        {
+            var coords = parser.Consume<Scalar>().Value.Split(" ");
+            return new Coord(int.Parse(coords[0]), int.Parse(coords[1]));
+        }
+
+        public void WriteYaml(IEmitter emitter, object value, Type type)
+        {
+            var coord = (Coord)value!;
+            emitter.Emit(new Scalar($"{coord.X} {coord.Y}"));
+        }
+    }
 }

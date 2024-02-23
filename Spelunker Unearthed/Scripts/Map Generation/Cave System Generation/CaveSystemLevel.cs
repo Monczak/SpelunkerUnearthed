@@ -1,23 +1,30 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using MariEngine;
 using MariEngine.Debugging;
 using MariEngine.Logging;
+using MariEngine.Persistence;
 using MariEngine.Services;
+using MariEngine.Utils;
+using YamlDotNet.Serialization;
 using Random = MariEngine.Utils.Random;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 
-public class CaveSystemLevel
+[SerializeCompressed]
+public partial class CaveSystemLevel : ISaveable<CaveSystemLevel>
 {
-    public List<Room> Rooms { get; private set; } = [];
+    public List<Room> Rooms { get; private init; } = [];
 
     private Dictionary<Coord, Room> map = new();
 
     private readonly Queue<Room> roomQueue = new();
     private Random random;
 
-    public Room EntranceRoom => Rooms.Find(r => (r.Flags & RoomFlags.Entrance) != 0);
+    [YamlIgnore] public Room EntranceRoom => Rooms.Find(r => (r.Flags & RoomFlags.Entrance) != 0);
     
     public CoordBounds BoundingBox { get; private set; }
     
@@ -152,4 +159,57 @@ public class CaveSystemLevel
         
         return CoordBounds.MakeCorners(topLeft, bottomRight);
     }
+
+    private struct SerializationProxy
+    {
+        public List<Room> Rooms { get; init; }
+        public CoordBounds BoundingBox { get; init; }
+        public Dictionary<Room, HashSet<SubRoomConnection>> Connections { get; init; }
+    }
+
+    public void Serialize(Stream stream)
+    {
+        var proxy = new SerializationProxy
+        {
+            Rooms = Rooms,
+            BoundingBox = BoundingBox,
+            Connections = Rooms.Select(room => new { room, connections = room.Connections })
+                .ToDictionary(data => data.room, data => data.connections)
+        };
+        
+        var writer = new StreamWriter(stream);
+        var serializedData = new SerializerBuilder()
+            .EnsureRoundtrip()
+            .WithTypeConverter(new Coord.YamlConverter())
+            .WithTypeConverter(new PointOfInterest.YamlConverter())
+            .Build()
+            .Serialize(proxy);
+        
+        writer.Write(YamlAnchorFixRegex().Replace(serializedData, m => $"*o{m.Groups[1].Value} :"));
+        writer.Flush();
+    }
+
+    public static CaveSystemLevel Deserialize(Stream stream)
+    {
+        var reader = new StreamReader(stream);
+        var data = new DeserializerBuilder()
+            .WithTypeConverter(new Coord.YamlConverter())
+            .WithTypeConverter(new PointOfInterest.YamlConverter())
+            .Build()
+            .Deserialize<SerializationProxy>(reader.ReadToEnd());
+
+        var level = new CaveSystemLevel
+        {
+            Rooms = data.Rooms,
+            BoundingBox = data.BoundingBox
+        };
+        
+        foreach (var room in level.Rooms)
+            room.Connections = data.Connections[room];
+
+        return level;
+    }
+
+    [GeneratedRegex(@"\*o(\d+):")]
+    private static partial Regex YamlAnchorFixRegex();
 }

@@ -12,6 +12,7 @@ using YamlDotNet.Serialization;
 
 namespace MariEngine.Tiles;
 
+[SerializeCompressed]
 public class TileBuffer(int width, int height) : IEnumerable<Tile>, ISaveable<TileBuffer>
 {
     private readonly Tile[] map = new Tile[width * height];

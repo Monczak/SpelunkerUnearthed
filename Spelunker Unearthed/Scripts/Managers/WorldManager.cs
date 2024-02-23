@@ -74,6 +74,7 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
             var level = CaveSystemManager.CaveSystem.Levels[index];
             var (walls, ground) = GenerateCaveSystemLevel(level);
 
+            // TODO: DEBUG - remove this
             using (var context = ServiceRegistry.Get<SaveLoadSystem>().LoadSaveFile("TestSave"))
             {
                 context.Save(walls, "Walls");

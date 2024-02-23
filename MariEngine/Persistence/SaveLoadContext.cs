@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using MariEngine.Logging;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -65,10 +66,23 @@ public class SaveLoadContext : IDisposable
             throw new InvalidOperationException("The specified path does not point to a DataNode with saved data.");
 
         using var stream = File.OpenRead(GetFilePath(node));
+        if (SerializeCompressed(typeof(T)))
+        {
+            using var gzipStream = new GZipStream(stream, CompressionMode.Decompress);
+            return T.Deserialize(gzipStream);
+        }
+
         return T.Deserialize(stream);
     }
 
+    private static bool SerializeCompressed(Type type) => type.IsDefined(typeof(SerializeCompressedAttribute), true);
+
     public void Dispose()
+    {
+        SaveData();
+    }
+
+    private void SaveData()
     {
         var dirPath = GetSaveFileDirectory();
         Directory.CreateDirectory(dirPath);
@@ -93,7 +107,16 @@ public class SaveLoadContext : IDisposable
             
             using var file = File.Create(nodePath);
             serializedData.Seek(0, SeekOrigin.Begin);
-            serializedData.CopyTo(file);
+
+            if (SerializeCompressed(data.GetType()))
+            {
+                using var gzipStream = new GZipStream(file, CompressionMode.Compress);
+                serializedData.CopyTo(gzipStream);
+            }
+            else
+            {
+                serializedData.CopyTo(file);
+            }
         }
     }
 }

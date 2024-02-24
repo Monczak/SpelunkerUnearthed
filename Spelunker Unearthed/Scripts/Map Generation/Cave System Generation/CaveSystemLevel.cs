@@ -185,6 +185,7 @@ public partial class CaveSystemLevel : ISaveable<CaveSystemLevel>
             .Build()
             .Serialize(proxy);
         
+        // Works around a YamlDotNet bug in serialization where there is no space between an anchor and a colon when the anchor is used as a mapping key
         writer.Write(YamlAnchorFixRegex().Replace(serializedData, m => $"*o{m.Groups[1].Value} :"));
         writer.Flush();
     }

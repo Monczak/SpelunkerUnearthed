@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Reflection;
 using MariEngine.Logging;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -90,6 +91,7 @@ public class SaveLoadContext : IDisposable
         using (var file = File.CreateText(indexFilePath))
         {
             var indexData = new SerializerBuilder()
+                .EnsureRoundtrip()
                 .WithNamingConvention(PascalCaseNamingConvention.Instance)
                 .Build()
                 .Serialize(root);

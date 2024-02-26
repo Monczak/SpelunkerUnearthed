@@ -17,6 +17,8 @@ namespace SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 [SerializeCompressed]
 public partial class CaveSystemLevel : ISaveable<CaveSystemLevel>
 {
+    public required int Depth { get; init; }
+    
     public List<Room> Rooms { get; private init; } = [];
 
     private Dictionary<Coord, Room> map = new();
@@ -162,6 +164,7 @@ public partial class CaveSystemLevel : ISaveable<CaveSystemLevel>
 
     private struct SerializationProxy
     {
+        public int Depth { get; init; }
         public List<Room> Rooms { get; init; }
         public CoordBounds BoundingBox { get; init; }
         public Dictionary<Room, HashSet<SubRoomConnection>> Connections { get; init; }
@@ -171,6 +174,7 @@ public partial class CaveSystemLevel : ISaveable<CaveSystemLevel>
     {
         var proxy = new SerializationProxy
         {
+            Depth = Depth,
             Rooms = Rooms,
             BoundingBox = BoundingBox,
             Connections = Rooms.Select(room => new { room, connections = room.Connections })
@@ -201,6 +205,7 @@ public partial class CaveSystemLevel : ISaveable<CaveSystemLevel>
 
         var level = new CaveSystemLevel
         {
+            Depth = data.Depth,
             Rooms = data.Rooms,
             BoundingBox = data.BoundingBox
         };

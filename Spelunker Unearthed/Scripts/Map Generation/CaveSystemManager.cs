@@ -8,14 +8,15 @@ using MariEngine.Services;
 using MariEngine.Tiles;
 using MariEngine.Utils;
 using Microsoft.Xna.Framework;
+using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
 using SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 using SpelunkerUnearthed.Scripts.Utils;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration;
 
-public class CaveSystemManager : Component
+public class CaveSystemManager(IBiomeProvider biomeProvider, RoomDecisionEngine roomDecisionEngine) : Component
 {
-    public CaveSystem CaveSystem { get; } = new();
+    public CaveSystem CaveSystem { get; } = new(biomeProvider, roomDecisionEngine);
 
     private Tilemap tilemap;
 
@@ -28,12 +29,16 @@ public class CaveSystemManager : Component
         CaveSystem.Generate();
     }
 
-    public void SetCurrentLevel(int level)
+    public CaveSystemLevel SetCurrentLevel(int level)
     {
         if (level < 0 || level >= CaveSystem.Levels.Count)
             Logger.LogError(
                 $"Trying to set cave system level to {level}, but deepest level is {CaveSystem.Levels.Count - 1}");
         else
             CurrentLevel = CaveSystem.Levels[level];
+
+        return CurrentLevel;
     }
+
+    public Biome GetBiome(Coord worldPos) => CaveSystem.BiomeMap.GetBiome(worldPos, CurrentLevel.Depth);
 }

@@ -11,28 +11,28 @@ public class BiomeMap(IBiomeProvider biomeProvider)
     }
 
     // TODO: Cache results nicely
-    public Biome GetBiome(Coord worldPos)
+    public Biome GetBiome(Coord worldPos, int level)
     {
-        return biomeProvider.GetBiome(worldPos);
+        return biomeProvider.GetBiome(worldPos, level);
     }
 
-    public Tile GetWall(Coord worldPos)
+    public Tile GetWall(Coord worldPos, int level)
     {
-        return GetBiome(worldPos).WallTileProvider.Get(worldPos);
+        return GetBiome(worldPos, level).WallTileProvider.Get(worldPos);
     }
 
-    public Tile GetGround(Coord worldPos)
+    public Tile GetGround(Coord worldPos, int level)
     {
-        return GetBiome(worldPos).GroundTileProvider.Get(worldPos);
+        return GetBiome(worldPos, level).GroundTileProvider.Get(worldPos);
     }
 
-    public float GetRandomFillAmount(Coord worldPos)
+    public float GetRandomFillAmount(Coord worldPos, int level)
     {
-        return GetBiome(worldPos).RandomFillAmountProvider.Get(worldPos);
+        return GetBiome(worldPos, level).RandomFillAmountProvider.Get(worldPos);
     }
     
-    public int GetSmoothIterations(Coord worldPos)
+    public int GetSmoothIterations(Coord worldPos, int level)
     {
-        return (int)GetBiome(worldPos).SmoothIterationsProvider.Get(worldPos);
+        return (int)GetBiome(worldPos, level).SmoothIterationsProvider.Get(worldPos);
     }
 }

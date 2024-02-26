@@ -71,7 +71,7 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
         return Task.Run(() =>
         {
             IsGenerating = true;
-            var level = CaveSystemManager.CaveSystem.Levels[index];
+            var level = CaveSystemManager.SetCurrentLevel(index);
             var (walls, ground) = GenerateCaveSystemLevel(level);
             
             // TODO: DEBUG - remove this
@@ -157,8 +157,7 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
 
         Logger.Log($"Level loading completed", stopwatch);
     }
-
-    // TODO: Create a player instead of manipulating an existing player
+    
     private void SpawnPlayer(CaveSystemLevel level, PlayerController playerController)
     {
         foreach (Room room in level.Rooms)
@@ -189,8 +188,8 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
     {
         Parallel.ForEach(walls.Coords, coord =>
         {
-            walls[coord] = CaveSystemManager.CaveSystem.BiomeMap.GetWall(coord);
-            ground[coord] = CaveSystemManager.CaveSystem.BiomeMap.GetGround(coord);
+            walls[coord] = CaveSystemManager.CaveSystem.BiomeMap.GetWall(coord, level.Depth);
+            ground[coord] = CaveSystemManager.CaveSystem.BiomeMap.GetGround(coord, level.Depth);
         });
 
         Parallel.ForEach(level.Rooms, room =>
@@ -204,8 +203,15 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
             };
 
             var pastePosition = RoomMath.TransformRoomPos(level, room.Position, BaseRoomSize);
-            var (roomWalls, roomGround) = new RoomMapGenerator(roomMapProcessors.Values)
-                .GenerateRoomMap(room, parameters, pastePosition, CaveSystemManager.CaveSystem.BiomeMap, BaseRoomSize);
+            var (roomWalls, roomGround) = new RoomMapGenerator(
+                    roomMapProcessors.Values,
+                    level.Depth,
+                    room,
+                    CaveSystemManager.CaveSystem.BiomeMap,
+                    parameters,
+                    BaseRoomSize
+                )
+                .GenerateRoomMap(pastePosition);
 
             walls.PasteAt(roomWalls, pastePosition);
             ground.PasteAt(roomGround, pastePosition);
@@ -231,35 +237,35 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
         return cameraBoundsMap[room];
     }
     
-    // public void DrawLevel(int level)
-    // {
-    //     foreach (Room room in CaveSystemManager.CaveSystem.Levels[level].Rooms)
-    //     {
-    //         Coord topLeft = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, room.Bounds.TopLeft, BaseRoomSize);
-    //         Coord topRight = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, room.Bounds.TopRight + Coord.UnitX, BaseRoomSize);
-    //         Coord bottomLeft = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, room.Bounds.BottomLeft + Coord.UnitY, BaseRoomSize);
-    //         Coord bottomRight = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, room.Bounds.BottomRight + Coord.One, BaseRoomSize);
-    //
-    //         Vector2 topLeftV = tilemap.CoordToWorldPoint(topLeft) + Vector2.One * 0.1f;
-    //         Vector2 topRightV = tilemap.CoordToWorldPoint(topRight) + (-Vector2.UnitX + Vector2.UnitY) * 0.1f;
-    //         Vector2 bottomLeftV = tilemap.CoordToWorldPoint(bottomLeft) + (Vector2.UnitX + -Vector2.UnitY)* 0.1f;
-    //         Vector2 bottomRightV = tilemap.CoordToWorldPoint(bottomRight) + -Vector2.One * 0.1f;
-    //         
-    //         gizmos.DrawLine(topLeftV, topRightV, Color.Blue, lifetime: 0);
-    //         gizmos.DrawLine(topRightV, bottomRightV, Color.Blue, lifetime: 0);
-    //         gizmos.DrawLine(bottomRightV, bottomLeftV, Color.Blue, lifetime: 0);
-    //         gizmos.DrawLine(bottomLeftV, topLeftV, Color.Blue, lifetime: 0);
-    //         
-    //         // gizmos.DrawRectangle((Vector2)room.Bounds.TopLeft + Vector2.One * 0.05f, (Vector2)room.Bounds.Size - Vector2.One * 0.1f,
-    //         //     new Color(0, MathUtils.InverseLerp(20, 0, room.Distance), MathUtils.InverseLerp(20, 0, room.Distance), 0.1f), 0);
-    //         foreach (SubRoomConnection connection in room.Connections)
-    //         {
-    //             Coord from = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, connection.From.Position, BaseRoomSize) + Coord.One * BaseRoomSize / 2;
-    //             Coord to = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, connection.To.Position, BaseRoomSize) + Coord.One * BaseRoomSize / 2;
-    //             Vector2 fromPos = tilemap.CoordToWorldPoint(from);
-    //             Vector2 toPos = tilemap.CoordToWorldPoint(to);
-    //             gizmos.DrawLine(fromPos + Vector2.One * 0.5f, toPos + Vector2.One * 0.5f, Color.Red, lifetime: 0);
-    //         }
-    //     }
-    // }
+    public void DrawLevel(CaveSystemLevel level)
+    {
+        foreach (Room room in level.Rooms)
+        {
+            Coord topLeft = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, room.Bounds.TopLeft, BaseRoomSize);
+            Coord topRight = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, room.Bounds.TopRight + Coord.UnitX, BaseRoomSize);
+            Coord bottomLeft = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, room.Bounds.BottomLeft + Coord.UnitY, BaseRoomSize);
+            Coord bottomRight = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, room.Bounds.BottomRight + Coord.One, BaseRoomSize);
+    
+            Vector2 topLeftV = tilemap.CoordToWorldPoint(topLeft) + Vector2.One * 0.1f;
+            Vector2 topRightV = tilemap.CoordToWorldPoint(topRight) + (-Vector2.UnitX + Vector2.UnitY) * 0.1f;
+            Vector2 bottomLeftV = tilemap.CoordToWorldPoint(bottomLeft) + (Vector2.UnitX + -Vector2.UnitY)* 0.1f;
+            Vector2 bottomRightV = tilemap.CoordToWorldPoint(bottomRight) + -Vector2.One * 0.1f;
+            
+            gizmos.DrawLine(topLeftV, topRightV, Color.Blue, lifetime: 0);
+            gizmos.DrawLine(topRightV, bottomRightV, Color.Blue, lifetime: 0);
+            gizmos.DrawLine(bottomRightV, bottomLeftV, Color.Blue, lifetime: 0);
+            gizmos.DrawLine(bottomLeftV, topLeftV, Color.Blue, lifetime: 0);
+            
+            gizmos.DrawRectangle((Vector2)room.Bounds.TopLeft + Vector2.One * 0.05f, (Vector2)room.Bounds.Size - Vector2.One * 0.1f,
+                new Color(0, MathUtils.InverseLerp(20, 0, room.Distance), MathUtils.InverseLerp(20, 0, room.Distance), 0.1f), 0);
+            foreach (SubRoomConnection connection in room.Connections)
+            {
+                Coord from = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, connection.From.Position, BaseRoomSize) + Coord.One * BaseRoomSize / 2;
+                Coord to = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, connection.To.Position, BaseRoomSize) + Coord.One * BaseRoomSize / 2;
+                Vector2 fromPos = tilemap.CoordToWorldPoint(from);
+                Vector2 toPos = tilemap.CoordToWorldPoint(to);
+                gizmos.DrawLine(fromPos + Vector2.One * 0.5f, toPos + Vector2.One * 0.5f, Color.Red, lifetime: 0);
+            }
+        }
+    }
 }

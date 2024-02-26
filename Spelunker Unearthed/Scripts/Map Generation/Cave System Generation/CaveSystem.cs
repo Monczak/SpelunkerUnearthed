@@ -4,12 +4,10 @@ using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 
-public class CaveSystem
+public class CaveSystem(IBiomeProvider biomeProvider, RoomDecisionEngine roomDecisionEngine)
 {
     public List<CaveSystemLevel> Levels { get; private set; } = [];
-    public BiomeMap BiomeMap { get; private set; } = new(new SimpleBiomeProvider());
-
-    public RoomDecisionEngine DecisionEngine { get; set; } = new TestDecisionEngine();  // TODO: Remove this assignment
+    public BiomeMap BiomeMap { get; private set; } = new(biomeProvider);
 
     private const int MaxGenerationAttempts = 10;
     
@@ -18,7 +16,7 @@ public class CaveSystem
         Levels.Clear();
         
         // TODO: Add levels procedurally
-        Levels.Add(new CaveSystemLevel());
+        Levels.Add(new CaveSystemLevel { Depth = 0 });
         
         for (int i = 0; i < Levels.Count; i++)
         {
@@ -26,10 +24,10 @@ public class CaveSystem
             int attempt = 0;
             while (attempt < MaxGenerationAttempts)
             {
-                level.Generate(DecisionEngine);
+                level.Generate(roomDecisionEngine);
                 attempt++;
 
-                if (!DecisionEngine.ShouldRegenerate(level))
+                if (!roomDecisionEngine.ShouldRegenerate(level))
                     break;
             }
 

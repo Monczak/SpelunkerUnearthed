@@ -14,7 +14,7 @@ public class PlayerBiomeWatcher(WorldManager worldManager, AmbienceController am
 
     protected override void OnPositionUpdate()
     {
-        currentBiome = worldManager.CaveSystemManager.CaveSystem.BiomeMap.GetBiome(OwnerEntity.Position);
+        currentBiome = worldManager.CaveSystemManager.GetBiome(OwnerEntity.Position);
         if (currentBiome != prevBiome) ambienceController.SetBiomeAmbience(currentBiome);
 
         prevBiome = currentBiome;

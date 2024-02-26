@@ -78,7 +78,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         Parallel.ForEach(tilemap.Coords, coord =>
         {
             (int x, int y) = coord;
-            Color color = worldManager.CaveSystemManager.CaveSystem.BiomeMap.GetBiome(coord).Color;
+            Color color = worldManager.CaveSystemManager.GetBiome(coord).Color;
             data[x + y * tilemap.Width] = new Color(color.R, color.G, color.B, (byte)20);
         });
         texture.SetData(data);
@@ -98,12 +98,12 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
         if (!worldManager.IsGenerating)
         {
-            // worldManager.DrawLevel(0);
+            worldManager.DrawLevel(caveSystemManager.CurrentLevel);
             
             // TODO: Maybe set this as a toggle?
             cameraController.SetBounds(0, worldManager.GetRoomCameraBounds(currentLevel, playerController.OwnerEntity.Position));
             
-            biomeDebugLine.SetParams(caveSystemManager.CaveSystem.BiomeMap.GetBiome(playerController.OwnerEntity.Position));
+            biomeDebugLine.SetParams(caveSystemManager.GetBiome(playerController.OwnerEntity.Position));
         }
     }
 
@@ -117,7 +117,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         AddEntity(debugEntity);
 
         Entity managersEntity = new("Managers");
-        caveSystemManager = new CaveSystemManager();
+        caveSystemManager = new CaveSystemManager(new SimpleBiomeProvider(), new TestDecisionEngine());
         managersEntity.AttachComponent(caveSystemManager);
 
         Entity controllersEntity = new("Controllers");

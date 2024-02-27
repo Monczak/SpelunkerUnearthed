@@ -7,18 +7,18 @@ using Microsoft.Xna.Framework;
 
 namespace MariEngine.Utils;
 
-public sealed class DeterministicRandom : RandomBase
+public sealed class PositionBasedRandom : RandomBase
 {
     private int seed;
     private ThreadLocal<Coord> position = new();
 
-    public DeterministicRandom()
+    public PositionBasedRandom()
     {
         CalculatePermutation();
         CalculateGradients();
     }
     
-    public DeterministicRandom WithPosition(Coord position)
+    public PositionBasedRandom WithPosition(Coord position)
     {
         this.position.Value = position;
         return this;

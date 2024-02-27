@@ -20,7 +20,7 @@ public class RoomMapGenerator(IEnumerable<IRoomMapProcessor> processors, int lev
     private TileBuffer wallBuffer;
     private TileBuffer groundBuffer;
 
-    private DeterministicRandom random;
+    private PositionBasedRandom random;
     
     public (TileBuffer walls, TileBuffer ground) GenerateRoomMap(Coord pastePosition)
     {

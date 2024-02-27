@@ -41,16 +41,16 @@ public class RandomProvider : Service
         }
     }
 
-    public DeterministicRandom RequestDeterministic(string name)
+    public PositionBasedRandom RequestDeterministic(string name)
     {
         lock (lockObj)
         {
-            if (localRandoms.TryGetValue(name, out var random) && random is DeterministicRandom pickedRandom)
+            if (localRandoms.TryGetValue(name, out var random) && random is PositionBasedRandom pickedRandom)
             {
                 return pickedRandom;
             }
 
-            var theRandom = new DeterministicRandom();
+            var theRandom = new PositionBasedRandom();
             localRandoms[name] = theRandom;
             return theRandom;
         }

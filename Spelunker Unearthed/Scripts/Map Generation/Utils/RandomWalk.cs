@@ -67,7 +67,7 @@ public static class RandomWalk
             if (!properties.CanSelfIntersect)
                 candidates = candidates.Where(pair => !path.Contains(pair.pos)).ToList();
 
-            if (random is DeterministicRandom deterministicRandom)
+            if (random is PositionBasedRandom deterministicRandom)
                 random = deterministicRandom.WithPosition(currentPos);
             currentPos = random.PickWeighted(candidates, out var picked);
             if (!picked)

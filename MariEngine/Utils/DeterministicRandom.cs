@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using MariEngine.Logging;
+using Microsoft.Xna.Framework;
 
 namespace MariEngine.Utils;
 
-public class DeterministicRandom : RandomBase
+public sealed class DeterministicRandom : RandomBase
 {
     private int seed;
     private ThreadLocal<Coord> position = new();
@@ -28,6 +30,33 @@ public class DeterministicRandom : RandomBase
         CalculatePermutation();
         CalculateGradients();
         return this;
+    }
+    
+    protected override void CalculatePermutation()
+    {
+        Permutation = Enumerable.Range(0, 256).ToArray();
+        var random = new System.Random(seed);
+        
+        for (var i = 0; i < Permutation.Length; i++)
+        {
+            var source = random.Next(Permutation.Length);
+
+            (Permutation[i], Permutation[source]) = (Permutation[source], Permutation[i]);
+        }
+    }
+
+    protected override void CalculateGradients()
+    {
+        Gradients = new Vector2[256];
+        var random = new System.Random(seed);
+        
+        for (var i = 0; i < Gradients.Length; i++)
+        {
+            Vector2 gradient = new(random.NextSingle() * 2 - 1, random.NextSingle() * 2 - 1);
+            gradient.Normalize();
+
+            Gradients[i] = gradient;
+        }
     }
 
     public override int Next()

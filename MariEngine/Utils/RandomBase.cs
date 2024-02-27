@@ -16,34 +16,33 @@ public abstract class RandomBase
     public abstract float NextFloat(float minInclusive, float maxExclusive);
     public abstract IList<T> Shuffle<T>(IList<T> list);
     public abstract TItem PickWeighted<TItem>(ICollection<(TItem item, float weight)> items, out bool picked, bool remove = false);
-    
-    private int[] permutation;
-    private Vector2[] gradients;
 
-    protected void CalculatePermutation()
+    protected int[] Permutation;
+    protected Vector2[] Gradients;
+
+    protected virtual void CalculatePermutation()
     {
-        permutation = Enumerable.Range(0, 256).ToArray();
+        Permutation = Enumerable.Range(0, 256).ToArray();
         
-        for (var i = 0; i < permutation.Length; i++)
+        for (var i = 0; i < Permutation.Length; i++)
         {
-            var source = Next(permutation.Length);
+            var source = Next(Permutation.Length);
 
-            (permutation[i], permutation[source]) = (permutation[source], permutation[i]);
+            (Permutation[i], Permutation[source]) = (Permutation[source], Permutation[i]);
         }
     }
 
-    protected void CalculateGradients()
+    protected virtual void CalculateGradients()
     {
-        gradients = new Vector2[256];
+        Gradients = new Vector2[256];
 
-        for (var i = 0; i < gradients.Length; i++)
+        for (var i = 0; i < Gradients.Length; i++)
         {
             Vector2 gradient = new(NextFloat() * 2 - 1, NextFloat() * 2 - 1);
             gradient.Normalize();
 
-            gradients[i] = gradient;
+            Gradients[i] = gradient;
         }
-
     }
 
     private float Fade(float t)
@@ -70,10 +69,10 @@ public abstract class RandomBase
             var ij = cell + n;
             var uv = new Vector2(x - ij.X, y - ij.Y);
 
-            var index = permutation[((int)ij.X + permutation.Length) % permutation.Length];
-            index = permutation[(index + (int)ij.Y + permutation.Length) % permutation.Length];
+            var index = Permutation[((int)ij.X + Permutation.Length) % Permutation.Length];
+            index = Permutation[(index + (int)ij.Y + Permutation.Length) % Permutation.Length];
 
-            var grad = gradients[index % gradients.Length];
+            var grad = Gradients[index % Gradients.Length];
 
             total += Q(uv.X, uv.Y) * Vector2.Dot(grad, uv);
         }

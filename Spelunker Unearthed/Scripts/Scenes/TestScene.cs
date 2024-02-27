@@ -57,7 +57,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         
         ambienceController.Play();
 
-        const int seed = 0;
+        const int seed = 1;
         worldManager.StartGenerateWorldTask(seed).ContinueWith(_ =>
         {
             worldManager.StartLoadLevelTask(0).ContinueWith(task => currentLevel = task.Result);

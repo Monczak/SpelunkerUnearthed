@@ -11,10 +11,10 @@ namespace SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 
 public class Room
 {
-    public Coord Position { get; private set; }
-    public Coord Size { get; private set; }
-    public int Distance { get; private set; }
-    public RoomFlags Flags { get; private set; }
+    public Coord Position { get; private init; }
+    public Coord Size { get; private init; }
+    public int Distance { get; private init; }
+    public RoomFlags Flags { get; set; }
 
     public Dictionary<PointOfInterestType, List<PointOfInterest>> PointsOfInterest { get; private init; }
     

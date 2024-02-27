@@ -58,11 +58,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         ambienceController.Play();
 
         const int seed = 0;
-        ServiceRegistry.Get<RandomProvider>().Request(Constants.BiomeGenRng).Seed(seed);
-        ServiceRegistry.Get<RandomProvider>().RequestDeterministic(Constants.MapGenRng).Seed(seed);
-        ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGenRng).Seed(seed);
-
-        worldManager.StartGenerateWorldTask().ContinueWith(_ =>
+        worldManager.StartGenerateWorldTask(seed).ContinueWith(_ =>
         {
             worldManager.StartLoadLevelTask(0).ContinueWith(task => currentLevel = task.Result);
         });
@@ -117,7 +113,9 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         AddEntity(debugEntity);
 
         Entity managersEntity = new("Managers");
-        caveSystemManager = new CaveSystemManager(new SimpleBiomeProvider(), new TestDecisionEngine());
+        caveSystemManager = new CaveSystemManager(new SimpleBiomeProvider(), new TestDecisionEngine(), [
+            new LadderRoomProcessor()
+        ]);
         managersEntity.AttachComponent(caveSystemManager);
 
         Entity controllersEntity = new("Controllers");

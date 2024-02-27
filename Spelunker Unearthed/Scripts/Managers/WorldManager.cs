@@ -47,47 +47,51 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
         roomMapProcessors.Add(priority, processor);
     }
 
-    public void GenerateWorld()
+    public void GenerateWorld(int worldSeed)
     {
-        CaveSystemManager.Generate();
+        CaveSystemManager.Generate(worldSeed);
     }
 
-    public Task StartGenerateWorldTask()
+    public Task StartGenerateWorldTask(int worldSeed)
     {
         if (IsGenerating) return null;
-        return Task.Run(GenerateWorld).ContinueWith(task =>
+        return Task.Run(() => GenerateWorld(worldSeed)).ContinueWith(task =>
         {
             if (task.IsFaulted)
             {
                 Logger.LogError($"World generation failed: {task.Exception}");
             }
+
+            foreach (CaveSystemLevel level in CaveSystemManager.CaveSystem.Levels)
+            {
+                ServiceRegistry.Get<RandomProvider>().RequestDeterministic(Constants.MapGenRng).Seed(level.MapGenSeed);
+                
+                var (walls, ground) = GenerateCaveSystemLevel(level);
+                using var context = ServiceRegistry.Get<SaveLoadSystem>().LoadSaveFile("TestSave");
+                context.Save(walls, $"World/Level{level.Depth}/Walls");
+                context.Save(ground, $"World/Level{level.Depth}/Ground");
+                context.Save(level, $"World/Level{level.Depth}/Level");
+            }
         });
     }
 
-    // TODO: Load level from file instead of generating
     public Task<CaveSystemLevel> StartLoadLevelTask(int index)
     {
         if (IsGenerating) return null;
         return Task.Run(() =>
         {
             IsGenerating = true;
-            var level = CaveSystemManager.SetCurrentLevel(index);
-            var (walls, ground) = GenerateCaveSystemLevel(level);
-            
-            // TODO: DEBUG - remove this
+
+            TileBuffer walls, ground;
+            CaveSystemLevel level;
             using (var context = ServiceRegistry.Get<SaveLoadSystem>().LoadSaveFile("TestSave"))
             {
-                context.Save(walls, "Walls");
-                context.Save(ground, "Ground");
-                context.Save(level, "Level");
+                walls = context.Load<TileBuffer>($"World/Level{index}/Walls");
+                ground = context.Load<TileBuffer>($"World/Level{index}/Ground");
+                level = context.Load<CaveSystemLevel>($"World/Level{index}/Level");
             }
-            
-            using (var context = ServiceRegistry.Get<SaveLoadSystem>().LoadSaveFile("TestSave"))
-            {
-                walls = context.Load<TileBuffer>("Walls");
-                ground = context.Load<TileBuffer>("Ground");
-                level = context.Load<CaveSystemLevel>("Level");
-            }
+
+            caveSystemManager.SetCurrentLevel(level.Depth);
             
             LoadLevel(level, walls, ground);
             IsGenerating = false;
@@ -96,19 +100,6 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
         });
     }
 
-    // TODO: Decouple tilemap from level generation - put everything into TileBuffers for walls and ground and then set the tilemap to use those buffers
-    // This will make implementing a world save system way easier
-    //
-    // This needs to be refactored like so:
-    // - Generate the cave system
-    // - For each level in the system:
-    //      - Generate the level (populate its tile buffers) 
-    //      - Save the buffers to files (or a single file)
-    //          - Devise a world file format (only tile IDs will need to be stored, probably, since tiles have no state - figure out compression)
-    // 
-    // Load cave system level in a separate method, taking in a parameter which specifies the level's index
-    // Assign the loaded tile buffers to the tilemap and spawn the player where they should be (spawn point, ladder, etc.)
-    // Get rid of CaveSystemManager.CurrentLevel?
     private (TileBuffer walls, TileBuffer ground) GenerateCaveSystemLevel(CaveSystemLevel level)
     {
         var stopwatch = Logger.StartStopwatch();
@@ -140,6 +131,7 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
         tilemap.Resize(new Coord(walls.Width, walls.Height));
         tilemap.GetComponent<Transform>().Position = level.BoundingBox.ExactCenter * BaseRoomSize;
 
+        Logger.Log($"Loading level: copying tile buffers", stopwatch);
         Parallel.ForEach(walls.Coords, coord =>
         {
             tilemap.Place(walls[coord], coord, Tilemap.BaseLayer);
@@ -232,6 +224,7 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
     
     public CameraBounds GetRoomCameraBounds(CaveSystemLevel level, Coord tilemapPos)
     {
+        if (level is null) return null;
         Room room = GetRoom(level, tilemapPos);
         if (room is null) return null;
         return cameraBoundsMap[room];
@@ -239,6 +232,8 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
     
     public void DrawLevel(CaveSystemLevel level)
     {
+        if (level is null) return;
+        
         foreach (Room room in level.Rooms)
         {
             Coord topLeft = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, room.Bounds.TopLeft, BaseRoomSize);
@@ -257,7 +252,7 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
             gizmos.DrawLine(bottomLeftV, topLeftV, Color.Blue, lifetime: 0);
             
             gizmos.DrawRectangle((Vector2)room.Bounds.TopLeft + Vector2.One * 0.05f, (Vector2)room.Bounds.Size - Vector2.One * 0.1f,
-                new Color(0, MathUtils.InverseLerp(20, 0, room.Distance), MathUtils.InverseLerp(20, 0, room.Distance), 0.1f), 0);
+                new Color((room.Flags & RoomFlags.LadderRoom) != 0 ? 255 : 0, MathUtils.InverseLerp(20, 0, room.Distance), MathUtils.InverseLerp(20, 0, room.Distance), 0.1f), 0);
             foreach (SubRoomConnection connection in room.Connections)
             {
                 Coord from = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, connection.From.Position, BaseRoomSize) + Coord.One * BaseRoomSize / 2;

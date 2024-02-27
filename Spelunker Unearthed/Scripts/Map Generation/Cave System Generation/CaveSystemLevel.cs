@@ -9,6 +9,7 @@ using MariEngine.Logging;
 using MariEngine.Persistence;
 using MariEngine.Services;
 using MariEngine.Utils;
+using SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
 using YamlDotNet.Serialization;
 using Random = MariEngine.Utils.Random;
 
@@ -18,6 +19,7 @@ namespace SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 public partial class CaveSystemLevel : ISaveable<CaveSystemLevel>
 {
     public required int Depth { get; init; }
+    public int MapGenSeed { get; init; }
     
     public List<Room> Rooms { get; private init; } = [];
 
@@ -30,7 +32,7 @@ public partial class CaveSystemLevel : ISaveable<CaveSystemLevel>
     
     public CoordBounds BoundingBox { get; private set; }
     
-    public void Generate(RoomDecisionEngine decisionEngine)
+    public void Generate(RoomDecisionEngine decisionEngine, IEnumerable<IRoomLayoutProcessor> roomLayoutProcessors)
     {
         Rooms.Clear();
         map.Clear();
@@ -46,6 +48,9 @@ public partial class CaveSystemLevel : ISaveable<CaveSystemLevel>
         {
             GenerateRoom(decisionEngine);
         }
+        
+        foreach (var processor in roomLayoutProcessors)
+            processor.ProcessRooms(Rooms);
 
         BoundingBox = CalculateBoundingBox();
     }
@@ -165,6 +170,7 @@ public partial class CaveSystemLevel : ISaveable<CaveSystemLevel>
     private struct SerializationProxy
     {
         public int Depth { get; init; }
+        public int MapGenSeed { get; init; }
         public List<Room> Rooms { get; init; }
         public CoordBounds BoundingBox { get; init; }
         public Dictionary<Room, HashSet<SubRoomConnection>> Connections { get; init; }
@@ -175,6 +181,7 @@ public partial class CaveSystemLevel : ISaveable<CaveSystemLevel>
         var proxy = new SerializationProxy
         {
             Depth = Depth,
+            MapGenSeed = MapGenSeed,
             Rooms = Rooms,
             BoundingBox = BoundingBox,
             Connections = Rooms.Select(room => new { room, connections = room.Connections })
@@ -206,6 +213,7 @@ public partial class CaveSystemLevel : ISaveable<CaveSystemLevel>
         var level = new CaveSystemLevel
         {
             Depth = data.Depth,
+            MapGenSeed = data.MapGenSeed,
             Rooms = data.Rooms,
             BoundingBox = data.BoundingBox
         };

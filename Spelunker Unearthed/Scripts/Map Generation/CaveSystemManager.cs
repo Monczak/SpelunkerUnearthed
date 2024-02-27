@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using MariEngine;
 using MariEngine.Components;
@@ -10,22 +11,23 @@ using MariEngine.Utils;
 using Microsoft.Xna.Framework;
 using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
 using SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
+using SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
 using SpelunkerUnearthed.Scripts.Utils;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration;
 
-public class CaveSystemManager(IBiomeProvider biomeProvider, RoomDecisionEngine roomDecisionEngine) : Component
+public class CaveSystemManager(IBiomeProvider biomeProvider, RoomDecisionEngine roomDecisionEngine, IEnumerable<IRoomLayoutProcessor> roomLayoutProcessors) : Component
 {
-    public CaveSystem CaveSystem { get; } = new(biomeProvider, roomDecisionEngine);
+    public CaveSystem CaveSystem { get; } = new(biomeProvider, roomDecisionEngine, roomLayoutProcessors);
 
     private Tilemap tilemap;
 
     public CaveSystemLevel CurrentLevel { get; set; }
 
-    public void Generate()
+    public void Generate(int worldSeed)
     {
-        // TODO: Add option for setting the seed
-        // ServiceRegistry.Get<RandomNumberGenerator>().Seed(1337);
+        ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGenRng).Seed(worldSeed);
+        ServiceRegistry.Get<RandomProvider>().Request(Constants.BiomeGenRng).Seed(worldSeed);
         CaveSystem.Generate();
     }
 
@@ -40,5 +42,5 @@ public class CaveSystemManager(IBiomeProvider biomeProvider, RoomDecisionEngine 
         return CurrentLevel;
     }
 
-    public Biome GetBiome(Coord worldPos) => CaveSystem.BiomeMap.GetBiome(worldPos, CurrentLevel.Depth);
+    public Biome GetBiome(Coord worldPos) => CurrentLevel is null ? null : CaveSystem.BiomeMap.GetBiome(worldPos, CurrentLevel.Depth);
 }

@@ -43,12 +43,13 @@ public static class RandomWalk
         return MathF.Abs(MathUtils.Cross(end - start, point - end)) / (end - start).Length();
     }
     
+    // TODO: Fix self intersection prevention potentially making it impossible to reach the goal pos
     public static List<Coord> WalkTo(Coord startPos, Coord goalPos, Properties properties, WeightChooser weightChooser, RandomBase random = null, int pathLengthLimit = 1000)
     {
         random ??= ServiceRegistry.Get<RandomProvider>().Request(Constants.GeneralPurposeRng);
         
         Coord currentPos = startPos;
-        HashSet<Coord> path = [currentPos];
+        List<Coord> path = [currentPos];
 
         while (currentPos != goalPos)
         {
@@ -61,14 +62,20 @@ public static class RandomWalk
             var maxWeight = candidates.MaxBy(pair => pair.weight).weight;
 
             candidates =
-                candidates.Select(pair => (pair.pos, MathUtils.InverseLerp(minWeight, maxWeight, pair.weight))).ToList();
+                candidates.Select(pair => (pair.pos, MathUtils.InverseLerp(minWeight, maxWeight, pair.weight) + 1)).ToList();
 
             if (!properties.CanSelfIntersect)
                 candidates = candidates.Where(pair => !path.Contains(pair.pos)).ToList();
 
             if (random is DeterministicRandom deterministicRandom)
                 random = deterministicRandom.WithPosition(currentPos);
-            currentPos = random.PickWeighted(candidates, out _);
+            currentPos = random.PickWeighted(candidates, out var picked);
+            if (!picked)
+            {
+                Logger.LogWarning($"Something went really wrong while walking from {startPos} to {goalPos}, trying again");
+                currentPos = startPos;
+                path = [currentPos];
+            }
             path.Add(currentPos);
 
             if (path.Count > pathLengthLimit)
@@ -78,6 +85,6 @@ public static class RandomWalk
             }
         }
 
-        return path.ToList();
+        return path;
     }
 }

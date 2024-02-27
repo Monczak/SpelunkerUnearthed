@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using MariEngine.Logging;
+using MariEngine.Services;
 using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
+using SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 
-public class CaveSystem(IBiomeProvider biomeProvider, RoomDecisionEngine roomDecisionEngine)
+public class CaveSystem(IBiomeProvider biomeProvider, RoomDecisionEngine roomDecisionEngine, IEnumerable<IRoomLayoutProcessor> roomLayoutProcessors)
 {
     public List<CaveSystemLevel> Levels { get; private set; } = [];
     public BiomeMap BiomeMap { get; private set; } = new(biomeProvider);
@@ -16,7 +18,7 @@ public class CaveSystem(IBiomeProvider biomeProvider, RoomDecisionEngine roomDec
         Levels.Clear();
         
         // TODO: Add levels procedurally
-        Levels.Add(new CaveSystemLevel { Depth = 0 });
+        Levels.Add(new CaveSystemLevel { Depth = 0, MapGenSeed = ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGenRng).Next()});
         
         for (int i = 0; i < Levels.Count; i++)
         {
@@ -24,7 +26,7 @@ public class CaveSystem(IBiomeProvider biomeProvider, RoomDecisionEngine roomDec
             int attempt = 0;
             while (attempt < MaxGenerationAttempts)
             {
-                level.Generate(roomDecisionEngine);
+                level.Generate(roomDecisionEngine, roomLayoutProcessors);
                 attempt++;
 
                 if (!roomDecisionEngine.ShouldRegenerate(level))

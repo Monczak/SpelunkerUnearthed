@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using MariEngine;
 using MariEngine.Services;
 using MariEngine.Tiles;
+using MariEngine.Utils;
 using SpelunkerUnearthed.Scripts.MapGeneration.Utils;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.Features;
@@ -12,15 +13,16 @@ public class Tunnel(Coord from, Coord to, int stencilSize) : ProceduralFeature
     
     protected override TileBuffer GenerateFeature(TileBuffer map)
     {
-        var positions = RandomWalk.WalkTo(from, to, new RandomWalk.Properties
-        {
-            Variance = 1,
-            CanSelfIntersect = false,
-            CanGoDiagonally = false,
-            DeviationPenalty = 100,
-            DistanceCost = 100
-        }, pos => map.IsInBounds(pos) ? 1 : 0,
-            random: ServiceRegistry.Get<RandomProvider>().RequestDeterministic(Constants.MapGenRng));
+        // var positions = RandomWalk.WalkTo(from, to, new RandomWalk.Properties
+        // {
+        //     Variance = 1,
+        //     CanSelfIntersect = false,
+        //     CanGoDiagonally = false,
+        //     DeviationPenalty = 100,
+        //     DistanceCost = 100
+        // }, pos => map.IsInBounds(pos) ? 1 : 0,
+        //     random: ServiceRegistry.Get<RandomProvider>().RequestDeterministic(Constants.MapGenRng));
+        var positions = DrawingUtils.BresenhamLine(from, to);   // TODO: Replace this back with the random walk once it's fixed
 
         HashSet<Coord> digPositions = [];
         foreach (Coord position in positions)

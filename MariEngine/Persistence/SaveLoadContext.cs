@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Reflection;
 using MariEngine.Logging;
 using YamlDotNet.Serialization;
@@ -15,6 +16,8 @@ public class SaveLoadContext : IDisposable
     private readonly DataNode root;
 
     private readonly Queue<(DataNode, ISaveable)> dataToSave = new();
+
+    private readonly record struct RootDataNodeProxy(DataNode Data, string GameVersion);
 
     private string GetFilePath(DataNode node)
     {
@@ -36,17 +39,29 @@ public class SaveLoadContext : IDisposable
         if (File.Exists(this.indexFilePath))
         {
             using var file = File.OpenText(this.indexFilePath);
-            root = new DeserializerBuilder()
+            var data = new DeserializerBuilder()
                 .WithNamingConvention(PascalCaseNamingConvention.Instance)
                 .Build()
-                .Deserialize<DataNode>(file.ReadToEnd());
-            root.FixParents();
+                .Deserialize<RootDataNodeProxy>(file.ReadToEnd());
+            
+            // TODO: Check save file game version (not MariEngine, but the assembly that uses MariEngine - use some IVersionProvider?)
+            data.Data.FixParents();
+            root = data.Data;
         }
         else
         {
             root = new DataNode("");
         }
     }
+
+    public IEnumerable<string> GetHierarchy(PathElement path) => GetHierarchy(path.ToString());
+
+    public IEnumerable<string> GetHierarchy(string path)
+    {
+        return root.Get(path).Children.Select(child => child.Key);
+    }
+
+    public void Save<T>(ISaveable<T> data, PathElement path) => Save(data, path.ToString());
     
     public void Save<T>(ISaveable<T> data, string path)
     {
@@ -56,6 +71,8 @@ public class SaveLoadContext : IDisposable
         var node = root.Get(path, createIfNotExists: true);
         dataToSave.Enqueue((node, data));
     }
+
+    public T Load<T>(PathElement path) where T : ISaveable<T> => Load<T>(path.ToString());
 
     public T Load<T>(string path) where T : ISaveable<T>
     {
@@ -90,11 +107,12 @@ public class SaveLoadContext : IDisposable
         
         using (var file = File.CreateText(indexFilePath))
         {
+            var data = new RootDataNodeProxy(root, "1.0.0"); // TODO: Get version information of the assembly that uses MariEngine
             var indexData = new SerializerBuilder()
                 .EnsureRoundtrip()
                 .WithNamingConvention(PascalCaseNamingConvention.Instance)
                 .Build()
-                .Serialize(root);
+                .Serialize(data);
             file.Write(indexData);
         }
         

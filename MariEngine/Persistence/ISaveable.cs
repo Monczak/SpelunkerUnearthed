@@ -12,3 +12,5 @@ public interface ISaveable<out T> : ISaveable
 {
     static virtual T Deserialize(Stream stream) => throw new NotImplementedException();
 }
+
+public interface IYamlSaveable<out T> : ISaveable<T> where T : new();

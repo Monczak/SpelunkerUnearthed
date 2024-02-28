@@ -14,8 +14,10 @@ using Microsoft.Xna.Framework;
 using SpelunkerUnearthed.Scripts.MapGeneration;
 using SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 using SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
+using SpelunkerUnearthed.Scripts.SaveSchema;
 using SpelunkerUnearthed.Scripts.TileEntities;
 using SpelunkerUnearthed.Scripts.Utils;
+using CaveSystem = SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration.CaveSystem;
 
 namespace SpelunkerUnearthed.Scripts.Managers;
 
@@ -62,7 +64,7 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
             }
             
             using var context = ServiceRegistry.Get<SaveLoadSystem>().LoadSaveFile("TestSave");
-            context.Save(CaveSystemManager.CaveSystem, "World/CaveSystem");
+            context.Save(CaveSystemManager.CaveSystem, Save.World.CaveSystem);
 
             foreach (CaveSystemLevel level in CaveSystemManager.CaveSystem.Levels)
             {
@@ -70,9 +72,9 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
                 
                 var (walls, ground) = GenerateCaveSystemLevel(level);
                 
-                context.Save(walls, $"World/Levels/Level{level.Depth}/Walls");
-                context.Save(ground, $"World/Levels/Level{level.Depth}/Ground");
-                context.Save(level, $"World/Levels/Level{level.Depth}/Level");
+                context.Save(walls, Save.World.Levels.Level(level.Depth).Walls);
+                context.Save(ground, Save.World.Levels.Level(level.Depth).Ground);
+                context.Save(level, Save.World.Levels.Level(level.Depth).LevelData);
             }
         });
     }
@@ -80,30 +82,30 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
     public void LoadWorld()
     {
         using var context = ServiceRegistry.Get<SaveLoadSystem>().LoadSaveFile("TestSave");
-        CaveSystemManager.Load(context.Load<CaveSystem>("World/CaveSystem"));
-        var levels = context.GetHierarchy("World/Levels")
-            .Select(levelName => context.Load<CaveSystemLevel>($"World/Levels/{levelName}/Level"))
+        CaveSystemManager.Load(context.Load<CaveSystem>(Save.World.CaveSystem));
+        var levels = context.GetHierarchy(Save.World.Levels)
+            .Select(levelName => context.Load<CaveSystemLevel>(Save.World.Levels.Level(levelName).LevelData))
             .ToList();
 
         CaveSystemManager.CaveSystem.Levels = levels;
     }
 
-    public void StartLoadLevelTask(CaveSystemLevel level)
+    public Task StartLoadLevelTask(CaveSystemLevel level)
     {
         if (IsGenerating)
         {
             Logger.LogError("Trying to load level, but IsGenerating is set");
-            return;
+            return null;
         }
-        Task.Run(() =>
+        return Task.Run(() =>
         {
             IsGenerating = true;
 
             TileBuffer walls, ground;
             using (var context = ServiceRegistry.Get<SaveLoadSystem>().LoadSaveFile("TestSave"))
             {
-                walls = context.Load<TileBuffer>($"World/Levels/Level{level.Depth}/Walls");
-                ground = context.Load<TileBuffer>($"World/Levels/Level{level.Depth}/Ground");
+                walls = context.Load<TileBuffer>(Save.World.Levels.Level(level.Depth).Walls);
+                ground = context.Load<TileBuffer>(Save.World.Levels.Level(level.Depth).Ground);
             }
 
             caveSystemManager.SetCurrentLevel(level);

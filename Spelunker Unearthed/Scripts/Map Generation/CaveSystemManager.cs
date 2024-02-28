@@ -18,28 +18,30 @@ namespace SpelunkerUnearthed.Scripts.MapGeneration;
 
 public class CaveSystemManager(IBiomeProvider biomeProvider, RoomDecisionEngine roomDecisionEngine, IEnumerable<IRoomLayoutProcessor> roomLayoutProcessors) : Component
 {
-    public CaveSystem CaveSystem { get; } = new(biomeProvider, roomDecisionEngine, roomLayoutProcessors);
-
-    private Tilemap tilemap;
+    public CaveSystem CaveSystem { get; private set; } = new(biomeProvider, roomDecisionEngine, roomLayoutProcessors);
 
     public CaveSystemLevel CurrentLevel { get; set; }
 
     public void Generate(int worldSeed)
     {
-        ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGenRng).Seed(worldSeed);
-        ServiceRegistry.Get<RandomProvider>().Request(Constants.BiomeGenRng).Seed(worldSeed);
-        CaveSystem.Generate();
+        CaveSystem.Generate(worldSeed);
     }
 
-    public CaveSystemLevel SetCurrentLevel(int level)
+    public void Load(CaveSystem caveSystem)
     {
-        if (level < 0 || level >= CaveSystem.Levels.Count)
-            Logger.LogError(
-                $"Trying to set cave system level to {level}, but deepest level is {CaveSystem.Levels.Count - 1}");
-        else
-            CurrentLevel = CaveSystem.Levels[level];
+        CaveSystem = caveSystem;
+    }
 
-        return CurrentLevel;
+    public void SetCurrentLevel(CaveSystemLevel level)
+    {
+        // if (level < 0 || level >= CaveSystem.Levels.Count)
+        //     Logger.LogError(
+        //         $"Trying to set cave system level to {level}, but deepest level is {CaveSystem.Levels.Count - 1}");
+        // else
+        //     CurrentLevel = CaveSystem.Levels[level];
+        //
+        // return CurrentLevel;
+        CurrentLevel = level;
     }
 
     public Biome GetBiome(Coord worldPos) => CurrentLevel is null ? null : CaveSystem.BiomeMap.GetBiome(worldPos, CurrentLevel.Depth);

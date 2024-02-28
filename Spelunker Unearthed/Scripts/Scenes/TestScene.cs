@@ -44,8 +44,6 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
     private Canvas canvas;
 
-    private CaveSystemLevel currentLevel;
-
     public override void Load()
     {
         ServiceRegistry.Get<AudioManager>().LoadBank(this, "Ambience");
@@ -60,8 +58,14 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         const int seed = 1;
         worldManager.StartGenerateWorldTask(seed).ContinueWith(_ =>
         {
-            worldManager.StartLoadLevelTask(0).ContinueWith(task => currentLevel = task.Result);
+            worldManager.LoadWorld();
+            var firstLevel = worldManager.CaveSystemManager.CaveSystem.Levels[0];
+            worldManager.StartLoadLevelTask(firstLevel);
         });
+        
+        // worldManager.LoadWorld();
+        // var firstLevel = worldManager.CaveSystemManager.CaveSystem.Levels[0];
+        // worldManager.StartLoadLevelTask(firstLevel);
         
         ServiceRegistry.Get<DebugScreen>().AddLine(biomeDebugLine);
     }
@@ -97,7 +101,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
             worldManager.DrawLevel(caveSystemManager.CurrentLevel);
             
             // TODO: Maybe set this as a toggle?
-            cameraController.SetBounds(0, worldManager.GetRoomCameraBounds(currentLevel, playerController.OwnerEntity.Position));
+            cameraController.SetBounds(0, worldManager.GetRoomCameraBounds(worldManager.CaveSystemManager.CurrentLevel, playerController.OwnerEntity.Position));
             
             biomeDebugLine.SetParams(caveSystemManager.GetBiome(playerController.OwnerEntity.Position));
         }

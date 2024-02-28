@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using MariEngine;
 using MariEngine.Components;
@@ -22,8 +23,6 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
         Gizmos gizmos)
     : Component
 {
-    private TilemapRenderer tilemapRenderer = tilemap.GetComponent<TilemapRenderer>();
-
     public CaveSystemManager CaveSystemManager { get; } = caveSystemManager;
 
     private Dictionary<Room, CameraBounds> cameraBoundsMap = new();
@@ -61,42 +60,65 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
             {
                 Logger.LogError($"World generation failed: {task.Exception}");
             }
+            
+            using var context = ServiceRegistry.Get<SaveLoadSystem>().LoadSaveFile("TestSave");
+            context.Save(CaveSystemManager.CaveSystem, "World/CaveSystem");
 
             foreach (CaveSystemLevel level in CaveSystemManager.CaveSystem.Levels)
             {
                 ServiceRegistry.Get<RandomProvider>().RequestDeterministic(Constants.MapGenRng).Seed(level.MapGenSeed);
                 
                 var (walls, ground) = GenerateCaveSystemLevel(level);
-                using var context = ServiceRegistry.Get<SaveLoadSystem>().LoadSaveFile("TestSave");
-                context.Save(walls, $"World/Level{level.Depth}/Walls");
-                context.Save(ground, $"World/Level{level.Depth}/Ground");
-                context.Save(level, $"World/Level{level.Depth}/Level");
+                
+                context.Save(walls, $"World/Levels/Level{level.Depth}/Walls");
+                context.Save(ground, $"World/Levels/Level{level.Depth}/Ground");
+                context.Save(level, $"World/Levels/Level{level.Depth}/Level");
             }
         });
     }
 
-    public Task<CaveSystemLevel> StartLoadLevelTask(int index)
+    public void LoadWorld()
     {
-        if (IsGenerating) return null;
-        return Task.Run(() =>
+        using var context = ServiceRegistry.Get<SaveLoadSystem>().LoadSaveFile("TestSave");
+        CaveSystemManager.Load(context.Load<CaveSystem>("World/CaveSystem"));
+        var levels = context.GetHierarchy("World/Levels")
+            .Select(levelName => context.Load<CaveSystemLevel>($"World/Levels/{levelName}/Level"))
+            .ToList();
+
+        CaveSystemManager.CaveSystem.Levels = levels;
+    }
+
+    public void StartLoadLevelTask(CaveSystemLevel level)
+    {
+        if (IsGenerating)
+        {
+            Logger.LogError("Trying to load level, but IsGenerating is set");
+            return;
+        }
+        Task.Run(() =>
         {
             IsGenerating = true;
 
             TileBuffer walls, ground;
-            CaveSystemLevel level;
             using (var context = ServiceRegistry.Get<SaveLoadSystem>().LoadSaveFile("TestSave"))
             {
-                walls = context.Load<TileBuffer>($"World/Level{index}/Walls");
-                ground = context.Load<TileBuffer>($"World/Level{index}/Ground");
-                level = context.Load<CaveSystemLevel>($"World/Level{index}/Level");
+                walls = context.Load<TileBuffer>($"World/Levels/Level{level.Depth}/Walls");
+                ground = context.Load<TileBuffer>($"World/Levels/Level{level.Depth}/Ground");
             }
 
-            caveSystemManager.SetCurrentLevel(level.Depth);
+            caveSystemManager.SetCurrentLevel(level);
             
             LoadLevel(level, walls, ground);
             IsGenerating = false;
 
             return level;
+        })
+        .ContinueWith(task =>
+        {
+            if (task.IsFaulted)
+            {
+                Logger.LogError($"Loading level {level.Depth} failed: {task.Exception}");
+            }
         });
     }
 

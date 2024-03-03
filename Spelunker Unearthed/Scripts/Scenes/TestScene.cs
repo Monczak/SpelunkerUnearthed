@@ -156,8 +156,6 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         tilemapRenderer = new TilemapRenderer(graphics.GraphicsDevice, Camera);
         tilemapEntity.AttachComponent(tilemapRenderer);
 
-        lightMap.AttachTilemapRenderer(tilemapRenderer);
-
         tilemapEntity.AttachComponent(new TilemapCollider());
         tilemapEntity.AttachComponent(new TilemapCameraBounds());
 

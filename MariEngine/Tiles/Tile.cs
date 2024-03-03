@@ -19,8 +19,7 @@ public class Tile : Resource<TileData>
     public float LightAttenuation { get; private set; }
     
     public int Tags { get; private set; }
-    
-    public Tilemap OwnerTilemap { get; set; }
+
     public HashSet<TileBehavior> Behaviors { get; private set; }
 
     public CollisionGroup CollisionGroup { get; private set; }
@@ -31,43 +30,23 @@ public class Tile : Resource<TileData>
     {
         
     }
-    
-    public Tile(Tile tile)
-    {
-        Id = tile.Id;
-        ForegroundColor = tile.ForegroundColor;
-        BackgroundColor = tile.BackgroundColor;
-        Character = tile.Character;
 
-        Tags = tile.Tags;
-
-        if (tile.LightSource is not null)
-            LightSource = tile.LightSource.Clone() as LightSource;
-        LightAttenuation = tile.LightAttenuation;
-
-        CollisionGroup = tile.CollisionGroup;
-
-        Behaviors = [..tile.Behaviors];
-
-        Type = tile.Type;
-    }
-
-    public void OnPlaced()
+    public void OnPlaced(Coord position)
     {
         foreach (var behavior in Behaviors)
-            behavior.OnPlaced();
+            behavior.OnPlaced(position);
     }
     
-    public void OnMined()
+    public void OnMined(Coord position)
     {
         foreach (var behavior in Behaviors)
-            behavior.OnMined();
+            behavior.OnMined(position);
     }
     
-    public void OnSteppedOn(TileEntity steppingEntity)
+    public void OnSteppedOn(Coord position, TileEntity steppingEntity)
     {
         foreach (var behavior in Behaviors)
-            behavior.OnSteppedOn(steppingEntity);
+            behavior.OnSteppedOn(position, steppingEntity);
     }
 
     protected internal override void BuildFromData(TileData data)

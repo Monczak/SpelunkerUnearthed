@@ -18,8 +18,13 @@ public class LightMap : Component
 {
     private Tilemap tilemap;
     public Color AmbientLight { get; set; }
+
+    // This WILL BREAK LIGHTING if not set, unless we come up with a neater method to calculate/store light rendered before world updates
+    // (the memory savings, tho... D:)
+    private readonly bool cacheRenderedLight;
     
     private Dictionary<LightSource, LightSourceData> lightSources;
+    private Dictionary<Coord, LightSourceData> staticLightSources;
 
     private HashSet<LightSourceData> dirtyLightSources = [];
     private HashSet<LightSourceData> toRemove = [];
@@ -30,6 +35,8 @@ public class LightMap : Component
 
     private readonly Action<LightSource> dirtyLightHandler;
 
+    private object lockObj = new();
+
     private class LightSourceData
     {
         public LightSource LightSource { get; }
@@ -37,10 +44,10 @@ public class LightMap : Component
         
         public bool New { get; set; }
         public bool Old { get; set; }
-        
+
         public Vector3[,] RenderedLight;
 
-        public LightSourceData(LightSource lightSource, Coord position)
+        public LightSourceData(LightSource lightSource, Coord position, bool useCache)
         {
             LightSource = lightSource;
             Position = new Deferred<Coord>(position);
@@ -48,22 +55,27 @@ public class LightMap : Component
             Old = false;
 
             var bounds = lightSource.GetBounds(Coord.Zero);
-            if (bounds is not null)
-                RenderedLight = new Vector3[bounds.Value.Size.X, bounds.Value.Size.Y];
-            else
-                RenderedLight = new Vector3[1, 1]; // TODO: What to do with unbounded lights?
+            if (useCache)
+            {
+                if (bounds is not null)
+                    RenderedLight = new Vector3[bounds.Value.Size.X, bounds.Value.Size.Y];
+                else
+                    RenderedLight = new Vector3[1, 1]; // TODO: What to do with unbounded lights?
+            }
         }
     }
 
-    public LightMap()
+    public LightMap(bool cacheRenderedLight = true)
     {
         dirtyLightHandler = OnLightSourceDirty;
+        this.cacheRenderedLight = cacheRenderedLight;
     }
 
     protected override void OnAttach()
     {
         tilemap = GetComponent<Tilemap>();
         lightSources = new Dictionary<LightSource, LightSourceData>();
+        staticLightSources = new Dictionary<Coord, LightSourceData>();
         toRemove = [];
         dirtyLightSources = [];
 
@@ -73,10 +85,6 @@ public class LightMap : Component
     public void Resize(Coord newSize)
     {
         map = new Vector3[newSize.X, newSize.Y];
-    }
-
-    public void AttachTilemapRenderer(TilemapRenderer renderer)
-    {
     }
 
     protected override void Update(GameTime gameTime)
@@ -99,7 +107,7 @@ public class LightMap : Component
 
     private void UpdateDirtyLights()
     {
-        object lockObj = new();
+        object lockObj2 = new();
         Parallel.ForEach(dirtyLightSources, new ParallelOptions { MaxDegreeOfParallelism = RenderThreads },data =>
         {
             if (!data.New)
@@ -108,7 +116,7 @@ public class LightMap : Component
             }
             else
             {
-                lock (lockObj)
+                lock (lockObj2)
                 {
                     toRemove.Remove(data);
                 }
@@ -123,7 +131,7 @@ public class LightMap : Component
             }
             else
             {
-                lock (lockObj)
+                lock (lockObj2)
                 {
                     toRemove.Add(data);
                 }
@@ -148,17 +156,17 @@ public class LightMap : Component
 
     public void AddEmittingTile(Tile tile, Coord position)
     {
-        AddLightSource(new LightSourceData(tile.LightSource, position));
+        AddLightSource(new LightSourceData(tile.LightSource, position, cacheRenderedLight), true);
     }
 
-    public void RemoveEmittingTile(Tile tile)
+    public void RemoveEmittingTile(Coord position)
     {
-        RemoveLightSource(tile.LightSource);
+        RemoveStaticLightSource(position);
     }
 
     public void AddEmitter(LightEmitter emitter)
     {
-        AddLightSource(new LightSourceData(emitter.LightSource, emitter.OwnerEntity.Position));
+        AddLightSource(new LightSourceData(emitter.LightSource, emitter.OwnerEntity.Position, cacheRenderedLight));
     }
 
     public void RemoveEmitter(LightEmitter emitter)
@@ -166,12 +174,19 @@ public class LightMap : Component
         RemoveLightSource(emitter.LightSource);
     }
 
-    private void AddLightSource(LightSourceData data)
+    private void AddLightSource(LightSourceData data, bool staticSource = false)
     {
-        lightSources.Add(data.LightSource, data);
-        data.LightSource.OnDirty += dirtyLightHandler;
+        lock (lockObj)
+        {
+            if (staticSource) staticLightSources.Add(data.Position.Get(), data);
+            else lightSources.Add(data.LightSource, data);
+            data.LightSource.OnDirty += dirtyLightHandler;
         
-        data.LightSource.Dirty = true;
+            if (staticSource)
+                MakeStaticLightSourceDirty(data.Position.Get());
+            else 
+                data.LightSource.Dirty = true;
+        }
     }
 
     private void RemoveLightSource(LightSource lightSource)
@@ -183,7 +198,21 @@ public class LightMap : Component
         }
     }
 
+    private void RemoveStaticLightSource(Coord position)
+    {
+        if (staticLightSources.TryGetValue(position, out var sourceData))
+        {
+            sourceData.Old = true;
+            MakeStaticLightSourceDirty(position);
+        }
+    }
+
     private void OnLightSourceDirty(LightSource source) => dirtyLightSources.Add(lightSources[source]);
+
+    private void MakeStaticLightSourceDirty(Coord position)
+    {
+        dirtyLightSources.Add(staticLightSources[position]);
+    }
 
     private void RenderLight(LightSourceData data, bool derender = false)
     {
@@ -201,12 +230,12 @@ public class LightMap : Component
                 int cy = y - lightBounds.Value.TopLeft.Y;
 
                 Vector3 light;
-                if (derender)
+                if (derender && cacheRenderedLight)
                     light = data.RenderedLight[cx, cy];
                 else
                 {
-                    light = data.LightSource.GetLight(data.Position.Get(), coord).ToVector3();
-                    data.RenderedLight[cx, cy] = light;
+                    light = data.LightSource.GetLight(tilemap, data.Position.Get(), coord).ToVector3();
+                    if (cacheRenderedLight) data.RenderedLight[cx, cy] = light;
                 }
                 
                 map[x, y] += light * (derender ? -1 : 1);

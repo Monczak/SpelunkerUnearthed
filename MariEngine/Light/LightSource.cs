@@ -8,8 +8,8 @@ namespace MariEngine.Light;
 
 public abstract class LightSource(Color color, float intensity) : ICloneable
 {
-    private readonly Deferred<Color> color = new Deferred<Color>(color);
-    private readonly Deferred<float> intensity = new Deferred<float>(intensity);
+    private readonly Deferred<Color> color = new(color);
+    private readonly Deferred<float> intensity = new(intensity);
 
     public Color Color
     {
@@ -31,8 +31,6 @@ public abstract class LightSource(Color color, float intensity) : ICloneable
         }
     }
 
-    protected Tilemap Tilemap;
-
     private bool dirty;
     internal bool Dirty
     {
@@ -46,19 +44,14 @@ public abstract class LightSource(Color color, float intensity) : ICloneable
 
     public event Action<LightSource> OnDirty;
 
-    public void AttachTilemap(Tilemap tilemap)
-    {
-        Tilemap = tilemap;
-    }
-
-    protected abstract Color CalculateLight(Coord sourcePosition, Coord receiverPosition);
-    protected abstract float CalculateAttenuation(Coord sourcePosition, Coord receiverPosition);
+    protected abstract Color CalculateLight(Tilemap tilemap, Coord sourcePosition, Coord receiverPosition);
+    protected abstract float CalculateAttenuation(Tilemap tilemap, Coord sourcePosition, Coord receiverPosition);
 
     public abstract CoordBounds? GetBounds(Coord sourcePosition);
 
-    public Color GetLight(Coord sourcePosition, Coord receiverPosition)
+    public Color GetLight(Tilemap tilemap, Coord sourcePosition, Coord receiverPosition)
     {
-        return CalculateLight(sourcePosition, receiverPosition) * CalculateAttenuation(sourcePosition, receiverPosition) * Intensity;
+        return CalculateLight(tilemap, sourcePosition, receiverPosition) * CalculateAttenuation(tilemap, sourcePosition, receiverPosition) * Intensity;
     }
 
     public object Clone()

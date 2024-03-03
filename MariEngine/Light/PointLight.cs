@@ -21,13 +21,13 @@ public class PointLight(Color color, float intensity, int radius) : LightSource(
         }
     }
 
-    protected override Color CalculateLight(Coord sourcePosition, Coord receiverPosition)
+    protected override Color CalculateLight(Tilemap tilemap, Coord sourcePosition, Coord receiverPosition)
     {
         return Color;
     }
     
     // TODO: Work out a way to optimize this, if necessary
-    protected override float CalculateAttenuation(Coord sourcePosition, Coord receiverPosition)
+    protected override float CalculateAttenuation(Tilemap tilemap, Coord sourcePosition, Coord receiverPosition)
     {
         float distance = (receiverPosition - sourcePosition).Magnitude;
         float normDistance = distance / radius.Get();
@@ -40,9 +40,9 @@ public class PointLight(Color color, float intensity, int radius) : LightSource(
         // Precomputing attenuation with lines towards edges of bounds will make this faster
         foreach (Coord coord in DrawingUtils.BresenhamLine(sourcePosition, receiverPosition, endPreemptively: true))
         {
-            if (!Tilemap.IsInBounds(coord)) continue;
+            if (!tilemap.IsInBounds(coord)) continue;
             
-            Tile tile = Tilemap.Get(coord, Tilemap.BaseLayer);
+            Tile tile = tilemap.Get(coord, Tilemap.BaseLayer);
             if (tile is null) continue;
             
             tileAttenuation *= 1 - tile.LightAttenuation;
@@ -56,7 +56,7 @@ public class PointLight(Color color, float intensity, int radius) : LightSource(
         return new CoordBounds(sourcePosition - Coord.One * radius.Get(), Coord.One * (radius.Get() * 2 + 1));
     }
 
-    protected override LightSource MakeClone() => new PointLight(Color, Intensity, Radius) { Tilemap = Tilemap };
+    protected override LightSource MakeClone() => new PointLight(Color, Intensity, Radius);
 
     protected override void UpdateProperties()
     {

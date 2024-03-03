@@ -93,27 +93,24 @@ public class Tilemap : Component
         {
             foreach (var behavior in theTile.Behaviors) BehaviorsToUpdate.Remove(behavior);
             if (theTile.LightSource is not null)
-                GetComponent<LightMap>()?.RemoveEmittingTile(theTile);
+                GetComponent<LightMap>()?.RemoveEmittingTile(coord);
         }
-
-        Tile newTile = new Tile(tile);
-        Set(newTile, coord, layerId);
-        newTile.OwnerTilemap = this;
-        newTile.OnPlaced();
+        
+        Set(tile, coord, layerId);
+        tile.OnPlaced(coord);
         
         foreach (var behavior in Get(coord, layerId).Behaviors) BehaviorsToUpdate.Add(behavior);
 
-        if (newTile.LightSource is not null)
+        if (tile.LightSource is not null)
         {
-            newTile.LightSource.AttachTilemap(this);
-            GetComponent<LightMap>()?.AddEmittingTile(newTile, coord);
+            GetComponent<LightMap>()?.AddEmittingTile(tile, coord);
         }
     }
     
     public void Mine(Coord tileCoord, int layerId)
     {
         // TODO: Update light map for all tile entity light emitters that affect this tile when tilemap is changed
-        Get(tileCoord, layerId).OnMined();
+        Get(tileCoord, layerId).OnMined(tileCoord);
         
         Place(ServiceRegistry.Get<TileLoader>().Get("Nothing"), tileCoord, layerId);
     }
@@ -122,7 +119,7 @@ public class Tilemap : Component
     {
         foreach (int layerId in layers.Keys)
         {
-            Get(tileCoord, layerId)?.OnSteppedOn(steppingEntity);    // TODO: Step only on tiles below the base layer?
+            Get(tileCoord, layerId)?.OnSteppedOn(tileCoord, steppingEntity);    // TODO: Step only on tiles below the base layer?
         }
     }
 

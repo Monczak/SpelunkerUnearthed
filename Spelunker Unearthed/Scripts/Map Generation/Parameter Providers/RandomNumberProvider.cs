@@ -11,7 +11,7 @@ public class RandomNumberProvider : NumberProvider
     
     public override float Get(Coord worldPos)
     {
-        return ServiceRegistry.Get<RandomProvider>().RequestDeterministic(rngId)
+        return ServiceRegistry.Get<RandomProvider>().RequestPositionBased(rngId)
             .WithPosition(worldPos)
             .NextFloat(min, max);
     }

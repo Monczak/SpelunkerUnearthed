@@ -24,7 +24,7 @@ public class RoomMapGenerator(IEnumerable<IRoomMapProcessor> processors, int lev
     
     public (TileBuffer walls, TileBuffer ground) GenerateRoomMap(Coord pastePosition)
     {
-        random = ServiceRegistry.Get<RandomProvider>().RequestDeterministic(Constants.MapGenRng);
+        random = ServiceRegistry.Get<RandomProvider>().RequestPositionBased(Constants.MapGenRng);
 
         return BuildRoomMap(pastePosition);
     }

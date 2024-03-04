@@ -41,7 +41,7 @@ public class RandomProvider : Service
         }
     }
 
-    public PositionBasedRandom RequestDeterministic(string name)
+    public PositionBasedRandom RequestPositionBased(string name)
     {
         lock (lockObj)
         {

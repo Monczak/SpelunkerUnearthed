@@ -68,7 +68,7 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
 
             foreach (CaveSystemLevel level in CaveSystemManager.CaveSystem.Levels)
             {
-                ServiceRegistry.Get<RandomProvider>().RequestDeterministic(Constants.MapGenRng).Seed(level.MapGenSeed);
+                ServiceRegistry.Get<RandomProvider>().RequestPositionBased(Constants.MapGenRng).Seed(level.MapGenSeed);
                 
                 var (walls, ground) = GenerateCaveSystemLevel(level);
                 

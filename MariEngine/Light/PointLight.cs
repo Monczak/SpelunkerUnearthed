@@ -9,7 +9,7 @@ namespace MariEngine.Light;
 
 public class PointLight(Color color, float intensity, int radius) : LightSource(color, intensity)
 {
-    private readonly Deferred<int> radius = new Deferred<int>(radius);
+    private readonly Deferred<int> radius = new(radius);
 
     public int Radius
     {

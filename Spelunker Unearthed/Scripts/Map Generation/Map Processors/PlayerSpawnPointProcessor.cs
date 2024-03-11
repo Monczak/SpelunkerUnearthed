@@ -12,23 +12,18 @@ public class PlayerSpawnPointProcessor : IRoomMapProcessor
 {
     public void ProcessRoomMap(TileBuffer roomMap, Room room)
     {
-        var random = ServiceRegistry.Get<RandomProvider>().RequestPositionBased(Constants.MapGenRng);
-        Coord spawnPoint = Coord.Zero;
+        var random = ServiceRegistry.Get<RandomProvider>()
+            .RequestPositionBased(Constants.MapGenRng)
+            .WithPosition(room.Position);
+        
+        var picked = MapProcessorUtil.PickRandomCoord(
+            random, 
+            roomMap, 
+            coord => !Tags.HasTag(roomMap[coord].Tags, "Wall"),
+            out var spawnPoint);   // TODO: Proper spawnable space handling
 
-        List<Coord> coordList = [..roomMap.Coords];
-        while (coordList.Count > 0)
-        {
-            int i = random.WithPosition(room.Position).Next(coordList.Count);
-            Coord coord = coordList[i];
-            coordList.RemoveAt(i);
-
-            // TODO: Proper spawnable space handling
-            if (!Tags.HasTag(roomMap[coord].Tags, "Wall"))
-            {
-                spawnPoint = coord;
-                break;
-            }
-        }
+        if (!picked)
+            throw new MapGenerationException($"Could not determine spawn point in room {room.Position}");
         
         room.AddPointOfInterest(PointOfInterestType.PlayerSpawnPoint, spawnPoint);
     }

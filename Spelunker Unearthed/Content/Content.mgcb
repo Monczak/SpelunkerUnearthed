@@ -31,6 +31,12 @@
 #begin Tiles/Ice.yml
 /copy:Tiles/Ice.yml
 
+#begin Tiles/LadderDown.yml
+/copy:Tiles/LadderDown.yml
+
+#begin Tiles/LadderUp.yml
+/copy:Tiles/LadderUp.yml
+
 #begin Tiles/PackedIce.yml
 /copy:Tiles/PackedIce.yml
 

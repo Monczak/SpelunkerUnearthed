@@ -174,7 +174,9 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
         worldManager = new WorldManager(caveSystemManager, tilemap, playerController, gizmos);
         worldManager.AddProcessor(new RoomConnectionProcessor(worldManager.BaseRoomSize, gizmos), 0);
+        worldManager.AddProcessor(new LadderFeaturePlacementProcessor(worldManager.BaseRoomSize), -10);
         worldManager.AddRoomMapProcessor(new PlayerSpawnPointProcessor(), 0); // TODO: Load all processors using reflection
+        worldManager.AddRoomMapProcessor(new LadderPlacementProcessor(), -10); 
         
         player.AttachComponent(new PlayerBiomeWatcher(worldManager, ambienceController));
 
@@ -189,15 +191,15 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         // var col1 = canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, PreferredWidth = 5, ContentAlignment = FlexContentAlignment.Center });
         // col1.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });
         // col1.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });
-        //
+        
         // var squareContainer = canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, PreferredWidth = 20 });
         // squareContainer.AddChild(new FlexLayoutNode());
         // var square = squareContainer.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, PreferredWidth = 20, PreferredHeight = 20 });
         // squareContainer.AddChild(new FlexLayoutNode());
-        //
+        
         // square.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });
         // square.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });
-        //
+        
         // var col2 = canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, PreferredWidth = 5, ContentAlignment = FlexContentAlignment.Center });
         // col2.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });
         // col2.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });

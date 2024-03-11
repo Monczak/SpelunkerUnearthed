@@ -15,14 +15,14 @@ namespace SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
 
 public class RoomConnectionProcessor(int baseRoomSize, Gizmos gizmos) : MapProcessor(baseRoomSize)
 {
-    public override void ProcessMap(TileBuffer map, CaveSystemLevel level)
+    public override void ProcessMap(TileBuffer walls, TileBuffer ground, CaveSystemLevel level)
     {
         var connections = level.Rooms
             .SelectMany(room => room.Connections)
             .DistinctBy(conn => conn, new SubRoomConnectionBidirectionalEqualityComparer());
         foreach (var connection in connections)
         {
-            HandleConnection(map, level, connection);
+            HandleConnection(walls, level, connection);
         }       
     }
 
@@ -35,7 +35,7 @@ public class RoomConnectionProcessor(int baseRoomSize, Gizmos gizmos) : MapProce
         var (from, to) = FindConnectionCoords(map, level, connection.From.Room, connection.To.Room, midpoint);
         (from, to) = StraightenLine(map, from, to, connection.Direction);
 
-        FeaturePlacer.Place(new Tunnel(from, to, 1), map, Tilemap.BaseLayer);
+        FeaturePlacer.Place(new Tunnel(from, to, 1), map);
         
         // gizmos.DrawLine(map.CoordToWorldPoint(from) + Vector2.One * 0.5f, map.CoordToWorldPoint(to) + Vector2.One * 0.5f, Color.Coral, lifetime: 10000);
     }

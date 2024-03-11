@@ -80,7 +80,7 @@ public partial class CanvasRenderer : Renderer
 
     protected override void Render(SpriteBatch spriteBatch)
     {
-        spriteBatch.Begin(SpriteSortMode.Texture, BlendState.AlphaBlend, SamplerState.PointClamp);
+        spriteBatch.Begin(SpriteSortMode.Texture, BlendState.AlphaBlend, SamplerState.AnisotropicClamp);
 
         foreach (var coord in tileBuffer.Coords)
         {

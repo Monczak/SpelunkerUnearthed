@@ -1,0 +1,6 @@
+ForegroundColor: "#5c5c5b"
+BackgroundColor: "#0a0a0a"
+Character: 'H'
+Tags:
+  - Ground
+LightAttenuation: 0.5

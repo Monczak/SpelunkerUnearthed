@@ -13,6 +13,7 @@ using MariEngine.Utils;
 using Microsoft.Xna.Framework;
 using SpelunkerUnearthed.Scripts.MapGeneration;
 using SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
+using SpelunkerUnearthed.Scripts.MapGeneration.Features;
 using SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
 using SpelunkerUnearthed.Scripts.SaveSchema;
 using SpelunkerUnearthed.Scripts.TileEntities;
@@ -40,12 +41,12 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
 
     public void AddProcessor(MapProcessor processor, int priority)
     {
-        mapProcessors.Add(priority, processor);
+        mapProcessors.Add(-priority, processor);
     }
     
     public void AddRoomMapProcessor(IRoomMapProcessor processor, int priority)
     {
-        roomMapProcessors.Add(priority, processor);
+        roomMapProcessors.Add(-priority, processor);
     }
 
     public void GenerateWorld(int worldSeed)
@@ -139,7 +140,7 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
         Logger.Log($"Level generation: processing map", stopwatch);
         foreach (var (_, processor) in mapProcessors)
         {
-            processor.ProcessMap(walls, level);
+            processor.ProcessMap(walls, ground, level);
         }
         
         Logger.Log($"Level generation completed", stopwatch);

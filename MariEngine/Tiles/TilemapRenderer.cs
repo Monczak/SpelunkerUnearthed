@@ -28,7 +28,7 @@ public class TilemapRenderer(GraphicsDevice graphicsDevice, Camera camera) : Ren
         var cullingBounds = GetCullingBounds();
         if (cullingBounds is null) return;
         
-        spriteBatch.Begin(SpriteSortMode.Texture, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: camera.TransformMatrix);
+        spriteBatch.Begin(SpriteSortMode.Texture, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: Camera.TransformMatrix);
 
         for (float y = cullingBounds.Value.TopLeft.Y; y < cullingBounds.Value.BottomRight.Y + 1; y++)
         {
@@ -42,13 +42,16 @@ public class TilemapRenderer(GraphicsDevice graphicsDevice, Camera camera) : Ren
         
         spriteBatch.End();
         
-        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: camera.TransformMatrix);
+        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: Camera.TransformMatrix);
 
         foreach (TileEntity entity in tilemap.TileEntities)
         {
-            if (!cullingBounds.Value.PointInside((Vector2)entity.Position)) continue;
+            var renderer = entity.GetComponent<TileEntityRenderer>();
+
+            if (renderer is null) continue;
+            if (Bounds.Overlap(cullingBounds.Value, renderer.GetCullingBounds()) is null) continue;
             
-            RenderTile(spriteBatch, tilemap.Vector2ToWorldPoint(entity.SmoothedPosition), entity.Tile, lightMap.GetRenderedLight(entity.Position));
+            renderer.Render(spriteBatch, camera, graphicsDevice, lightMap);
         }
 
         spriteBatch.End();
@@ -66,7 +69,7 @@ public class TilemapRenderer(GraphicsDevice graphicsDevice, Camera camera) : Ren
 
     internal Bounds? GetWorldCullingBounds()
     {
-        Bounds cameraBounds = camera.ViewingWindow;
+        Bounds cameraBounds = Camera.ViewingWindow;
         Bounds tilemapBounds = new(tilemap.CoordToWorldPoint(Coord.Zero), new Vector2(tilemap.Width, tilemap.Height));
         Bounds? overlap = Bounds.Overlap(cameraBounds, tilemapBounds);
         return overlap;
@@ -82,6 +85,6 @@ public class TilemapRenderer(GraphicsDevice graphicsDevice, Camera camera) : Ren
         // 1 or 2 draw calls (one for background, one for foreground)
         // https://badecho.com/index.php/2022/08/04/drawing-tiles/
         if (tile is not null)
-            ServiceRegistry.Get<TileAtlas>().DrawTile(spriteBatch, pos * camera.TileSize, tile.Id, tint);
+            ServiceRegistry.Get<TileAtlas>().DrawTile(spriteBatch, pos * Camera.TileSize, tile.Id, tint);
     }
 }

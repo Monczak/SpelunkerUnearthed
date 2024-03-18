@@ -1,10 +1,10 @@
-ForegroundColor: "#5c5c5b"
+ForegroundColor: "#754105"
 BackgroundColor: "#121212"
 Character: 'H'
 Tags:
   - Ground
 LightAttenuation: 0.5
 Light:
-  Color: "#ffffff"
-  Intensity: 0.3
+  Color: "#edc28a"
+  Intensity: 0.7
   Radius: 7

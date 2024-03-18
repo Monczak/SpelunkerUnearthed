@@ -7,8 +7,8 @@ namespace MariEngine.Rendering;
 [Exclusive]
 public abstract class Renderer(GraphicsDevice graphicsDevice, Camera camera) : Component
 {
-    protected Camera camera = camera;
-    protected GraphicsDevice graphicsDevice = graphicsDevice;
+    protected internal readonly Camera Camera = camera;
+    protected internal readonly GraphicsDevice GraphicsDevice = graphicsDevice;
 
     public int Layer { get; set; } = 0;
 

@@ -32,11 +32,11 @@ public class GizmoRenderer : Renderer
 
     protected override void Render(SpriteBatch spriteBatch)
     {
-        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: camera.TransformMatrix);
+        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: Camera.TransformMatrix);
         
         foreach (GizmoShape shape in gizmos.Shapes)
         {
-            shape.Render(spriteBatch, camera, gizmoTexture);
+            shape.Render(spriteBatch, Camera, gizmoTexture);
         }
 
         spriteBatch.End();

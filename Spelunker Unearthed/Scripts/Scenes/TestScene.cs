@@ -159,18 +159,20 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         tilemapEntity.AttachComponent(new TilemapCollider());
         tilemapEntity.AttachComponent(new TilemapCameraBounds());
 
-        TileEntity player = new TileEntity("Player")
-        {
-            Tile = ServiceRegistry.Get<TileLoader>().Get("Player")
-        };
+        TileEntity player = new TileEntity("Player");
         tilemap.AddTileEntity(player);
 
         playerController = new PlayerController();
         player.AttachComponent(playerController);
 
         player.AttachComponent(new LightEmitter { LightSource = new PointLight(new Color(237, 222, 138), 1f, 30) });
+        player.AttachComponent(new BasicTileEntityRenderer(ServiceRegistry.Get<TileLoader>().Get("Player")));
 
         AddEntity(tilemapEntity);
+
+        var testTileEntity = new TileEntity("TestTileEntity");
+        testTileEntity.AttachComponent(new BasicTileEntityRenderer(ServiceRegistry.Get<TileLoader>().Get("Player")));
+        tilemap.AddTileEntity(testTileEntity);
 
         worldManager = new WorldManager(caveSystemManager, tilemap, playerController, gizmos);
         worldManager.AddProcessor(new RoomConnectionProcessor(worldManager.BaseRoomSize, gizmos), 0);

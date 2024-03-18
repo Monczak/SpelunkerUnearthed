@@ -41,7 +41,7 @@ public partial class CanvasRenderer : Renderer
 
     private void InitializeBuffer()
     {
-        Coord screenSize = new(graphicsDevice.PresentationParameters.BackBufferWidth, graphicsDevice.PresentationParameters.BackBufferHeight);
+        Coord screenSize = new(GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
         screenSize /= ServiceRegistry.Get<TileAtlas>().TileSize;
         tileBuffer = new TileBuffer(screenSize + Coord.One * overscan * 2);
     }
@@ -87,7 +87,7 @@ public partial class CanvasRenderer : Renderer
             var tile = tileBuffer[coord];
             if (tile is not null)
             {
-                ServiceRegistry.Get<TileAtlas>().DrawTile(spriteBatch, ((Vector2)coord - Vector2.One * overscan) * camera.TileSize + CalculateCenterOffset(), tile.Id, Color.White);
+                ServiceRegistry.Get<TileAtlas>().DrawTile(spriteBatch, ((Vector2)coord - Vector2.One * overscan) * Camera.TileSize + CalculateCenterOffset(), tile.Id, Color.White);
             }
         }
             
@@ -96,10 +96,10 @@ public partial class CanvasRenderer : Renderer
 
     protected override Vector2 CalculateCenterOffset()
     {
-        Vector2 screenSize = new(graphicsDevice.PresentationParameters.BackBufferWidth,
-            graphicsDevice.PresentationParameters.BackBufferHeight);
+        Vector2 screenSize = new(GraphicsDevice.PresentationParameters.BackBufferWidth,
+            GraphicsDevice.PresentationParameters.BackBufferHeight);
         Vector2 uiSize = new Vector2(tileBuffer.Width, tileBuffer.Height) - Vector2.One * overscan * 2;
-        Vector2 leftover = screenSize - uiSize * camera.TileSize;
+        Vector2 leftover = screenSize - uiSize * Camera.TileSize;
         return leftover / 2;
     }
 

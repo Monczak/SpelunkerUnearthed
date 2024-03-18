@@ -15,7 +15,9 @@ public class TilemapCollider : Collider
     {
         if (!tilemap.IsInBounds(coord)) return true;
         
-        Tile mapTile = tilemap.Get(coord, Tilemap.BaseLayer);   // TODO: Handle collision on other layers?
-        return DoTilesCollide(mapTile, tileEntity.Tile);
+        // TODO: Use custom colliders
+        // Tile mapTile = tilemap.Get(coord, Tilemap.BaseLayer);   // TODO: Handle collision on other layers?
+        // return DoTilesCollide(mapTile, tileEntity.Tile);
+        return false;
     }
 }

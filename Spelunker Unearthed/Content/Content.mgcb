@@ -22,6 +22,9 @@
 #begin Fonts/whitrabt.ttf
 /copy:Fonts/whitrabt.ttf
 
+#begin Sprites/TestSprite.yml
+/copy:Sprites/TestSprite.yml
+
 #begin Sprites/UIBackground.yml
 /copy:Sprites/UIBackground.yml
 

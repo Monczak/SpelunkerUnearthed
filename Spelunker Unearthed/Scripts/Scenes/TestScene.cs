@@ -166,7 +166,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         player.AttachComponent(playerController);
 
         player.AttachComponent(new LightEmitter { LightSource = new PointLight(new Color(237, 222, 138), 1f, 30) });
-        player.AttachComponent(new BasicTileEntityRenderer(ServiceRegistry.Get<TileLoader>().Get("Player")));
+        player.AttachComponent(new SpriteRenderer(ServiceRegistry.Get<SpriteLoader>().Get("TestSprite")));
 
         AddEntity(tilemapEntity);
 

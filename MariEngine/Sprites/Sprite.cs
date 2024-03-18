@@ -12,6 +12,8 @@ public class Sprite : Resource<SpriteData>
     public bool NineSliced { get; private set; }
     public int NineSliceCornerSize { get; private set; }
 
+    public Coord Size => new(Tiles.Width, Tiles.Height);
+
     public Tile GetNineSlice(CoordBounds bounds, Coord pos)
     {
         return (pos - bounds.TopLeft) switch
@@ -29,7 +31,8 @@ public class Sprite : Resource<SpriteData>
             // Vertical Edges
             var c when c.X < NineSliceCornerSize && c.Y >= NineSliceCornerSize => Tiles[c.X, c.Y % (Tiles.Height - NineSliceCornerSize * 2)],
             var c when c.X >= bounds.Size.X - NineSliceCornerSize && c.Y >= NineSliceCornerSize => Tiles[c.X - bounds.Size.X + Tiles.Width, c.Y % (Tiles.Height - NineSliceCornerSize * 2)],
-            _ => Tiles[1, 1]
+            
+            _ => Tiles[1, 1]    // TODO: Support wrapping inside borders
         };
     }
     

@@ -1,14 +1,99 @@
-﻿using MariEngine.Tiles;
+﻿using System.Collections.Generic;
+using System.Linq;
+using MariEngine.Tiles;
 
 namespace MariEngine.Collision;
 
-public class TilemapCollider : Collider
+public class TilemapCollider(Coord? spatialPartitionCellSize = null) : Collider
 {
     private Tilemap tilemap;
+    private readonly Dictionary<Coord, HashSet<TileEntity>> spatialPartition = new();
+
+    private readonly Coord cellSize = spatialPartitionCellSize ?? Coord.One * 8;
+
+    private IEnumerable<Coord> GetCellIndices(TileEntityCollider collider)
+    {
+        return GetCellIndices(GetColliderBoundsAtPos(collider, collider.OwnerEntity.Position));
+    }
+
+    private IEnumerable<Coord> GetCellIndices(CoordBounds bounds)
+    {
+        var topLeft = bounds.TopLeft / cellSize;
+        var bottomRight = bounds.BottomRight / cellSize;
+
+        for (var y = topLeft.Y; y <= bottomRight.Y; y++)
+        {
+            for (var x = topLeft.X; x <= bottomRight.X; x++)
+            {
+                yield return new Coord(x, y);
+            }
+        }
+    }
 
     protected override void OnAttach()
     {
         tilemap = GetComponent<Tilemap>();
+        tilemap.TileEntityAdded += OnTileEntityAdded;
+        tilemap.TileEntityRemoved += OnTileEntityRemoved;
+    }
+    
+    private void OnTileEntityAdded(TileEntity tileEntity)
+    {
+        if (spatialPartitionCellSize is null) return;
+        
+        var collider = tileEntity.GetComponent<TileEntityCollider>();
+        if (collider is null) return;
+
+        foreach (var coord in GetCellIndices(collider))
+        {
+            spatialPartition.TryAdd(coord, []);
+            spatialPartition[coord].Add(tileEntity);
+        }
+        
+        tileEntity.PositionUpdated += OnTileEntityPositionUpdated;
+    }
+
+    private void OnTileEntityPositionUpdated(TileEntity sender, Coord oldPos, Coord newPos)
+    {
+        if (spatialPartitionCellSize is null) return;
+        
+        if (oldPos == newPos)
+            return;
+        
+        var collider = sender.GetComponent<TileEntityCollider>();
+        var oldIndices = GetCellIndices(GetColliderBoundsAtPos(collider, oldPos));
+        var newIndices = GetCellIndices(GetColliderBoundsAtPos(collider, newPos));
+
+        foreach (var index in oldIndices)
+        {
+            if (spatialPartition.TryGetValue(index, out var tileEntities))
+            {
+                tileEntities.Remove(sender);
+                if (spatialPartition[index].Count == 0) spatialPartition.Remove(index);
+            }
+        }
+
+        foreach (var index in newIndices)
+        {
+            if (!spatialPartition.ContainsKey(index)) spatialPartition.Add(index, []);
+            spatialPartition[index].Add(sender);
+        }
+    }
+
+    private void OnTileEntityRemoved(TileEntity tileEntity)
+    {
+        if (spatialPartitionCellSize is null) return;
+        
+        var collider = tileEntity.GetComponent<TileEntityCollider>();
+        if (collider is null) return;
+        
+        foreach (var coord in GetCellIndices(collider))
+        {
+            spatialPartition[coord]?.Remove(tileEntity);
+            if (spatialPartition[coord].Count == 0) spatialPartition.Remove(coord);
+        }
+
+        tileEntity.PositionUpdated -= OnTileEntityPositionUpdated;
     }
 
     public override bool TileEntityCollides(TileEntity tileEntity, Coord coord)
@@ -42,7 +127,13 @@ public class TilemapCollider : Collider
     {
         var collides = false;
         var colliderBounds = GetColliderBoundsAtPos(collider, coord);
-        foreach (var entity in tilemap.TileEntities) // TODO: Use spatial partitioning to avoid checking tile entities far away
+        var cellIndices = GetCellIndices(collider);
+
+        var tileEntitiesToCheck = spatialPartitionCellSize is null
+            ? tilemap.TileEntities
+            : cellIndices.SelectMany(index => spatialPartition.TryGetValue(index, out var value) ? value : []);
+        
+        foreach (var entity in tileEntitiesToCheck)
         {
             if (entity == collider.OwnerEntity) continue;
             

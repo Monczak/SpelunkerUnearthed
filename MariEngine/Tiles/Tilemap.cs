@@ -27,6 +27,9 @@ public class Tilemap : Component
 
     public CoordBounds Bounds => new(Coord.Zero, new Coord(Width, Height));
 
+    public event Action<TileEntity> TileEntityAdded;
+    public event Action<TileEntity> TileEntityRemoved;
+
     private class DescendingComparer<T> : IComparer<T> where T : IComparable<T>
     {
         public int Compare(T x, T y)
@@ -185,6 +188,13 @@ public class Tilemap : Component
     {
         TileEntities.Add(tileEntity);
         tileEntity.AttachToTilemap(this);
+        TileEntityAdded?.Invoke(tileEntity);
+    }
+
+    public void RemoveTileEntity(TileEntity tileEntity)
+    {
+        TileEntities.Remove(tileEntity);
+        TileEntityRemoved?.Invoke(tileEntity);
     }
 
     public IEnumerable<Coord> Coords => Bounds.Coords;

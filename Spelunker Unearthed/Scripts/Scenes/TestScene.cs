@@ -162,18 +162,17 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         tilemapRenderer = new TilemapRenderer(graphics.GraphicsDevice, Camera);
         tilemapEntity.AttachComponent(tilemapRenderer);
 
-        tilemapEntity.AttachComponent(new TilemapCollider());
+        tilemapEntity.AttachComponent(new TilemapCollider(spatialPartitionCellSize: Coord.One * 8));
         tilemapEntity.AttachComponent(new TilemapCameraBounds());
 
         var player = new TileEntity("Player");
+        player.AttachComponent(new TileEntitySpriteRenderer(ServiceRegistry.Get<SpriteLoader>().Get("Player")));
+        player.AttachComponent(new SpriteTileEntityCollider());
         tilemap.AddTileEntity(player);
 
         playerController = new PlayerController();
         player.AttachComponent(playerController);
-
         player.AttachComponent(new LightEmitter { LightSource = new PointLight(new Color(237, 222, 138), 1f, 30) });
-        player.AttachComponent(new TileEntitySpriteRenderer(ServiceRegistry.Get<SpriteLoader>().Get("Player")));
-        player.AttachComponent(new SpriteTileEntityCollider());
 
         AddEntity(tilemapEntity);
 

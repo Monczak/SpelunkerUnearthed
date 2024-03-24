@@ -19,9 +19,11 @@ public class TileEntity(string name)
         get => position;
         set
         {
+            var oldPosition = position;
             position = value;
             foreach (TileEntityComponent component in components.Values)
                 component.OnPositionUpdate();
+            PositionUpdated?.Invoke(this, oldPosition, position);
             Tilemap.StepOn(this, position);
         }
     }
@@ -32,6 +34,9 @@ public class TileEntity(string name)
     public Tilemap Tilemap { get; private set; }
 
     private Dictionary<Type, TileEntityComponent> components = new();
+
+    public delegate void PositionUpdateHandler(TileEntity sender, Coord oldPos, Coord newPos);
+    public event PositionUpdateHandler PositionUpdated;
 
     public T AddComponent<T>() where T : TileEntityComponent
     {
@@ -137,7 +142,7 @@ public class TileEntity(string name)
 
     public void Destroy()
     {
-        Tilemap.TileEntities.Remove(this);
+        Tilemap.RemoveTileEntity(this);
         OnDestroy();
     }
 

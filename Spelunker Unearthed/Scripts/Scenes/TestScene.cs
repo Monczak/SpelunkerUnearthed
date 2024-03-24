@@ -45,6 +45,8 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
     private Canvas canvas;
 
+    private TileEntity testTileEntity;
+    
     public override void Load()
     {
         ServiceRegistry.Get<AudioManager>().LoadBank(this, "Ambience");
@@ -110,6 +112,10 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
             cameraController.SetBounds(0, worldManager.GetRoomCameraBounds(worldManager.CaveSystemManager.CurrentLevel, playerController.OwnerEntity.Position));
             
             biomeDebugLine.SetParams(caveSystemManager.GetBiome(playerController.OwnerEntity.Position));
+            
+            var pos = new Coord(265, 357);
+            if (tilemap.IsInBounds(pos))
+                testTileEntity.Position = pos;
         }
     }
 
@@ -171,8 +177,9 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
         AddEntity(tilemapEntity);
 
-        var testTileEntity = new TileEntity("TestTileEntity");
-        testTileEntity.AttachComponent(new BasicTileEntityRenderer(ServiceRegistry.Get<TileLoader>().Get("Player")));
+        testTileEntity = new TileEntity("TestTileEntity");
+        testTileEntity.AttachComponent(new TileEntitySpriteRenderer(ServiceRegistry.Get<SpriteLoader>().Get("Player")));
+        testTileEntity.AttachComponent(new SpriteTileEntityCollider());
         tilemap.AddTileEntity(testTileEntity);
 
         worldManager = new WorldManager(caveSystemManager, tilemap, playerController, gizmos);

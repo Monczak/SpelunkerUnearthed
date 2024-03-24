@@ -1,10 +1,10 @@
 using MariEngine.Light;
-using MariEngine.Rendering;
 using MariEngine.Services;
+using MariEngine.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MariEngine.Tiles;
+namespace MariEngine.Rendering;
 
 public class BasicTileEntityRenderer(Tile tile) : TileEntityRenderer
 {

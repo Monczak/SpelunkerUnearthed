@@ -1,9 +1,8 @@
 using MariEngine.Components;
 using MariEngine.Light;
-using MariEngine.Rendering;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MariEngine.Tiles;
+namespace MariEngine.Rendering;
 
 public abstract class TileEntityRenderer : TileEntityComponent
 {

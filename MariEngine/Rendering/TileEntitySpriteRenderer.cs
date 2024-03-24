@@ -1,11 +1,11 @@
 using MariEngine.Light;
-using MariEngine.Rendering;
 using MariEngine.Services;
+using MariEngine.Sprites;
 using MariEngine.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MariEngine.Sprites;
+namespace MariEngine.Rendering;
 
 public class TileEntitySpriteRenderer(Sprite sprite) : TileEntityRenderer
 {

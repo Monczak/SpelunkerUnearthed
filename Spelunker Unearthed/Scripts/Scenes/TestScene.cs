@@ -9,6 +9,7 @@ using MariEngine.Debugging;
 using MariEngine.Events;
 using MariEngine.Light;
 using MariEngine.Logging;
+using MariEngine.Rendering;
 using MariEngine.Services;
 using MariEngine.Sprites;
 using MariEngine.Tiles;

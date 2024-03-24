@@ -8,9 +8,8 @@ using MariEngine.Tiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MariEngine.Logging;
-using MariEngine.Rendering;
 
-namespace MariEngine.Tiles;
+namespace MariEngine.Rendering;
 
 public class TilemapRenderer(GraphicsDevice graphicsDevice, Camera camera) : Renderer(graphicsDevice, camera)
 {

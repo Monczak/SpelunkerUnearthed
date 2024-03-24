@@ -62,6 +62,8 @@ public struct Coord(int x, int y)
     public static Vector2 operator *(Vector2 v, Coord c) => new(v.X * c.X, v.Y * c.Y);
     public static Vector2 operator *(Coord c, Vector2 v) => new(v.X * c.X, v.Y * c.Y);
 
+    public static Coord operator -(Coord c) => new(-c.X, -c.Y);
+
     public void Deconstruct(out int x, out int y)
     {
         x = X;

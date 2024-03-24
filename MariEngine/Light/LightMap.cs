@@ -248,15 +248,12 @@ public class LightMap : Component
 
     public Color GetRenderedLight(Coord position)
     {
+        if (!tilemap.IsInBounds(position)) return Color.Black;
+        
         Vector3 color = map[position.X, position.Y] + AmbientLight.ToVector3();
         float max = MathF.Max(color.X, MathF.Max(color.Y, color.Z));
         if (max > 1)
             color /= max;
         return new Color(color);
-    }
-
-    public Vector3 GetLight(Coord position)
-    {
-        return map[position.X, position.Y];
     }
 }

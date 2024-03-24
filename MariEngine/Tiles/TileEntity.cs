@@ -28,9 +28,7 @@ public class TileEntity(string name)
     
     public Vector2 SmoothedPosition { get; private set; }
     public float PositionSmoothing { get; set; }
-    
-    public Tile Tile { get; set; }
-    
+
     public Tilemap Tilemap { get; private set; }
 
     private Dictionary<Type, TileEntityComponent> components = new();
@@ -105,7 +103,7 @@ public class TileEntity(string name)
     public bool HasComponent<T>() where T : Component => components.Keys.Any(c => c.IsAssignableTo(typeof(T)));
 
 
-    public void AttachToTilemap(Tilemap tilemap)
+    internal void AttachToTilemap(Tilemap tilemap)
     {
         Tilemap = tilemap;
         OnAttachToTilemap();

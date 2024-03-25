@@ -168,7 +168,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
         var player = new TileEntity("Player");
         player.AttachComponent(new TileEntitySpriteRenderer(ServiceRegistry.Get<SpriteLoader>().Get("Player")));
-        player.AttachComponent(new SpriteTileEntityCollider());
+        player.AttachComponent(new TileEntitySpriteCollider());
         tilemap.AddTileEntity(player);
 
         playerController = new PlayerController();
@@ -179,7 +179,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
         testTileEntity = new TileEntity("TestTileEntity");
         testTileEntity.AttachComponent(new TileEntitySpriteRenderer(ServiceRegistry.Get<SpriteLoader>().Get("Player")));
-        testTileEntity.AttachComponent(new SpriteTileEntityCollider());
+        testTileEntity.AttachComponent(new TileEntitySpriteCollider());
         tilemap.AddTileEntity(testTileEntity);
 
         worldManager = new WorldManager(caveSystemManager, tilemap, playerController, gizmos);
@@ -214,12 +214,12 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         // col2.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });
         // col2.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });
 
-        // var container1 = canvas.Root.AddChild(new FlexLayoutNode
-        //     { Background = ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"), Padding = Coord.One });
-        // var container2 = canvas.Root.AddChild(new FlexLayoutNode());
-        //
-        // var text = container1.AddChild(new TextComponent("According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway. Because bees don't care what humans think is impossible.") { WordWrap = WordWrap.Wrap, LineSpacing = 1 });
-        // var text2 = container2.AddChild(new TextComponent("Test 123"));
+        var container1 = canvas.Root.AddChild(new FlexLayoutNode
+            { Background = ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"), Padding = Coord.One });
+        var container2 = canvas.Root.AddChild(new FlexLayoutNode());
+        
+        var text = container1.AddChild(new TextComponent("According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway. Because bees don't care what humans think is impossible.") { WordWrap = WordWrap.Wrap, LineSpacing = 1 });
+        var text2 = container2.AddChild(new TextComponent("Test 123"));
         
         canvas.GetComponent<CanvasRenderer>().Redraw();
     }

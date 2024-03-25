@@ -3,7 +3,7 @@ using MariEngine.Sprites;
 
 namespace MariEngine.Collision;
 
-public class SpriteTileEntityCollider : TileEntityCollider
+public class TileEntitySpriteCollider : TileEntityCollider
 {
     private Sprite sprite;
 

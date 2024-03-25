@@ -25,14 +25,14 @@ public class Sprite : Resource<SpriteData>
             var c when c.X >= bounds.Size.X - NineSliceCornerSize && c.Y >= bounds.Size.Y - NineSliceCornerSize => Tiles[c.X - bounds.Size.X + Tiles.Width, c.Y - bounds.Size.Y + Tiles.Height],
             
             // Horizontal Edges
-            var c when c.X >= NineSliceCornerSize && c.Y < NineSliceCornerSize => Tiles[c.X % (Tiles.Width - NineSliceCornerSize * 2), c.Y],
-            var c when c.X >= NineSliceCornerSize && c.Y >= bounds.Size.Y - NineSliceCornerSize => Tiles[c.X % (Tiles.Width - NineSliceCornerSize * 2), c.Y - bounds.Size.Y + Tiles.Height],
+            var c when c.X >= NineSliceCornerSize && c.Y < NineSliceCornerSize => Tiles[c.X % (Tiles.Width - NineSliceCornerSize * 2) + NineSliceCornerSize, c.Y],
+            var c when c.X >= NineSliceCornerSize && c.Y >= bounds.Size.Y - NineSliceCornerSize => Tiles[c.X % (Tiles.Width - NineSliceCornerSize * 2) + NineSliceCornerSize, c.Y - bounds.Size.Y + Tiles.Height],
             
             // Vertical Edges
-            var c when c.X < NineSliceCornerSize && c.Y >= NineSliceCornerSize => Tiles[c.X, c.Y % (Tiles.Height - NineSliceCornerSize * 2)],
-            var c when c.X >= bounds.Size.X - NineSliceCornerSize && c.Y >= NineSliceCornerSize => Tiles[c.X - bounds.Size.X + Tiles.Width, c.Y % (Tiles.Height - NineSliceCornerSize * 2)],
+            var c when c.X < NineSliceCornerSize && c.Y >= NineSliceCornerSize => Tiles[c.X, c.Y % (Tiles.Height - NineSliceCornerSize * 2) + NineSliceCornerSize],
+            var c when c.X >= bounds.Size.X - NineSliceCornerSize && c.Y >= NineSliceCornerSize => Tiles[c.X - bounds.Size.X + Tiles.Width, c.Y % (Tiles.Height - NineSliceCornerSize * 2) + NineSliceCornerSize],
             
-            _ => Tiles[1, 1]    // TODO: Support wrapping inside borders
+            var c => Tiles[c.X % (Tiles.Width - NineSliceCornerSize * 2) + NineSliceCornerSize, c.Y % (Tiles.Height - NineSliceCornerSize * 2) + NineSliceCornerSize]
         };
     }
     
@@ -55,7 +55,7 @@ public class Sprite : Resource<SpriteData>
                     ' ' => null,
                     '.' => ServiceRegistry.Get<TileLoader>().Get("Nothing"),
                     _ => ServiceRegistry.Get<TileLoader>().Get(keys[tileChar.ToString()])
-                };;
+                };
             }
         }
 

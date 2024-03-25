@@ -1,8 +1,10 @@
 ﻿Tiles:
-  - "aaa"
-  - "aba"
-  - "aaa"
+  - "caaaac"
+  - "cabbac"
+  - "cbaabc"
+  - "caaaac"
 Keys:
   a: Basalt
   b: Nothing
+  c: Stone
 NineSliceCornerSize: 1

@@ -110,12 +110,16 @@ public class Tilemap : Component
         }
     }
     
-    public void Mine(Coord tileCoord, int layerId)
+    public bool Mine(Coord tileCoord, int layerId)
     {
         // TODO: Update light map for all tile entity light emitters that affect this tile when tilemap is changed
-        Get(tileCoord, layerId).OnMined(tileCoord);
+        var tile = Get(tileCoord, layerId);
+        tile?.OnMined(tileCoord);
+        var wasEmpty = tile is null || tile.Id == "Nothing";
         
         Place(ServiceRegistry.Get<TileLoader>().Get("Nothing"), tileCoord, layerId);
+
+        return !wasEmpty;
     }
 
     public void StepOn(TileEntity steppingEntity, Coord tileCoord)

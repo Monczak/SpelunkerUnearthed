@@ -1,6 +1,4 @@
 ﻿Tiles:
-  - " a "
-  - "aaa"
-  - " a "
+  - "a"
 Keys:
   a: Player

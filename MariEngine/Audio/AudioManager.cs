@@ -3,12 +3,17 @@ using System.Linq;
 using FmodForFoxes.Studio;
 using MariEngine.Logging;
 using MariEngine.Services;
+using MariEngine.Utils;
 
 namespace MariEngine.Audio;
 
 public class AudioManager : Service
 {
     private readonly Dictionary<object, Dictionary<string, Bank>> banks = new();
+
+    public IAudioListener Listener { get; private set; }
+
+    public void SetListener(IAudioListener listener) => Listener = listener;
 
     public Bank LoadBank(object context, string name)
     {
@@ -56,10 +61,10 @@ public class AudioManager : Service
         }
     }
 
-    public EventInstance GetEvent(string path)
+    public AudioEvent GetEvent(string path, bool oneShot = false)
     {
         var eventDescription = StudioSystem.GetEvent(path);
         eventDescription.LoadSampleData();
-        return eventDescription.CreateInstance();
+        return new AudioEvent(eventDescription, Listener, oneShot);
     }
 }

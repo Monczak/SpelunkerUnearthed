@@ -1,12 +1,13 @@
 ﻿using System;
 using MariEngine.Services;
 using MariEngine.Tiles;
+using MariEngine.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace MariEngine.Rendering;
 
-public class Camera(GameWindow window, GraphicsDeviceManager graphics)
+public class Camera(GameWindow window, GraphicsDeviceManager graphics) : IAudioListener
 {
     private GraphicsDeviceManager graphics = graphics;
     private TileAtlas tileAtlas = ServiceRegistry.Get<TileAtlas>();
@@ -35,4 +36,6 @@ public class Camera(GameWindow window, GraphicsDeviceManager graphics)
 
     public Bounds ViewingWindow => Bounds.MakeCorners(ScreenToWorldPoint(Vector2.Zero),
         ScreenToWorldPoint(new Vector2(window.ClientBounds.Width, window.ClientBounds.Height)));
+
+    public Vector2 GetPosition() => WorldPosition;
 }

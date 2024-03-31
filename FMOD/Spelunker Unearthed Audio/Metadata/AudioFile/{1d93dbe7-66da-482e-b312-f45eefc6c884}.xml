@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{1d93dbe7-66da-482e-b312-f45eefc6c884}">
+		<property name="assetPath">
+			<value>SFX/mine-02.ogg</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>96</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>0.74534374999999997</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{8e1310fe-f4c5-477c-b55a-009a1edcf74b}</destination>
+		</relationship>
+	</object>
+</objects>

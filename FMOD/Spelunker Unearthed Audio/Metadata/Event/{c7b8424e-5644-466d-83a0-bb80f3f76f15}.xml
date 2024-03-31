@@ -62,7 +62,11 @@
 			<destination>{a608f963-7a6c-4748-bacd-4e441cb8e84d}</destination>
 		</relationship>
 	</object>
-	<object class="EventAutomatableProperties" id="{0375a791-9ecd-4844-a47b-ab9889c17725}" />
+	<object class="EventAutomatableProperties" id="{0375a791-9ecd-4844-a47b-ab9889c17725}">
+		<property name="dopplerEnabled">
+			<value>true</value>
+		</property>
+	</object>
 	<object class="MarkerTrack" id="{ebab49fb-7f36-4eae-90bd-8261f830cc6d}" />
 	<object class="GroupTrack" id="{62c022c3-592a-4686-b219-7042a13f047e}">
 		<relationship name="automationTracks">
@@ -352,7 +356,11 @@
 			<destination>{cbac9420-b8f0-4d44-a6b6-db870804a41f}</destination>
 		</relationship>
 	</object>
-	<object class="MixerBusPanner" id="{d1d98649-2d46-4df1-8bdc-2d5f2158a6a4}" />
+	<object class="MixerBusPanner" id="{d1d98649-2d46-4df1-8bdc-2d5f2158a6a4}">
+		<property name="surroundPanExtent">
+			<value>0</value>
+		</property>
+	</object>
 	<object class="MixerBusFader" id="{ea9aaddc-13e1-4167-a0d0-58c077eaf5ba}" />
 	<object class="ADSRModulator" id="{be527bf2-e286-4c92-b85f-2409d5097e28}">
 		<property name="nameOfPropertyBeingModulated">

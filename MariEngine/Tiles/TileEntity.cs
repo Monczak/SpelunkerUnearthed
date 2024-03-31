@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using MariEngine.Components;
+using MariEngine.Utils;
 using Microsoft.Xna.Framework;
 
 namespace MariEngine.Tiles;
 
 // TODO: Refactor this to use a generic base class for a component container
-public class TileEntity(string name)
+public class TileEntity(string name) : IAudioListener
 {
     public string Name { get; set; } = name;
 
@@ -150,4 +151,6 @@ public class TileEntity(string name)
     {
         
     }
+
+    public Vector2 GetPosition() => Tilemap.Vector2ToWorldPoint(SmoothedPosition);
 }

@@ -3,6 +3,7 @@ using FmodForFoxes.Studio;
 using MariEngine.Audio;
 using MariEngine.Components;
 using MariEngine.Services;
+using Microsoft.Xna.Framework;
 using SpelunkerUnearthed.Scripts.Managers;
 using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
 
@@ -10,7 +11,7 @@ namespace SpelunkerUnearthed.Scripts.Components;
 
 public class AmbienceController : Component
 {
-    private readonly EventInstance ambienceEvent = ServiceRegistry.Get<AudioManager>().GetEvent("event:/Ambience");
+    private readonly AudioEvent ambienceEvent = ServiceRegistry.Get<AudioManager>().GetEvent("event:/Ambience");
 
     public void Play()
     {

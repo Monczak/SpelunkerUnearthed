@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using MariEngine;
+using MariEngine.Audio;
 using MariEngine.Collision;
 using MariEngine.Components;
 using MariEngine.Debugging;
@@ -62,8 +63,15 @@ public class PlayerController : TileEntityComponent
 
     private void Mine()
     {
-        if (OwnerEntity.Tilemap.IsInBounds(OwnerEntity.Position + facingDirection))
-            OwnerEntity.Tilemap.Mine(OwnerEntity.Position + facingDirection, Tilemap.BaseLayer);
+        var tilePos = OwnerEntity.Position + facingDirection;
+        if (OwnerEntity.Tilemap.IsInBounds(tilePos))
+        {
+            var mined = OwnerEntity.Tilemap.Mine(tilePos, Tilemap.BaseLayer);
+            if (mined)
+            {
+                GetComponent<TileEntityAudioSource>().Play(tilePos);
+            }
+        }
     }
 
     private void OnUp()

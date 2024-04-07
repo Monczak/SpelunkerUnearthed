@@ -30,6 +30,10 @@ public class Tilemap : Component
     public event Action<TileEntity> TileEntityAdded;
     public event Action<TileEntity> TileEntityRemoved;
 
+    public delegate void TileUpdateDelegate(Coord position, Tile tile);
+
+    public event TileUpdateDelegate TileMined;
+
     private class DescendingComparer<T> : IComparer<T> where T : IComparable<T>
     {
         public int Compare(T x, T y)
@@ -117,9 +121,13 @@ public class Tilemap : Component
         // TODO: Update light map for all tile entity light emitters that affect this tile when tilemap is changed
         var tile = Get(tileCoord, layerId);
         tile?.OnMined(tileCoord);
+        
         var wasEmpty = tile is null || tile.Id == "Nothing";
         
         Place(ServiceRegistry.Get<TileLoader>().Get("Nothing"), tileCoord, layerId);
+        
+        if (!wasEmpty)
+            TileMined?.Invoke(tileCoord, tile);
 
         return !wasEmpty;
     }

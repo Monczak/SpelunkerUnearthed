@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework;
 
 namespace SpelunkerUnearthed.Scripts.Audio;
 
-public class WorldReverbAutomation(TileEntity emitter) : AudioParameterAutomation
+public class WorldReverbTrait(Tilemap tilemap) : AudioTrait
 {
     private const int EnvironmentEvaluationRayCount = 8;
 
@@ -20,7 +20,7 @@ public class WorldReverbAutomation(TileEntity emitter) : AudioParameterAutomatio
         for (int i = 0; i < EnvironmentEvaluationRayCount; i++)
         {
             var rayAngle = (float)i / EnvironmentEvaluationRayCount * MathF.Tau;
-            var ray = new Raycasting.Ray((Vector2)emitter.Position,
+            var ray = new Raycasting.Ray(GetPosition(),
                 new Vector2(MathF.Cos(rayAngle), MathF.Sin(rayAngle)));
             rays.Add(ray);
         }
@@ -35,7 +35,7 @@ public class WorldReverbAutomation(TileEntity emitter) : AudioParameterAutomatio
         var raysHit = 0;
         foreach (var ray in GetEnvironmentEvaluationRays())
         {
-            var hitInfo = Raycasting.Raycast(emitter.Tilemap.GetLayer(Tilemap.BaseLayer), ray);
+            var hitInfo = Raycasting.Raycast(tilemap.GetLayer(Tilemap.BaseLayer), ray);
 
             var material = hitInfo is null ? ServiceRegistry.Get<MaterialLoader>().Get("None") : hitInfo.Value.Tile.Material;
             reflectivitySum += material.SoundReflectivity;

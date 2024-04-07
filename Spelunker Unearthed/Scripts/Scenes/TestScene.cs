@@ -167,6 +167,12 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
         tilemapEntity.AttachComponent(new TilemapCollider(spatialPartitionCellSize: Coord.One * 8));
         tilemapEntity.AttachComponent(new TilemapCameraBounds());
+        
+        tilemapEntity.AttachComponent(new TilemapAudio(new PositionalAudioSource()
+            .WithEvent("Mine", ServiceRegistry.Get<AudioManager>().GetEvent("event:/Mining", oneShot: true))
+            .WithAutomation(new WorldReverbTrait(tilemap))
+            .WithAutomation(new WorldAttenuationTrait(tilemap))
+        ));
 
         var player = new TileEntity("Player");
         ServiceRegistry.Get<AudioManager>().SetListener(player);
@@ -187,9 +193,9 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         
         var testAudio = new TileEntityAudioSource(new PositionalAudioSource()
             .WithEvent("Test", ServiceRegistry.Get<AudioManager>().GetEvent("event:/Mining", oneShot: true))
-            .WithAutomation(new WorldReverbAutomation(testTileEntity))
-            .WithAutomation(new WorldAttenuationAutomation(testTileEntity)
-        ));
+            .WithAutomation(new WorldReverbTrait(tilemap).WithPositionProvider(() => (Vector2)testTileEntity.Position))
+            .WithAutomation(new WorldAttenuationTrait(tilemap).WithPositionProvider(() => (Vector2)testTileEntity.Position))
+        );
         testTileEntity.AttachComponent(testAudio);
         testTileEntity.AttachComponent(new AudioTester());
         tilemap.AddTileEntity(testTileEntity);

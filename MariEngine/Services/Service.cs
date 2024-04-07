@@ -1,4 +1,6 @@
-﻿namespace MariEngine.Services;
+﻿using Microsoft.Xna.Framework;
+
+namespace MariEngine.Services;
 
 public class Service
 {
@@ -7,7 +9,7 @@ public class Service
         
     }
 
-    public virtual void Update()
+    public virtual void Update(GameTime gameTime)
     {
         
     }

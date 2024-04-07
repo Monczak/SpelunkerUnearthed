@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MariEngine.Logging;
+using Microsoft.Xna.Framework;
 
 namespace MariEngine.Services;
 
@@ -26,9 +27,9 @@ public static class ServiceRegistry
         return (T)services[typeof(T)];
     }
 
-    public static void UpdateServices()
+    public static void UpdateServices(GameTime gameTime)
     {
         foreach (Service service in services.Values)
-            service.Update();
+            service.Update(gameTime);
     }
 }

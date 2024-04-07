@@ -55,7 +55,7 @@ public class InputManager : Service
         releasedHandlers[inputEvents[inputName]].Remove(handler);
     }
 
-    public override void Update()
+    public override void Update(GameTime gameTime)
     {
         var state = Keyboard.GetState();
         pressedKeys = [..state.GetPressedKeys()];

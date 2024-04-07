@@ -17,7 +17,7 @@ public static class MathUtils
 
     public static float Lerp(float a, float b, float t)
     {
-        return MathHelper.Clamp(LerpUnclamped(a, b, t), a, b);
+        return Clamp(LerpUnclamped(a, b, t), a, b);
     }
 
     public static float InverseLerp(float a, float b, float v)

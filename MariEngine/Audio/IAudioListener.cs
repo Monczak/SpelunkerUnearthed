@@ -1,8 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 
 namespace MariEngine.Utils;
 
 public interface IAudioListener
 {
-    public Vector2 GetPosition();
+    Vector2 GetPosition();
 }

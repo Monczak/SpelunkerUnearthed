@@ -37,6 +37,7 @@ public class SpelunkerUnearthedGame : Game
     private DebugScreenLine<TimeSpan> potentialUpdateTimeDebugLine;
     private DebugScreenLine<TimeSpan> drawTimeDebugLine;
     private DebugScreenLine<TimeSpan> potentialDrawTimeDebugLine;
+    private DebugScreenLine<int> activeAudioEventsDebugLine;
     
     private Stopwatch updateTimeStopwatch;
     private Stopwatch drawTimeStopwatch;
@@ -122,10 +123,13 @@ public class SpelunkerUnearthedGame : Game
         potentialDrawTimeDebugLine = new DebugScreenLine<TimeSpan>(timeSpan =>
             $"Potential FPS: {1.0f / timeSpan.TotalSeconds:F3} FPS ({timeSpan.TotalMilliseconds:F3} ms per frame)");
 
+        activeAudioEventsDebugLine = new DebugScreenLine<int>(count => $"Active audio events: {count}");
+
         debugScreen.AddLine(drawTimeDebugLine);
         debugScreen.AddLine(potentialDrawTimeDebugLine);
         debugScreen.AddLine(updateTimeDebugLine);
         debugScreen.AddLine(potentialUpdateTimeDebugLine);
+        debugScreen.AddLine(activeAudioEventsDebugLine);
     }
 
     private void InitializeInputs()
@@ -185,7 +189,7 @@ public class SpelunkerUnearthedGame : Game
         updateTimeStopwatch.Reset();
         updateTimeStopwatch.Start();
         
-        ServiceRegistry.UpdateServices();
+        ServiceRegistry.UpdateServices(gameTime);
         scene.Update(gameTime);
 
         updateTimeStopwatch.Stop();
@@ -210,6 +214,8 @@ public class SpelunkerUnearthedGame : Game
         drawTimeStopwatch.Stop();
         potentialDrawTimeDebugLine.SetParams(drawTimeStopwatch.Elapsed);
         drawTimeDebugLine.SetParams(gameTime.ElapsedGameTime);
+        
+        activeAudioEventsDebugLine.SetParams(ServiceRegistry.Get<AudioManager>().ActiveEventCount);
         
         base.Draw(gameTime);
     }

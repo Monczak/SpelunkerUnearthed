@@ -61,7 +61,7 @@
 			<value>1</value>
 		</property>
 		<property name="soundSize">
-			<value>12</value>
+			<value>12.5</value>
 		</property>
 		<property name="userStereoSeparation">
 			<value>-79.12043</value>

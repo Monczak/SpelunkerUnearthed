@@ -11,7 +11,7 @@ namespace SpelunkerUnearthed.Scripts.Components;
 
 public class AmbienceController : Component
 {
-    private readonly AudioEvent ambienceEvent = ServiceRegistry.Get<AudioManager>().GetEvent("event:/Ambience");
+    private readonly AudioEvent ambienceEvent = ServiceRegistry.Get<AudioManager>().GetEvent("event:/Ambience", global: true);
 
     public void Play()
     {

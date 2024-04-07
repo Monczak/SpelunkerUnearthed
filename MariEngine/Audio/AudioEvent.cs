@@ -12,8 +12,8 @@ namespace MariEngine.Audio;
 // TODO: This needs some cleanup (converting Vector2 to Vector3)
 public class AudioEvent : IDisposable
 {
-    private readonly IAudioListener listener;
     private readonly bool oneShot;
+    private readonly bool global;
     
     private readonly List<EventInstance> instances = [];
     private int instanceIndex;
@@ -22,10 +22,14 @@ public class AudioEvent : IDisposable
 
     private const int OneShotInstanceLimit = 10;
 
-    public AudioEvent(EventDescription description, IAudioListener listener, bool oneShot = false)
+    private Vector2 listenerPos;
+
+    public bool Disposed { get; private set; } = false;
+
+    public AudioEvent(EventDescription description, bool oneShot = false, bool global = false)
     {
-        this.listener = listener;
         this.oneShot = oneShot;
+        this.global = global;
         
         if (oneShot)
         {
@@ -37,22 +41,34 @@ public class AudioEvent : IDisposable
             instances.Add(description.CreateInstance());
         }
     }
+    
+    internal void SetListenerPosition(Vector2 pos)
+    {
+        listenerPos = pos;
+        foreach (var instance in instances)
+        {
+            SetupEventPosition3D(instance, position);
+        }
+    }
 
-    private EventInstance GetEvent(Vector2? positionOverride = null)
+    private EventInstance GetEvent()
     {
         var theEvent = instances[instanceIndex];
         instanceIndex = (instanceIndex + 1) % instances.Count; 
-        
-        var relativePos = GetPositionRelativeToListener(positionOverride ?? position);
-        theEvent.Position3D = new Vector3(relativePos.X, relativePos.Y, 0);
-        
+
         foreach (var (name, (value, ignoreSeekSpeed)) in parameters)
             theEvent.SetParameterValue(name, value, ignoreSeekSpeed);
         
         return theEvent;
     }
-    
-    public void Start(Vector2? positionOverride = null) => GetEvent(positionOverride).Start();
+
+    private void SetupEventPosition3D(EventInstance theEvent, Vector2 pos)
+    {
+        var relativePos = GetPositionRelativeToListener(pos);
+        theEvent.Position3D = new Vector3(relativePos.X, relativePos.Y, 0);
+    }
+
+    public void Start() => GetEvent().Start();
 
     public void Stop()
     {
@@ -70,9 +86,8 @@ public class AudioEvent : IDisposable
 
     private Vector2 GetPositionRelativeToListener(Vector2 pos)
     {
-        if (listener is null) return Vector2.Zero;
+        if (global) return Vector2.Zero;
         
-        var listenerPos = listener.GetPosition();
         var delta = pos - listenerPos;
         return delta;
     }
@@ -80,12 +95,6 @@ public class AudioEvent : IDisposable
     public void SetPosition(Vector2 pos)
     {
         position = pos;
-        
-        if (!oneShot)
-        {
-            var relativePos = GetPositionRelativeToListener(position);
-            instances[0].Position3D = new Vector3(relativePos.X, relativePos.Y, 0);
-        }
     }
 
     public void SetPosition(Coord coord) => SetPosition((Vector2)coord);
@@ -94,5 +103,6 @@ public class AudioEvent : IDisposable
     {
         foreach (var instance in instances)
             instance.Dispose();
+        Disposed = true;
     }
 }

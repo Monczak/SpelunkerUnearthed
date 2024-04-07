@@ -4,6 +4,7 @@ using FmodForFoxes.Studio;
 using MariEngine.Logging;
 using MariEngine.Services;
 using MariEngine.Utils;
+using Microsoft.Xna.Framework;
 
 namespace MariEngine.Audio;
 
@@ -11,7 +12,13 @@ public class AudioManager : Service
 {
     private readonly Dictionary<object, Dictionary<string, Bank>> banks = new();
 
+    private readonly HashSet<AudioEvent> activeEvents = [];
+    private const float ListenerPositionSmoothing = 10f;
+
+    public int ActiveEventCount => activeEvents.Count;
+
     public IAudioListener Listener { get; private set; }
+    private Vector2 smoothedListenerPos;
 
     public void SetListener(IAudioListener listener) => Listener = listener;
 
@@ -61,10 +68,28 @@ public class AudioManager : Service
         }
     }
 
-    public AudioEvent GetEvent(string path, bool oneShot = false)
+    public AudioEvent GetEvent(string path, bool oneShot = false, bool global = false)
     {
         var eventDescription = StudioSystem.GetEvent(path);
         eventDescription.LoadSampleData();
-        return new AudioEvent(eventDescription, Listener, oneShot);
+        
+        var audioEvent = new AudioEvent(eventDescription, oneShot, global);
+        activeEvents.Add(audioEvent);
+        return audioEvent;
+    }
+
+    public override void Update(GameTime gameTime)
+    {
+        base.Update(gameTime);
+
+        smoothedListenerPos = Vector2.Lerp(smoothedListenerPos, Listener.GetPosition(),
+            (float)(ListenerPositionSmoothing * gameTime.ElapsedGameTime.TotalSeconds));
+        
+        foreach (var audioEvent in activeEvents)
+        {
+            audioEvent.SetListenerPosition(smoothedListenerPos);
+        }
+
+        activeEvents.RemoveWhere(@event => @event.Disposed);
     }
 }

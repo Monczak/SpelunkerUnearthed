@@ -22,9 +22,12 @@ public class TileEntity(string name) : IAudioListener
         {
             var oldPosition = position;
             position = value;
+            
             foreach (TileEntityComponent component in components.Values)
                 component.OnPositionUpdate();
+            
             PositionUpdated?.Invoke(this, oldPosition, position);
+            
             Tilemap.StepOn(this, position);
         }
     }
@@ -36,8 +39,8 @@ public class TileEntity(string name) : IAudioListener
 
     private Dictionary<Type, TileEntityComponent> components = new();
 
-    public delegate void PositionUpdateHandler(TileEntity sender, Coord oldPos, Coord newPos);
-    public event PositionUpdateHandler PositionUpdated;
+    public delegate void PositionUpdatedHandler(TileEntity sender, Coord oldPos, Coord newPos);
+    public event PositionUpdatedHandler PositionUpdated;
 
     public T AddComponent<T>() where T : TileEntityComponent
     {
@@ -152,5 +155,5 @@ public class TileEntity(string name) : IAudioListener
         
     }
 
-    public Vector2 GetPosition() => Tilemap.Vector2ToWorldPoint(SmoothedPosition);
+    public Vector2 GetPosition() => Tilemap.CoordToWorldPoint(Position);
 }

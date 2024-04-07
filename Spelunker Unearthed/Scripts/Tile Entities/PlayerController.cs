@@ -67,11 +67,7 @@ public class PlayerController : TileEntityComponent
         var tilePos = OwnerEntity.Position + facingDirection;
         if (OwnerEntity.Tilemap.IsInBounds(tilePos))
         {
-            var mined = OwnerEntity.Tilemap.Mine(tilePos, Tilemap.BaseLayer);
-            if (mined)
-            {
-                GetComponent<TileEntityAudioSource>().Play("Mine", tilePos);
-            }
+            OwnerEntity.Tilemap.Mine(tilePos, Tilemap.BaseLayer);
         }
     }
 

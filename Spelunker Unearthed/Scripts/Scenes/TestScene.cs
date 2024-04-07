@@ -174,7 +174,8 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         player.AttachComponent(new TileEntitySpriteRenderer(ServiceRegistry.Get<SpriteLoader>().Get("Player")));
         player.AttachComponent(new TileEntitySpriteCollider());
         
-        var mineAudio = new TileEntityAudioSource(ServiceRegistry.Get<AudioManager>().GetEvent("event:/Mining", oneShot: true));    // TODO: This is only for testing, the player wouldn't normally play tile breaking sounds
+        var mineAudio = new TileEntityAudioSource()
+            .WithEvent("Mine", ServiceRegistry.Get<AudioManager>().GetEvent("event:/Mining", oneShot: true));    // TODO: This is only for testing, the player wouldn't normally play tile breaking sounds
         mineAudio.AddAutomation(new WorldReverbAutomation(player));
         player.AttachComponent(mineAudio);
         tilemap.AddTileEntity(player);

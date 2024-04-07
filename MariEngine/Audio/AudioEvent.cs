@@ -5,22 +5,45 @@ using FmodForFoxes;
 using MariEngine.Utils;
 using Microsoft.Xna.Framework;
 using FmodForFoxes.Studio;
+using MariEngine.Logging;
 
 namespace MariEngine.Audio;
 
 // TODO: This needs some cleanup (converting Vector2 to Vector3)
-public class AudioEvent(EventDescription description, IAudioListener listener, bool oneShot = false) : IDisposable
+public class AudioEvent : IDisposable
 {
-    private readonly EventInstance fmodEvent = oneShot ? null : description.CreateInstance();
+    private readonly IAudioListener listener;
+    private readonly bool oneShot;
+    
+    private readonly List<EventInstance> instances = [];
+    private int instanceIndex;
     private Vector2 position;
     private readonly Dictionary<string, (float, bool)> parameters = new();
 
+    private const int OneShotInstanceLimit = 10;
+
+    public AudioEvent(EventDescription description, IAudioListener listener, bool oneShot = false)
+    {
+        this.listener = listener;
+        this.oneShot = oneShot;
+        
+        if (oneShot)
+        {
+            for (var i = 0; i < OneShotInstanceLimit; i++)
+                instances.Add(description.CreateInstance());
+        }
+        else
+        {
+            instances.Add(description.CreateInstance());
+        }
+    }
+
     private EventInstance GetEvent(Vector2? positionOverride = null)
     {
-        // TODO: Cleanup one-shot events (they may not be disposed properly)
-        var theEvent = oneShot ? description.CreateInstance() : fmodEvent;
+        var theEvent = instances[instanceIndex];
+        instanceIndex = (instanceIndex + 1) % instances.Count; 
+        
         var relativePos = GetPositionRelativeToListener(positionOverride ?? position);
-
         theEvent.Position3D = new Vector3(relativePos.X, relativePos.Y, 0);
         
         foreach (var (name, (value, ignoreSeekSpeed)) in parameters)
@@ -30,12 +53,19 @@ public class AudioEvent(EventDescription description, IAudioListener listener, b
     }
     
     public void Start(Vector2? positionOverride = null) => GetEvent(positionOverride).Start();
-    public void Stop() => fmodEvent?.Stop();
+
+    public void Stop()
+    {
+        foreach (var instance in instances)
+            instance.Stop();
+    }
 
     public void SetParameterValue(string name, float value, bool ignoreSeekSpeed = false)
     {
         parameters[name] = (value, ignoreSeekSpeed);
-        fmodEvent?.SetParameterValue(name, value, ignoreSeekSpeed);
+        
+        if (!oneShot)
+            instances[0].SetParameterValue(name, value, ignoreSeekSpeed);
     }
 
     private Vector2 GetPositionRelativeToListener(Vector2 pos)
@@ -50,11 +80,11 @@ public class AudioEvent(EventDescription description, IAudioListener listener, b
     public void SetPosition(Vector2 pos)
     {
         position = pos;
-
-        if (fmodEvent is not null)
+        
+        if (!oneShot)
         {
-            var relativePos = GetPositionRelativeToListener(pos);
-            fmodEvent.Position3D = new Vector3(relativePos.X, relativePos.Y, 0);
+            var relativePos = GetPositionRelativeToListener(position);
+            instances[0].Position3D = new Vector3(relativePos.X, relativePos.Y, 0);
         }
     }
 
@@ -62,6 +92,7 @@ public class AudioEvent(EventDescription description, IAudioListener listener, b
 
     public void Dispose()
     {
-        fmodEvent?.Dispose();
+        foreach (var instance in instances)
+            instance.Dispose();
     }
 }

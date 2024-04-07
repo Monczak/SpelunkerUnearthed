@@ -70,7 +70,7 @@ public class PlayerController : TileEntityComponent
             var mined = OwnerEntity.Tilemap.Mine(tilePos, Tilemap.BaseLayer);
             if (mined)
             {
-                GetComponent<TileEntityAudioSource>().Play(tilePos);
+                GetComponent<TileEntityAudioSource>().Play("Mine", tilePos);
             }
         }
     }

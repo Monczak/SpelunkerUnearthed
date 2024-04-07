@@ -47,14 +47,15 @@ public class WorldReverbAutomation(TileEntity emitter) : AudioParameterAutomatio
         if (raysHit == 0)
             return;
 
+        // TODO: Improve reverb parameter calc to make it more realistic
         var avgReflectivity = reflectivitySum / raysHit;
         var avgDistance = MathF.Pow(distanceProduct, 1f / raysHit);
 
         var reverbTime = MathF.Pow(avgReflectivity, 1.8f);
         var reverbEarlyLate = MathUtils.Clamp(MathUtils.InverseLerp(0, 10, avgDistance), 0, 1);
-        var reverbWet = (reverbTime + reverbEarlyLate) / 3;
+        var reverbWet = MathUtils.Clamp((reverbTime + reverbEarlyLate) / 3, 0, 0.4f);
         
-        Logger.LogDebug($"Time: {reverbTime} Wet: {reverbWet} EarlyLate: {reverbEarlyLate}");
+        // Logger.LogDebug($"Time: {reverbTime} Wet: {reverbWet} EarlyLate: {reverbEarlyLate}");
         
         audioEvent.SetParameterValue("Reverb Time", reverbTime);
         audioEvent.SetParameterValue("Reverb Wet", reverbWet);

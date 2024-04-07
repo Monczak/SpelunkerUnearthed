@@ -4,17 +4,26 @@ using Microsoft.Xna.Framework;
 
 namespace MariEngine.Audio;
 
-public class TileEntityAudioSource(AudioEvent audioEvent) : TileEntityComponent
+public class TileEntityAudioSource : TileEntityComponent
 {
-    private List<AudioParameterAutomation> automations = [];
+    private readonly Dictionary<string, AudioEvent> events = new();
+    private readonly List<AudioParameterAutomation> automations = [];
 
+    public TileEntityAudioSource WithEvent(string eventId, AudioEvent audioEvent)
+    {
+        events.Add(eventId, audioEvent);
+        return this;
+    }
+    
     public void AddAutomation(AudioParameterAutomation automation)
     {
         automations.Add(automation);
     }
     
-    public void Play(Coord? positionOverride = null)
+    public void Play(string eventId, Coord? positionOverride = null)
     {
+        var audioEvent = events[eventId];
+        
         foreach (var automation in automations) 
             automation.Apply(audioEvent);
         
@@ -30,13 +39,17 @@ public class TileEntityAudioSource(AudioEvent audioEvent) : TileEntityComponent
     
     protected internal override void OnPositionUpdate()
     {
-        audioEvent.SetPosition(GetWorldPos(OwnerEntity.SmoothedPosition));
+        foreach (var audioEvent in events.Values)
+            audioEvent.SetPosition(GetWorldPos(OwnerEntity.SmoothedPosition));
+        
         base.OnPositionUpdate();
     }
 
     protected override void OnDestroy()
     {
-        audioEvent.Dispose();
+        foreach (var audioEvent in events.Values)
+            audioEvent.Dispose();
+        
         base.OnDestroy();
     }
 }

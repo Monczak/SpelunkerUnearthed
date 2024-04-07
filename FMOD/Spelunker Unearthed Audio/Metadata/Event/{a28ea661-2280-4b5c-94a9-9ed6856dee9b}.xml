@@ -41,6 +41,9 @@
 		</relationship>
 	</object>
 	<object class="MasterTrack" id="{f50a3ce9-9a95-49c3-a00c-117163e7a425}">
+		<relationship name="automationTracks">
+			<destination>{bb66077d-79d6-4346-b258-fa2bce5c81dc}</destination>
+		</relationship>
 		<relationship name="modules">
 			<destination>{282b3fde-44f8-4a55-ae78-66702d46417d}</destination>
 		</relationship>
@@ -59,7 +62,11 @@
 			<destination>{a608f963-7a6c-4748-bacd-4e441cb8e84d}</destination>
 		</relationship>
 	</object>
-	<object class="EventAutomatableProperties" id="{a47a3907-36a5-4f45-adcb-ee017bf8db08}" />
+	<object class="EventAutomatableProperties" id="{a47a3907-36a5-4f45-adcb-ee017bf8db08}">
+		<property name="maximumDistance">
+			<value>30</value>
+		</property>
+	</object>
 	<object class="MarkerTrack" id="{fd332dbf-523e-44e2-a0e4-1a184902dd67}" />
 	<object class="Timeline" id="{d81a193a-a698-4d19-ad4e-660c09878189}">
 		<property name="isProxyEnabled">
@@ -82,6 +89,11 @@
 			<destination>{0422017a-b890-4b76-87c7-a1d4c617df93}</destination>
 		</relationship>
 	</object>
+	<object class="AutomationTrack" id="{bb66077d-79d6-4346-b258-fa2bce5c81dc}">
+		<relationship name="automator">
+			<destination>{47cc881d-5e6c-480b-b5ba-a52a09498734}</destination>
+		</relationship>
+	</object>
 	<object class="MultiSound" id="{282b3fde-44f8-4a55-ae78-66702d46417d}">
 		<relationship name="sounds">
 			<destination>{33614c49-0b4d-4954-aab1-6bac4eecb13f}</destination>
@@ -97,7 +109,6 @@
 		<relationship name="effects">
 			<destination>{ff5af073-82b0-4943-94b4-39505dcb3372}</destination>
 			<destination>{20e22950-b8ad-41dd-b7f7-7171bccace47}</destination>
-			<destination>{cb6c79e5-1d34-45ad-8057-38008fc31dc7}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{c67a9899-82a9-47e9-840d-f97fd9118a58}" />
@@ -123,10 +134,12 @@
 		</relationship>
 	</object>
 	<object class="MixerBusFader" id="{20e22950-b8ad-41dd-b7f7-7171bccace47}" />
-	<object class="SpatialiserEffect" id="{cb6c79e5-1d34-45ad-8057-38008fc31dc7}" />
 	<object class="RandomizerModulator" id="{68ba8302-ef2f-4b6f-965b-f87dbe229d93}">
 		<property name="nameOfPropertyBeingModulated">
 			<value>pitch</value>
+		</property>
+		<property name="amount">
+			<value>4.5</value>
 		</property>
 	</object>
 	<object class="SingleSound" id="{e739addb-5926-46ae-b845-c22f07e42d8a}">

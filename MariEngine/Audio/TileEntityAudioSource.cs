@@ -6,6 +6,7 @@ namespace MariEngine.Audio;
 
 public class TileEntityAudioSource : TileEntityComponent
 {
+    // TODO: Refactor this out to a separate PositionalAudioSource?
     private readonly Dictionary<string, AudioEvent> events = new();
     private readonly List<AudioParameterAutomation> automations = [];
 

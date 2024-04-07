@@ -177,6 +177,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         var mineAudio = new TileEntityAudioSource()
             .WithEvent("Mine", ServiceRegistry.Get<AudioManager>().GetEvent("event:/Mining", oneShot: true));    // TODO: This is only for testing, the player wouldn't normally play tile breaking sounds
         mineAudio.AddAutomation(new WorldReverbAutomation(player));
+        mineAudio.AddAutomation(new WorldAttenuationAutomation(player));
         player.AttachComponent(mineAudio);
         tilemap.AddTileEntity(player);
 
@@ -189,6 +190,13 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         testTileEntity = new TileEntity("TestTileEntity");
         testTileEntity.AttachComponent(new TileEntitySpriteRenderer(ServiceRegistry.Get<SpriteLoader>().Get("Player")));
         testTileEntity.AttachComponent(new TileEntitySpriteCollider());
+        
+        var testAudio = new TileEntityAudioSource()
+            .WithEvent("Test", ServiceRegistry.Get<AudioManager>().GetEvent("event:/Mining", oneShot: true));    // TODO: This is only for testing, the player wouldn't normally play tile breaking sounds
+        testAudio.AddAutomation(new WorldReverbAutomation(testTileEntity));
+        testAudio.AddAutomation(new WorldAttenuationAutomation(testTileEntity));
+        testTileEntity.AttachComponent(testAudio);
+        testTileEntity.AttachComponent(new AudioTester());
         tilemap.AddTileEntity(testTileEntity);
 
         worldManager = new WorldManager(caveSystemManager, tilemap, playerController, gizmos);

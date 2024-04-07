@@ -6,3 +6,4 @@ Tags:
 CollisionGroups:
   - Group1
 LightAttenuation: 0.5
+Material: Stone

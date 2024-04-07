@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using FMOD;
+using FmodForFoxes;
 using MariEngine.Utils;
 using Microsoft.Xna.Framework;
 using FmodForFoxes.Studio;

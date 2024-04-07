@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="ParameterPreset" id="{c3303ab7-4d97-4771-9cdb-56597b979265}">
+		<property name="name">
+			<value>Reverb Wet</value>
+		</property>
+		<relationship name="folder">
+			<destination>{e06238f9-554b-4b14-89ce-c4e74f774204}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{17e33608-58d4-43e7-ae89-92840f330f07}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{17e33608-58d4-43e7-ae89-92840f330f07}">
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+		<property name="seekSpeed">
+			<value>0.62000000476837158</value>
+		</property>
+	</object>
+</objects>

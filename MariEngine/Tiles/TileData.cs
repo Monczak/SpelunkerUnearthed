@@ -8,4 +8,5 @@ public record struct TileData(string ForegroundColor,
     TileLightData? Light,
     float LightAttenuation,
     string[] CollisionGroups,
-    string Type);
+    string Type,
+    string Material);

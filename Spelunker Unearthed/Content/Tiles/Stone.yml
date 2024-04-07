@@ -6,6 +6,7 @@ Tags:
 CollisionGroups:
   - Group1
 LightAttenuation: 0.5
+Material: Stone
 #Light:
 #  Color: "#0f0f0f"
 #  Radius: 3

@@ -13,6 +13,7 @@ using MariEngine.Logging;
 using MariEngine.Rendering;
 using MariEngine.Services;
 using MariEngine.Tiles;
+using MariEngine.Utils;
 using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
 
 namespace SpelunkerUnearthed.Scripts.TileEntities;

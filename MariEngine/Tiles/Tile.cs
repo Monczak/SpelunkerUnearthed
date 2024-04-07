@@ -25,6 +25,8 @@ public class Tile : Resource<TileData>
     public CollisionGroup CollisionGroup { get; private set; }
     
     public TileType Type { get; private set; }
+    
+    public Material Material { get; private set; }
 
     public Tile()
     {
@@ -87,6 +89,15 @@ public class Tile : Resource<TileData>
         else
         {
             Type = Enum.Parse<TileType>(data.Type);
+        }
+
+        if (data.Material is null)
+        {
+            Material = ServiceRegistry.Get<MaterialLoader>().Get("None");
+        }
+        else
+        {
+            Material = ServiceRegistry.Get<MaterialLoader>().Get(data.Material);
         }
         
         Behaviors = [];

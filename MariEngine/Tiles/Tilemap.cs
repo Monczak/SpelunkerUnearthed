@@ -80,6 +80,8 @@ public class Tilemap : Component
         layerIds = [..layers.Keys];
     }
 
+    public TileBuffer GetLayer(int layerId) => layers[layerId];
+
     public void Resize(Coord newSize)
     {
         (Width, Height) = newSize;
@@ -187,6 +189,8 @@ public class Tilemap : Component
     }
 
     public bool IsInBounds(Coord coord) => Bounds.PointInside(coord);
+
+    public TileBufferFragment GetFragment(CoordBounds bounds, int layerId) => layers[layerId].GetFragment(bounds);
 
     public void AddTileEntity(TileEntity tileEntity)
     {

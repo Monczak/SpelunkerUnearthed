@@ -22,6 +22,9 @@
 #begin Fonts/whitrabt.ttf
 /copy:Fonts/whitrabt.ttf
 
+#begin Materials/Stone.yml
+/copy:Materials/Stone.yml
+
 #begin Sprites/Player.yml
 /copy:Sprites/Player.yml
 

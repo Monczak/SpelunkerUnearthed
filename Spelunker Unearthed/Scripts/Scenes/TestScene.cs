@@ -16,6 +16,7 @@ using MariEngine.Tiles;
 using MariEngine.UI;
 using MariEngine.UI.Nodes.Components;
 using MariEngine.UI.Nodes.Layouts;
+using SpelunkerUnearthed.Scripts.Audio;
 using SpelunkerUnearthed.Scripts.Components;
 using SpelunkerUnearthed.Scripts.Managers;
 using SpelunkerUnearthed.Scripts.MapGeneration;
@@ -172,7 +173,10 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         
         player.AttachComponent(new TileEntitySpriteRenderer(ServiceRegistry.Get<SpriteLoader>().Get("Player")));
         player.AttachComponent(new TileEntitySpriteCollider());
-        player.AttachComponent(new TileEntityAudioSource(ServiceRegistry.Get<AudioManager>().GetEvent("event:/Mining", oneShot: true)));    // TODO: This is only for testing, the player wouldn't normally play tile breaking sounds
+        
+        var mineAudio = new TileEntityAudioSource(ServiceRegistry.Get<AudioManager>().GetEvent("event:/Mining", oneShot: true));    // TODO: This is only for testing, the player wouldn't normally play tile breaking sounds
+        mineAudio.AddAutomation(new WorldReverbAutomation(player));
+        player.AttachComponent(mineAudio);
         tilemap.AddTileEntity(player);
 
         playerController = new PlayerController();

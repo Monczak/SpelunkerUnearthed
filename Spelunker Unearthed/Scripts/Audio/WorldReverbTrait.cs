@@ -13,20 +13,17 @@ namespace SpelunkerUnearthed.Scripts.Audio;
 
 public class WorldReverbTrait(Tilemap tilemap) : AudioTrait
 {
-    private const int EnvironmentEvaluationRayCount = 5;
+    private const int EnvironmentEvaluationRayCount = 16;
 
-    private List<Raycasting.Ray> GetEnvironmentEvaluationRays(Vector2 origin)
+    private IEnumerable<Raycasting.Ray> GetEnvironmentEvaluationRays(Vector2 origin)
     {
-        var rays = new List<Raycasting.Ray>();
-        for (int i = 0; i < EnvironmentEvaluationRayCount; i++)
+        for (var i = 0; i < EnvironmentEvaluationRayCount; i++)
         {
             var rayAngle = (float)i / EnvironmentEvaluationRayCount * MathF.Tau;
             var ray = new Raycasting.Ray((Vector2)tilemap.WorldPointToCoord(origin) + Vector2.One * 0.5f,
                 new Vector2(MathF.Cos(rayAngle), MathF.Sin(rayAngle)));
-            rays.Add(ray);
+            yield return ray;
         }
-
-        return rays;
     } 
     
     protected override void Apply(AudioEvent audioEvent)

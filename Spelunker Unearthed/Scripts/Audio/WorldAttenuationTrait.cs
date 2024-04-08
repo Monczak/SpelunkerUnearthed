@@ -12,9 +12,10 @@ public class WorldAttenuationTrait(Tilemap tilemap) : AudioTrait
 {
     protected override void Apply(AudioEvent audioEvent)
     {
-        var emitterTilemapPos = (Coord)GetPosition();
+        var emitterTilemapPos = tilemap.WorldPointToCoord(audioEvent.Position);
         var listenerTilemapPos = tilemap.WorldPointToCoord(ServiceRegistry.Get<AudioManager>().Listener.GetPosition());
 
+        // TODO: Use raytracing to evaluate attenuation 
         var cumulativeAttenuation = 0f;
         foreach (var coord in DrawingUtils.BresenhamLine(emitterTilemapPos, listenerTilemapPos))
         {

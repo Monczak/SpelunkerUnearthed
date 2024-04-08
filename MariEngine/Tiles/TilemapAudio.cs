@@ -17,7 +17,6 @@ public class TilemapAudio(PositionalAudioSource source) : Component
 
     private void OnTileMined(Coord position, Tile tile)
     {
-        source.SetAutomationPositionProvider(() => (Vector2)position);
         source.Play("Mine", tilemap.CoordToWorldPoint(position));
     }
 }

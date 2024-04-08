@@ -17,12 +17,14 @@ public class AudioEvent : IDisposable
     
     private readonly List<EventInstance> instances = [];
     private int instanceIndex;
-    private Vector2 position;
+    
+    public Vector2 Position { get; private set; }
+    private Vector2 listenerPos;
+    
     private readonly Dictionary<string, (float, bool)> parameters = new();
 
     private const int OneShotInstanceLimit = 10;
 
-    private Vector2 listenerPos;
 
     public bool Disposed { get; private set; } = false;
 
@@ -47,7 +49,7 @@ public class AudioEvent : IDisposable
         listenerPos = pos;
         foreach (var instance in instances)
         {
-            SetupEventPosition3D(instance, position);
+            SetupEventPosition3D(instance, Position);
         }
     }
 
@@ -94,7 +96,7 @@ public class AudioEvent : IDisposable
 
     public void SetPosition(Vector2 pos)
     {
-        position = pos;
+        Position = pos;
     }
 
     public void SetPosition(Coord coord) => SetPosition((Vector2)coord);

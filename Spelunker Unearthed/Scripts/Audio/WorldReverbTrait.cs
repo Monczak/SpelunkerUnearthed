@@ -14,13 +14,13 @@ public class WorldReverbTrait(Tilemap tilemap) : AudioTrait
 {
     private const int EnvironmentEvaluationRayCount = 8;
 
-    private List<Raycasting.Ray> GetEnvironmentEvaluationRays()
+    private List<Raycasting.Ray> GetEnvironmentEvaluationRays(Vector2 origin)
     {
         var rays = new List<Raycasting.Ray>();
         for (int i = 0; i < EnvironmentEvaluationRayCount; i++)
         {
             var rayAngle = (float)i / EnvironmentEvaluationRayCount * MathF.Tau;
-            var ray = new Raycasting.Ray(GetPosition(),
+            var ray = new Raycasting.Ray((Vector2)tilemap.WorldPointToCoord(origin),
                 new Vector2(MathF.Cos(rayAngle), MathF.Sin(rayAngle)));
             rays.Add(ray);
         }
@@ -33,7 +33,7 @@ public class WorldReverbTrait(Tilemap tilemap) : AudioTrait
         var reflectivitySum = 0f;
         var distanceProduct = 1f;
         var raysHit = 0;
-        foreach (var ray in GetEnvironmentEvaluationRays())
+        foreach (var ray in GetEnvironmentEvaluationRays(audioEvent.Position))
         {
             var hitInfo = Raycasting.Raycast(tilemap.GetLayer(Tilemap.BaseLayer), ray);
 

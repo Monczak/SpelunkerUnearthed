@@ -7,13 +7,7 @@ namespace MariEngine.Audio;
 public class PositionalAudioSource : IDisposable
 {
     private readonly Dictionary<string, AudioEvent> events = new();
-    private readonly List<AudioTrait> automations = [];
-
-    public void SetAutomationPositionProvider(Func<Vector2> provider)
-    {
-        foreach (var automation in automations)
-            automation.SetPositionProvider(provider);
-    }
+    private readonly List<AudioTrait> traits = [];
     
     public PositionalAudioSource WithEvent(string eventId, AudioEvent audioEvent)
     {
@@ -21,9 +15,9 @@ public class PositionalAudioSource : IDisposable
         return this;
     }
     
-    public PositionalAudioSource WithAutomation(AudioTrait automation)
+    public PositionalAudioSource WithTrait(AudioTrait trait)
     {
-        automations.Add(automation);
+        traits.Add(trait);
         return this;
     }
     
@@ -31,8 +25,8 @@ public class PositionalAudioSource : IDisposable
     {
         var audioEvent = events[eventId];
         
-        foreach (var automation in automations) 
-            automation.Apply(audioEvent);
+        foreach (var trait in traits) 
+            trait.Apply(audioEvent);
         
         if (position is not null)
             audioEvent.SetPosition(position.Value);

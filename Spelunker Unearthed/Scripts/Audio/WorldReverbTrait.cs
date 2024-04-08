@@ -44,6 +44,7 @@ public class WorldReverbTrait(Tilemap tilemap) : AudioTrait
                 var hitPoint = tilemap.Vector2ToWorldPoint(hitInfo.Value.Position);
                 
                 Gizmos.Default.DrawLine(origin, hitPoint, Color.White, lifetime: 1);
+                Gizmos.Default.DrawLine(hitPoint, hitPoint + hitInfo.Value.Normal, Color.Magenta, lifetime: 1);
                 foreach (var debugPoint in hitInfo.Value.DebugPoints)
                 {
                     Gizmos.Default.DrawRectangle(tilemap.Vector2ToWorldPoint(debugPoint), Vector2.One * 0.2f, Color.Green, lifetime: 1);

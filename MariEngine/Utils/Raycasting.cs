@@ -76,12 +76,31 @@ public static class Raycasting
             
             if (buffer[c] is not null && buffer[c].Id != "Nothing")
             {
+                // Direction dir = angle switch
+                // {
+                //     < 0.5f or >= 3.5f => Direction.Right,
+                //     >= 0.5f and < 1.5f => Direction.Down,
+                //     >= 1.5f and < 2.5f => Direction.Left,
+                //     >= 2.5f and < 3.5f => Direction.Up,
+                //     _ => throw new ArgumentOutOfRangeException()
+                // };
+
+                var normal = MathUtils.DiamondAngle(pos - ((Vector2)c + Vector2.One * 0.5f)) switch
+                {
+                    < 0.5f or >= 3.5f => Vector2.UnitX,
+                    >= 0.5f and < 1.5f => Vector2.UnitY,
+                    >= 1.5f and < 2.5f => -Vector2.UnitX,
+                    >= 2.5f and < 3.5f => -Vector2.UnitY,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+                
                 return new HitInfo
                 {
                     Position = pos,
                     Tile = buffer[c],
                     DebugPoints = debugPoints.ToArray(),
-                    Distance = t
+                    Distance = t,
+                    Normal = normal
                 };
             }
         }

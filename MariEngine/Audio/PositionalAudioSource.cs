@@ -25,11 +25,11 @@ public class PositionalAudioSource : IDisposable
     {
         var audioEvent = events[eventId];
         
-        foreach (var trait in traits) 
-            trait.Apply(audioEvent);
-        
         if (position is not null)
             audioEvent.SetPosition(position.Value);
+        
+        foreach (var trait in traits) 
+            trait.Apply(audioEvent);
         
         audioEvent.Start();
     }

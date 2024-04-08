@@ -9,7 +9,11 @@ namespace MariEngine.Debugging;
 
 public class Gizmos : Component
 {
+    public static Gizmos Default { get; private set; }
+    
     private object lockObj = new();
+
+    public static void SetDefault(Gizmos gizmos) => Default = gizmos;
     
     internal List<GizmoShape> Shapes { get; private set; } = [];
     

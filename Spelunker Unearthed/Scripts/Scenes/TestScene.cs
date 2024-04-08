@@ -126,6 +126,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
     {
         Entity debugEntity = new("Debug");
         gizmos = new Gizmos();
+        Gizmos.SetDefault(gizmos);
         debugEntity.AttachComponent(gizmos);
         debugEntity.AttachComponent(new GizmoRenderer(graphics.GraphicsDevice, Camera)
             { Layer = 100, Enabled = false });

@@ -17,18 +17,15 @@ public class WorldReverbTrait(Tilemap tilemap) : AudioTrait
     private const int EnvironmentEvaluationRayCount = 24;
     private const int EnvironmentEvaluationRayBounceCount = 8;
 
-    private List<Raycasting.Ray> GetEnvironmentEvaluationRays(Vector2 origin)
+    private IEnumerable<Raycasting.Ray> GetEnvironmentEvaluationRays(Vector2 origin)
     {
-        var rays = new List<Raycasting.Ray>();
-        for (int i = 0; i < EnvironmentEvaluationRayCount; i++)
+        for (var i = 0; i < EnvironmentEvaluationRayCount; i++)
         {
             var rayAngle = (float)i / EnvironmentEvaluationRayCount * MathF.Tau;
             var ray = new Raycasting.Ray((Vector2)tilemap.WorldPointToCoord(origin) + Vector2.One * 0.5f,
                 new Vector2(MathF.Cos(rayAngle), MathF.Sin(rayAngle)));
-            rays.Add(ray);
+            yield return ray;
         }
-
-        return rays;
     }
 
     private IEnumerable<(Raycasting.Ray, Raycasting.HitInfo)> TraceBounces(Raycasting.Ray ray)

@@ -7,7 +7,7 @@ namespace MariEngine.Utils;
 
 public static class Raycasting
 {
-    public struct HitInfo
+    public readonly struct HitInfo
     {
         public Vector2 Position { get; init; }
         public Vector2 Normal { get; init; }
@@ -30,9 +30,6 @@ public static class Raycasting
 
     public static HitInfo? Raycast(TileBuffer buffer, Vector2 origin, Vector2 direction, float maxDistance = 100.0f)
     {
-        // TODO: Implement proper raycasting instead of Bresenham and hit normal calculation
-        // https://theshoemaker.de/posts/ray-casting-in-2d-grids
-
         var debugPoints = new List<Vector2>();
 
         var dirSign = new Coord(direction.X > 0 ? 1 : -1, direction.Y > 0 ? 1 : -1);
@@ -42,15 +39,14 @@ public static class Raycasting
         var tilePos = (Coord)origin;
 
         var t = 0f;
-
-        // TODO: Add normal calculation
+        
         while (t < maxDistance)
         {
             var dtX = direction.X == 0 ? float.PositiveInfinity : (tilePos.X + tileOffset.X - pos.X) / direction.X;
             var dtY = direction.Y == 0 ? float.PositiveInfinity : (tilePos.Y + tileOffset.Y - pos.Y) / direction.Y;
 
             float dt;
-            var dTile = new Coord(0, 0);
+            var dTile = Coord.Zero;
 
             if (dtX < dtY)
             {
@@ -76,15 +72,6 @@ public static class Raycasting
             
             if (buffer[c] is not null && buffer[c].Id != "Nothing")
             {
-                // Direction dir = angle switch
-                // {
-                //     < 0.5f or >= 3.5f => Direction.Right,
-                //     >= 0.5f and < 1.5f => Direction.Down,
-                //     >= 1.5f and < 2.5f => Direction.Left,
-                //     >= 2.5f and < 3.5f => Direction.Up,
-                //     _ => throw new ArgumentOutOfRangeException()
-                // };
-
                 var normal = MathUtils.DiamondAngle(pos - ((Vector2)c + Vector2.One * 0.5f)) switch
                 {
                     < 0.5f or >= 3.5f => Vector2.UnitX,
@@ -104,27 +91,6 @@ public static class Raycasting
                 };
             }
         }
-        
-        // foreach (var coord in DrawingUtils.BresenhamLine((Coord)origin,
-        //              (Coord)(origin + direction * maxDistance)))
-        // {
-        //     if (!buffer.IsInBounds(coord))
-        //         continue;
-        //
-        //     debugPoints.Add((Vector2)coord);
-        //
-        //     var tile = buffer[coord];
-        //     if (tile is not null && tile.Id != "Nothing")
-        //     {
-        //         return new HitInfo
-        //         {
-        //             Position = coord,
-        //             Distance = ((Vector2)coord - origin).Length(),
-        //             Tile = tile,
-        //             DebugPoints = debugPoints.ToArray()
-        //         };
-        //     }
-        // }
 
         return null;
     }

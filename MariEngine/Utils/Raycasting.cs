@@ -24,8 +24,8 @@ public static class Raycasting
 
     public readonly struct Ray(Vector2 origin, Vector2 direction)
     {
-        public Vector2 Origin { get; init; } = origin;
-        public Vector2 Direction { get; init; } = direction.Normalized();
+        public Vector2 Origin { get; } = origin;
+        public Vector2 Direction { get; } = direction.Normalized();
     }
 
     public static HitInfo? Raycast(TileBuffer buffer, Vector2 origin, Vector2 direction, float maxDistance = 100.0f)
@@ -68,7 +68,7 @@ public static class Raycasting
 
             pos += direction * dt;
             
-            var c = (Coord)(pos + direction * 0.01f);
+            var c = (Coord)(pos + direction * 0.0001f);
             if (!buffer.IsInBounds(c))
                 continue;
             
@@ -99,7 +99,7 @@ public static class Raycasting
                     Position = pos,
                     Tile = buffer[c],
                     DebugPoints = debugPoints.ToArray(),
-                    Distance = t,
+                    Distance = (pos - origin).Length(),
                     Normal = normal
                 };
             }

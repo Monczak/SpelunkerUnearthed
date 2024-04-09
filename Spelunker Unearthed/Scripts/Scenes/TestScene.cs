@@ -116,7 +116,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
             
             biomeDebugLine.SetParams(caveSystemManager.GetBiome(playerController.OwnerEntity.Position));
             
-            var pos = new Coord(265, 357);
+            var pos = new Coord(255, 337);
             if (tilemap.IsInBounds(pos))
                 testTileEntity.Position = pos;
         }

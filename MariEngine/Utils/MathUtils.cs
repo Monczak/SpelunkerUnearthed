@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 
 namespace MariEngine.Utils;
@@ -24,6 +26,11 @@ public static class MathUtils
     {
         if (Math.Abs(a - b) < float.Epsilon) return 1;
         return (v - a) / (b - a);
+    }
+
+    public static float Remap(float i1, float i2, float o1, float o2, float v)
+    {
+        return Lerp(o1, o2, InverseLerp(i1, i2, v));
     }
 
     public static float Clamp(float x, float min, float max)
@@ -60,5 +67,39 @@ public static class MathUtils
         if (y >= 0)
             return x >= 0 ? y / (x + y) : 1 - x / ( -x + y);
         return x < 0 ? 2 - y / (-x - y) : 3 + x / (x - y);
+    }
+
+    public static float GeometricMean(this IEnumerable<float> collection)
+    {
+        var count = 0;
+        var product = 1f;
+        foreach (var x in collection)
+        {
+            count++;
+            product *= x;
+        }
+
+        return MathF.Pow(product, 1f / count);
+    }
+
+    public static float HarmonicMean(this IEnumerable<float> collection)
+    {
+        var count = 0;
+        var reciprocalSum = 0f;
+        foreach (var x in collection)
+        {
+            count++;
+            reciprocalSum += 1f / x;
+        }
+        return count / reciprocalSum;
+    }
+
+    public static IEnumerable<float> Normalize(this IEnumerable<float> collection)
+    {
+        var copy = new List<float>(collection);
+        var min = copy.Min();
+        var max = copy.Max();
+        foreach (var x in copy)
+            yield return InverseLerp(min, max, x);
     }
 }

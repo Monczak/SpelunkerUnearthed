@@ -127,7 +127,7 @@ public class TilemapCollider(Coord? spatialPartitionCellSize = null) : Collider
     {
         var collides = false;
         var colliderBounds = GetColliderBoundsAtPos(collider, coord);
-        var cellIndices = GetCellIndices(collider);
+        var cellIndices = GetCellIndices(colliderBounds);
 
         var tileEntitiesToCheck = spatialPartitionCellSize is null
             ? tilemap.TileEntities

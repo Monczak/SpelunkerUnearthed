@@ -1,40 +1,23 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using MariEngine.Tiles;
+using MariEngine.Utils;
 
 namespace MariEngine.Collision;
 
 public class TilemapCollider(Coord? spatialPartitionCellSize = null) : Collider
 {
     private Tilemap tilemap;
-    private readonly Dictionary<Coord, HashSet<TileEntity>> spatialPartition = new();
+    private SpatialPartition<TileEntityCollider> spatialPartition;
 
     private readonly Coord cellSize = spatialPartitionCellSize ?? Coord.One * 8;
-
-    private IEnumerable<Coord> GetCellIndices(TileEntityCollider collider)
-    {
-        return GetCellIndices(GetColliderBoundsAtPos(collider, collider.OwnerEntity.Position));
-    }
-
-    private IEnumerable<Coord> GetCellIndices(CoordBounds bounds)
-    {
-        var topLeft = bounds.TopLeft / cellSize;
-        var bottomRight = bounds.BottomRight / cellSize;
-
-        for (var y = topLeft.Y; y <= bottomRight.Y; y++)
-        {
-            for (var x = topLeft.X; x <= bottomRight.X; x++)
-            {
-                yield return new Coord(x, y);
-            }
-        }
-    }
 
     protected override void OnAttach()
     {
         tilemap = GetComponent<Tilemap>();
         tilemap.TileEntityAdded += OnTileEntityAdded;
         tilemap.TileEntityRemoved += OnTileEntityRemoved;
+
+        spatialPartition = new SpatialPartition<TileEntityCollider>(cellSize);
     }
     
     private void OnTileEntityAdded(TileEntity tileEntity)
@@ -43,12 +26,8 @@ public class TilemapCollider(Coord? spatialPartitionCellSize = null) : Collider
         
         var collider = tileEntity.GetComponent<TileEntityCollider>();
         if (collider is null) return;
-
-        foreach (var coord in GetCellIndices(collider))
-        {
-            spatialPartition.TryAdd(coord, []);
-            spatialPartition[coord].Add(tileEntity);
-        }
+        
+        spatialPartition.Add(collider, collider.OwnerEntity.Position);
         
         tileEntity.PositionUpdated += OnTileEntityPositionUpdated;
     }
@@ -60,24 +39,7 @@ public class TilemapCollider(Coord? spatialPartitionCellSize = null) : Collider
         if (oldPos == newPos)
             return;
         
-        var collider = sender.GetComponent<TileEntityCollider>();
-        var oldIndices = GetCellIndices(GetColliderBoundsAtPos(collider, oldPos));
-        var newIndices = GetCellIndices(GetColliderBoundsAtPos(collider, newPos));
-
-        foreach (var index in oldIndices)
-        {
-            if (spatialPartition.TryGetValue(index, out var tileEntities))
-            {
-                tileEntities.Remove(sender);
-                if (spatialPartition[index].Count == 0) spatialPartition.Remove(index);
-            }
-        }
-
-        foreach (var index in newIndices)
-        {
-            if (!spatialPartition.ContainsKey(index)) spatialPartition.Add(index, []);
-            spatialPartition[index].Add(sender);
-        }
+        spatialPartition.UpdatePosition(sender.GetComponent<TileEntityCollider>(), oldPos, newPos);
     }
 
     private void OnTileEntityRemoved(TileEntity tileEntity)
@@ -86,12 +48,8 @@ public class TilemapCollider(Coord? spatialPartitionCellSize = null) : Collider
         
         var collider = tileEntity.GetComponent<TileEntityCollider>();
         if (collider is null) return;
-        
-        foreach (var coord in GetCellIndices(collider))
-        {
-            spatialPartition[coord]?.Remove(tileEntity);
-            if (spatialPartition[coord].Count == 0) spatialPartition.Remove(coord);
-        }
+
+        spatialPartition.Remove(collider, collider.OwnerEntity.Position);
 
         tileEntity.PositionUpdated -= OnTileEntityPositionUpdated;
     }
@@ -111,8 +69,8 @@ public class TilemapCollider(Coord? spatialPartitionCellSize = null) : Collider
         if (!tilemap.IsInBounds(coord)) return true;
         var colliderBounds = GetColliderBoundsAtPos(collider, coord);
 
-        bool collides = false;
-        foreach (Coord worldPos in colliderBounds.Coords)
+        var collides = false;
+        foreach (var worldPos in colliderBounds.Coords)
         {
             var tilemapTileColGroup = tilemap.Get(worldPos, Tilemap.BaseLayer).CollisionGroup; // TODO: Handle collision on other layers?
             var tileEntityColGroup = collider.GetCollisionGroup(worldPos - colliderBounds.TopLeft);
@@ -127,20 +85,17 @@ public class TilemapCollider(Coord? spatialPartitionCellSize = null) : Collider
     {
         var collides = false;
         var colliderBounds = GetColliderBoundsAtPos(collider, coord);
-        var cellIndices = GetCellIndices(collider);
 
-        var tileEntitiesToCheck = spatialPartitionCellSize is null
-            ? tilemap.TileEntities
-            : cellIndices.SelectMany(index => spatialPartition.TryGetValue(index, out var value) ? value : []);
+        var collidersToCheck = spatialPartitionCellSize is null
+            ? tilemap.TileEntities.Select(t => t.GetComponent<TileEntityCollider>())
+            : spatialPartition.Check(collider, coord);
         
-        foreach (var entity in tileEntitiesToCheck)
+        foreach (var otherCollider in collidersToCheck)
         {
-            if (entity == collider.OwnerEntity) continue;
-            
-            var otherCollider = entity.GetComponent<TileEntityCollider>();
+            if (otherCollider == collider) continue;
             if (otherCollider is null) continue;
 
-            var otherColliderBounds = GetColliderBoundsAtPos(otherCollider, entity.Position);
+            var otherColliderBounds = GetColliderBoundsAtPos(otherCollider, otherCollider.OwnerEntity.Position);
             var overlap = CoordBounds.GetOverlap(colliderBounds, otherColliderBounds);
             if (overlap is null) continue;
 

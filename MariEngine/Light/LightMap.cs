@@ -29,6 +29,9 @@ public class LightMap : Component
     private HashSet<LightSourceData> dirtyLightSources = [];
     private HashSet<LightSourceData> toRemove = [];
 
+    // private SpatialPartition<LightSource> spatialPartition;
+    private Coord? spatialPartitionCellSize;
+    
     private Vector3[,] map;
 
     public int RenderThreads { get; set; } = 8;
@@ -65,9 +68,10 @@ public class LightMap : Component
         }
     }
 
-    public LightMap(bool cacheRenderedLight = true)
+    public LightMap(Coord? spatialPartitionCellSize = null, bool cacheRenderedLight = true)
     {
         dirtyLightHandler = OnLightSourceDirty;
+        this.spatialPartitionCellSize = spatialPartitionCellSize;
         this.cacheRenderedLight = cacheRenderedLight;
     }
 
@@ -76,6 +80,7 @@ public class LightMap : Component
         tilemap = GetComponent<Tilemap>();
         lightSources = new Dictionary<LightSource, LightSourceData>();
         staticLightSources = new Dictionary<Coord, LightSourceData>();
+
         toRemove = [];
         dirtyLightSources = [];
 
@@ -92,10 +97,10 @@ public class LightMap : Component
         base.Update(gameTime);
         
         UpdateDirtyLights();
-        RemoveLights();
+        RemoveDirtyLights();
     }
 
-    private void RemoveLights()
+    private void RemoveDirtyLights()
     {
         foreach (LightSourceData data in toRemove)
         {

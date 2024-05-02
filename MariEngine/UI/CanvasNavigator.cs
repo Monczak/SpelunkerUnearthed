@@ -31,8 +31,8 @@ public class CanvasNavigator : Component
 
     private void SelectNextComponent() => SelectComponent(true);
     private void SelectPreviousComponent() => SelectComponent(false);
-    private void InteractOnPressed() => (SelectedComponent as IComponentInteractable)?.OnPressed();
-    private void InteractOnReleased() => (SelectedComponent as IComponentInteractable)?.OnReleased();
+    private void InteractOnPressed() => (SelectedComponent as IUiCommandReceiver)?.HandleCommand(new UiCommand(UiCommandType.StartInteracting));
+    private void InteractOnReleased() => (SelectedComponent as IUiCommandReceiver)?.HandleCommand(new UiCommand(UiCommandType.StopInteracting));
 
     private void CanvasOnComponentAdded(object sender, ComponentNode e)
     {

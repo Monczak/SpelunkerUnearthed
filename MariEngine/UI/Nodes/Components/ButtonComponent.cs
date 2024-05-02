@@ -1,10 +1,11 @@
+using System;
 using MariEngine.Logging;
 using MariEngine.Sprites;
 using MariEngine.Tiles;
 
 namespace MariEngine.UI.Nodes.Components;
 
-public class ButtonComponent(Sprite background, string label = "") : ComponentNode, IComponentSelectable, IComponentInteractable
+public class ButtonComponent(Sprite background, string label = "") : ComponentNode, IComponentSelectable, IUiCommandReceiver
 {
     public Sprite Background { get; set; } = background;
     public string Label { get; set; } = label;
@@ -26,15 +27,18 @@ public class ButtonComponent(Sprite background, string label = "") : ComponentNo
         Logger.LogDebug($"Deselected {Label}");
     }
 
-    public void OnPressed()
+    public void HandleCommand(UiCommand command)
     {
-        Pressed = true;
-        Logger.LogDebug($"Pressed {Label}");
-    }
-
-    public void OnReleased()
-    {
-        Pressed = false;
-        Logger.LogDebug($"Released {Label}");
+        switch (command)
+        {
+            case { Type: UiCommandType.StartInteracting }:
+                Pressed = true;
+                Logger.LogDebug($"Pressed {Label}");
+                break;
+            case { Type: UiCommandType.StopInteracting }:
+                Pressed = false;
+                Logger.LogDebug($"Released {label}");
+                break;
+        }
     }
 }

@@ -2,6 +2,7 @@
 using FMOD;
 using MariEngine.Logging;
 using MariEngine.Services;
+using MariEngine.Sprites;
 using MariEngine.Tiles;
 using MariEngine.UI.Nodes;
 using MariEngine.UI.Nodes.Components;
@@ -19,12 +20,15 @@ public class CanvasRendererVisitor : ICanvasRendererVisitor
     public void Visit(LayoutNode node, TileBufferFragment buffer)
     {
         if (node.Background is not null)
+            RenderBackground(node.Background, buffer);
+    }
+
+    private static void RenderBackground(Sprite background, TileBufferFragment buffer)
+    {
+        // TODO: Support non-9-sliced sprites
+        foreach (Coord coord in buffer.Bounds.Coords)
         {
-            // TODO: Support non-9-sliced sprites
-            foreach (Coord coord in buffer.Bounds.Coords)
-            {
-                buffer.SetAbsolute(coord, node.Background.GetNineSlice(buffer.Bounds, coord));
-            }
+            buffer.SetAbsolute(coord, background.GetNineSlice(buffer.Bounds, coord));
         }
     }
 
@@ -35,6 +39,11 @@ public class CanvasRendererVisitor : ICanvasRendererVisitor
 
     // TODO: Add support for text alignment
     public void Visit(TextComponent node, TileBufferFragment buffer)
+    {
+        RenderText(node, buffer);
+    }
+
+    private static void RenderText(TextComponent node, TileBufferFragment buffer)
     {
         var coord = Coord.Zero;
         int i = -1;
@@ -80,5 +89,11 @@ public class CanvasRendererVisitor : ICanvasRendererVisitor
         }
 
         bool IsLineBreakOpportunity(char c) => c is ' ' or '\n';
+    }
+
+    public void Visit(ButtonComponent node, TileBufferFragment buffer)
+    {
+        if (node.Background is not null)
+            RenderBackground(node.Background, buffer);
     }
 }

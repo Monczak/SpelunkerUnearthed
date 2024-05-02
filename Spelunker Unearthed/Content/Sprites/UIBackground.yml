@@ -1,8 +1,7 @@
 ﻿Tiles:
-  - "caaaac"
-  - "cabbac"
-  - "cbaabc"
-  - "caaaac"
+  - "aaa"
+  - "aba"
+  - "aaa"
 Keys:
   a: Basalt
   b: Nothing

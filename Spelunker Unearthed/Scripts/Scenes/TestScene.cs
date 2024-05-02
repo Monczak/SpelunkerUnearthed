@@ -214,31 +214,24 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         Entity uiEntity = new("UI");
         canvas = new Canvas();
         uiEntity.AttachComponent(canvas);
+        uiEntity.AttachComponent(new CanvasNavigator());
         uiEntity.AttachComponent(new CanvasRenderer(graphics.GraphicsDevice, Camera));
         AddEntity(uiEntity);
-        
-        // var col1 = canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, PreferredWidth = 5, ContentAlignment = FlexContentAlignment.Center });
-        // col1.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });
-        // col1.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });
-        
-        // var squareContainer = canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, PreferredWidth = 20 });
-        // squareContainer.AddChild(new FlexLayoutNode());
-        // var square = squareContainer.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, PreferredWidth = 20, PreferredHeight = 20 });
-        // squareContainer.AddChild(new FlexLayoutNode());
-        
-        // square.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });
-        // square.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });
-        
-        // var col2 = canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column, PreferredWidth = 5, ContentAlignment = FlexContentAlignment.Center });
-        // col2.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });
-        // col2.AddChild(new FlexLayoutNode { PreferredWidth = 5, PreferredHeight = 5 });
 
-        // var container1 = canvas.Root.AddChild(new FlexLayoutNode
-        //     { Background = ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"), Padding = Coord.One });
-        // var container2 = canvas.Root.AddChild(new FlexLayoutNode());
-        //
-        // var text = container1.AddChild(new TextComponent("According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway. Because bees don't care what humans think is impossible.") { WordWrap = WordWrap.Wrap, LineSpacing = 1 });
-        // var text2 = container2.AddChild(new TextComponent("Test 123"));
+        var container = canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column });
+        var spacer = container.AddChild(new FlexLayoutNode());
+        var panel = container.AddChild(new FlexLayoutNode
+            { Background = ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"), Padding = Coord.One, PreferredHeight = 10 });
+        
+        var button1 = panel.AddChild(new ButtonComponent(
+            ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
+            "Button 1"));
+        var button2 = panel.AddChild(new ButtonComponent(
+            ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
+            "Button 2"));
+        var button3 = panel.AddChild(new ButtonComponent(
+            ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
+            "Button 3"));
         
         canvas.GetComponent<CanvasRenderer>().Redraw();
     }

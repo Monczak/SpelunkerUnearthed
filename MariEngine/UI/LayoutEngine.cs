@@ -63,6 +63,9 @@ public static class LayoutEngine
         var flexDirection = flexLayoutNode.FlexDirection;
         var contentAlignment = flexLayoutNode.ContentAlignment;
         var totalFlexGrow = flexLayoutNode.Children.Where(child => !child.HasPreferredSize).Sum(child => child.FlexGrow);
+
+        if (totalFlexGrow == 0)
+            totalFlexGrow = flexLayoutNode.Children.Count;
         
         Vector2 error = Vector2.Zero;
 
@@ -176,13 +179,13 @@ public static class LayoutEngine
                     _ => throw new ArgumentOutOfRangeException()
                 }; 
                     
-                var (flexGapBefore, flexGapAfter) = CalculateFlexGap(flexLayoutNode, i);
-                usableSize -= flexDirection switch
-                {
-                    FlexDirection.Row => Coord.UnitX * (flexGapBefore + flexGapAfter),
-                    FlexDirection.Column => Coord.UnitY * (flexGapBefore + flexGapAfter),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
+                // var (flexGapBefore, flexGapAfter) = CalculateFlexGap(flexLayoutNode, i);
+                // usableSize -= flexDirection switch
+                // {
+                //     FlexDirection.Row => Coord.UnitX * (flexGapBefore + flexGapAfter),
+                //     FlexDirection.Column => Coord.UnitY * (flexGapBefore + flexGapAfter),
+                //     _ => throw new ArgumentOutOfRangeException()
+                // };
             }
         }
 

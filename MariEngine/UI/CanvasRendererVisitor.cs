@@ -37,25 +37,37 @@ public class CanvasRendererVisitor : ICanvasRendererVisitor
         Logger.LogDebug("Visit ComponentNode");
     }
 
-    // TODO: Add support for text alignment
+    
     public void Visit(TextComponent node, TileBufferFragment buffer)
     {
         RenderText(node, buffer);
     }
 
-    private static void RenderText(TextComponent node, TileBufferFragment buffer)
+    private static Coord MeasureText(string text, int lineSpacing, int xSize) =>
+        RenderText(text, lineSpacing, null, xSize);
+
+    private static Coord RenderText(string text, int lineSpacing, TileBufferFragment buffer) =>
+        RenderText(text, lineSpacing, buffer, buffer.Bounds.Size.X);
+    
+    private static Coord RenderText(TextComponent node, TileBufferFragment buffer) =>
+        RenderText(node.Text, node.LineSpacing, buffer, buffer.Bounds.Size.X);
+
+    // TODO: Add support for text alignment
+    private static Coord RenderText(string text, int lineSpacing, TileBufferFragment buffer, int xSize)
     {
+        var textSize = Coord.Zero;
+        
         var coord = Coord.Zero;
         int i = -1;
-        var characters = new Queue<char>(node.Text);
+        var characters = new Queue<char>(text);
 
         var lineBreakOpportunities = new Queue<int>();
-        for (int j = 1; j < node.Text.Length; j++)
+        for (int j = 1; j < text.Length; j++)
         {
-            if (IsLineBreakOpportunity(node.Text[j]) && !IsLineBreakOpportunity(node.Text[j - 1]))
+            if (IsLineBreakOpportunity(text[j]) && !IsLineBreakOpportunity(text[j - 1]))
                 lineBreakOpportunities.Enqueue(j);
         }
-        lineBreakOpportunities.Enqueue(node.Text.Length);
+        lineBreakOpportunities.Enqueue(text.Length);
 
         lineBreakOpportunities.TryDequeue(out var currentLineBreakOpportunity);
         while (characters.TryDequeue(out var c))
@@ -66,26 +78,28 @@ public class CanvasRendererVisitor : ICanvasRendererVisitor
             {
                 var wordLength = nextLineBreakOpportunity - currentLineBreakOpportunity;
                 lineBreakOpportunities.TryDequeue(out currentLineBreakOpportunity);
-                if (coord.X + wordLength > buffer.Bounds.Size.X || c == '\n')
+                if (coord.X + wordLength > xSize || c == '\n')
                 {
                     LineBreak(ref coord);
                     continue;
                 }
             }
             
-            if (buffer.IsInBounds(coord))
+            if (buffer is not null && buffer.IsInBounds(coord))
             {
                 buffer[coord] = ServiceRegistry.Get<TileLoader>().GetCharacter(c);
-                coord += Coord.UnitX;
             }
+            
+            textSize = Coord.Max(textSize, coord + Coord.One);
+            coord += Coord.UnitX;
         }
 
-        return;
+        return textSize;
 
         void LineBreak(ref Coord coord)
         {
             coord.X = 0;
-            coord.Y += node.LineSpacing + 1;
+            coord.Y += lineSpacing + 1;
         }
 
         bool IsLineBreakOpportunity(char c) => c is ' ' or '\n';
@@ -95,5 +109,13 @@ public class CanvasRendererVisitor : ICanvasRendererVisitor
     {
         if (node.Background is not null)
             RenderBackground(node.Background, buffer);
+
+        var labelSize = buffer.Bounds.Size - Coord.One * node.TextPadding * 2;
+        
+        var textSize = MeasureText(node.Label, 1, labelSize.X);
+        var textBufferSize = Coord.Min(textSize, labelSize);
+        var textBufferTopLeft = Coord.One * node.TextPadding + (labelSize - textBufferSize) / 2;
+        var textBuffer = new TileBufferFragment(buffer, new CoordBounds(textBufferTopLeft, textBufferSize));
+        RenderText(node.Label, 1, textBuffer);
     }
 }

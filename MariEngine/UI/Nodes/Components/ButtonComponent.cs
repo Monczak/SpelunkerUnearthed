@@ -7,6 +7,8 @@ namespace MariEngine.UI.Nodes.Components;
 
 public class ButtonComponent(Sprite background, string label = "") : ComponentNode, IComponentSelectable, IUiCommandReceiver
 {
+    public int TextPadding { get; init; } = 2;
+
     public Sprite Background { get; set; } = background;
     public string Label { get; set; } = label;
     

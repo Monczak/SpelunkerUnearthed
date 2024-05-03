@@ -221,17 +221,17 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         var container = canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column });
         var spacer = container.AddChild(new FlexLayoutNode());
         var panel = container.AddChild(new FlexLayoutNode
-            { Background = ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"), Padding = Coord.One, PreferredHeight = 10 });
+            { Background = ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"), Padding = Coord.One, PreferredHeight = 9, FlexGap = 3 });
         
         var button1 = panel.AddChild(new ButtonComponent(
             ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
-            "Button 1"));
+            "Button 1") { PreferredHeight = 5, TextPadding = 1 });
         var button2 = panel.AddChild(new ButtonComponent(
             ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
-            "Button 2"));
+            "Button 2") { PreferredHeight = 5, TextPadding = 1 });
         var button3 = panel.AddChild(new ButtonComponent(
             ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
-            "Button 3"));
+            "Button 3") { PreferredHeight = 5, TextPadding = 1 });
         
         canvas.GetComponent<CanvasRenderer>().Redraw();
     }

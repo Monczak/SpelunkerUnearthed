@@ -31,13 +31,16 @@ public class ButtonComponent(Sprite background, string label = "") : ComponentNo
     {
         switch (command)
         {
-            case { Type: UiCommandType.StartInteracting }:
+            case StartInteractionUiCommand:
                 Pressed = true;
                 Logger.LogDebug($"Pressed {Label}");
                 break;
-            case { Type: UiCommandType.StopInteracting }:
+            case StopInteractionUiCommand:
                 Pressed = false;
-                Logger.LogDebug($"Released {label}");
+                Logger.LogDebug($"Released {Label}");
+                break;
+            case InputKeyUiCommand inputKeyUiCommand:
+                Logger.LogDebug($"Key {inputKeyUiCommand.Key}, pressed: {inputKeyUiCommand.IsPressed}");
                 break;
         }
     }

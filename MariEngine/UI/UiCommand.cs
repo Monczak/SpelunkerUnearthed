@@ -1,3 +1,11 @@
-﻿namespace MariEngine.UI;
+﻿using Microsoft.Xna.Framework.Input;
 
-public record struct UiCommand(UiCommandType Type);
+namespace MariEngine.UI;
+
+public record UiCommand;
+
+public record StartInteractionUiCommand : UiCommand;
+
+public record StopInteractionUiCommand : UiCommand;
+
+public record InputKeyUiCommand(Keys Key, bool IsPressed) : UiCommand;

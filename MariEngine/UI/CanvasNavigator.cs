@@ -4,6 +4,7 @@ using MariEngine.Input;
 using MariEngine.Logging;
 using MariEngine.Services;
 using MariEngine.UI.Nodes.Components;
+using Microsoft.Xna.Framework.Input;
 
 namespace MariEngine.UI;
 
@@ -27,12 +28,18 @@ public class CanvasNavigator : Component
         ServiceRegistry.Get<InputManager>().OnPressed("Down", SelectPreviousComponent);
         ServiceRegistry.Get<InputManager>().OnPressed("Mine", InteractOnPressed);
         ServiceRegistry.Get<InputManager>().OnReleased("Mine", InteractOnReleased);
+        
+        ServiceRegistry.Get<InputManager>().OnPressedPassThrough(PassPressedToSelectedComponent);
+        ServiceRegistry.Get<InputManager>().OnReleasedPassThrough(PassReleasedToSelectedComponent);
     }
+    
+    private void PassPressedToSelectedComponent(Keys key) => (SelectedComponent as IUiCommandReceiver)?.HandleCommand(new InputKeyUiCommand(key, true));
+    private void PassReleasedToSelectedComponent(Keys key) => (SelectedComponent as IUiCommandReceiver)?.HandleCommand(new InputKeyUiCommand(key, false));
 
     private void SelectNextComponent() => SelectComponent(true);
     private void SelectPreviousComponent() => SelectComponent(false);
-    private void InteractOnPressed() => (SelectedComponent as IUiCommandReceiver)?.HandleCommand(new UiCommand(UiCommandType.StartInteracting));
-    private void InteractOnReleased() => (SelectedComponent as IUiCommandReceiver)?.HandleCommand(new UiCommand(UiCommandType.StopInteracting));
+    private void InteractOnPressed() => (SelectedComponent as IUiCommandReceiver)?.HandleCommand(new StartInteractionUiCommand());
+    private void InteractOnReleased() => (SelectedComponent as IUiCommandReceiver)?.HandleCommand(new StopInteractionUiCommand());
 
     private void CanvasOnComponentAdded(object sender, ComponentNode e)
     {
@@ -67,6 +74,9 @@ public class CanvasNavigator : Component
         ServiceRegistry.Get<InputManager>().UnbindOnPressed("Down", SelectPreviousComponent);
         ServiceRegistry.Get<InputManager>().UnbindOnPressed("Mine", InteractOnPressed);
         ServiceRegistry.Get<InputManager>().UnbindOnReleased("Mine", InteractOnReleased);
+        
+        ServiceRegistry.Get<InputManager>().UnbindOnPressedPassThrough(PassPressedToSelectedComponent);
+        ServiceRegistry.Get<InputManager>().UnbindOnReleasedPassThrough(PassReleasedToSelectedComponent);
         
         canvas.ComponentAdded -= CanvasOnComponentAdded;
         canvas.ComponentRemoved -= CanvasOnComponentRemoved;

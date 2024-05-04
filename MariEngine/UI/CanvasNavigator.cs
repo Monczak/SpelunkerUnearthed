@@ -57,13 +57,14 @@ public class CanvasNavigator : Component
             return;
 
         SelectedComponent?.OnDeselected();
-        
+
+        var oldIndex = selectedComponentIndex;
         do
         {
             selectedComponentIndex += next ? 1 : -1;
             selectedComponentIndex = (selectedComponentIndex + components.Count) % components.Count;
             SelectedComponent = components[selectedComponentIndex] as IComponentSelectable;
-        } while (SelectedComponent is null);
+        } while ((SelectedComponent is null || !SelectedComponent.Selectable) && selectedComponentIndex != oldIndex);
 
         SelectedComponent?.OnSelected();
     }

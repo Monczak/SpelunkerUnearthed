@@ -29,6 +29,8 @@ public class ButtonComponent(Sprite background, string label = "") : ComponentNo
         Logger.LogDebug($"Deselected {Label}");
     }
 
+    public bool Selectable { get; set; } = true;
+
     public void HandleCommand(UiCommand command)
     {
         switch (command)

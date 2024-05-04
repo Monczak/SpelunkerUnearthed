@@ -47,6 +47,7 @@ public abstract class Component
 
     public void Destroy()
     {
+        OnDestroy();
         OwnerEntity.RemoveComponent(this);
     }
 

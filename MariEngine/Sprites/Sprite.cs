@@ -16,6 +16,8 @@ public class Sprite : Resource<SpriteData>
 
     public Tile GetNineSlice(CoordBounds bounds, Coord pos)
     {
+        if (Size == Coord.One) return Tiles[Coord.Zero];
+        
         return (pos - bounds.TopLeft) switch
         {
             // Corners
@@ -62,7 +64,7 @@ public class Sprite : Resource<SpriteData>
         NineSliced = data.NineSliceCornerSize is not null;
         NineSliceCornerSize = data.NineSliceCornerSize ?? 0;
 
-        if (NineSliceCornerSize < 0 || NineSliceCornerSize >= Math.Ceiling(Math.Min(width, height) / 2.0))
+        if (width * height != 1 && (NineSliceCornerSize < 0 || NineSliceCornerSize >= Math.Ceiling(Math.Min(width, height) / 2.0)))
             throw new ResourceLoadingException(
                 "9-slice corner size must be greater than 0 and less than half of the sprite's width or height, whichever is less.");
     }

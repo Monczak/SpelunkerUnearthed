@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using FMOD;
 using MariEngine.Logging;
 using MariEngine.Services;
 using MariEngine.Sprites;
@@ -117,5 +116,19 @@ public class CanvasRendererVisitor : ICanvasRendererVisitor
         var textBufferTopLeft = Coord.One * node.TextPadding + (labelSize - textBufferSize) / 2;
         var textBuffer = new TileBufferFragment(buffer, new CoordBounds(textBufferTopLeft, textBufferSize));
         RenderText(node.Label, 1, textBuffer);
+    }
+
+    public void Visit(SliderComponent node, TileBufferFragment buffer)
+    {
+        if (node.Background is not null)
+            RenderBackground(node.Background, buffer);
+
+        var fillPercentage = node.FillAmount;
+        var barBounds = new CoordBounds(buffer.Bounds.TopLeft,
+            new Coord(buffer.Bounds.Size.X * fillPercentage, buffer.Bounds.Size.Y));
+        foreach (var coord in barBounds.Coords)
+        {
+            buffer.SetAbsolute(coord, node.Bar.GetNineSlice(barBounds, coord));
+        }
     }
 }

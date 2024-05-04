@@ -10,7 +10,7 @@ namespace MariEngine.UI;
 
 public class CanvasNavigator : Component
 {
-    private List<ComponentNode> components = [];
+    private readonly List<ComponentNode> components = [];
     public IComponentSelectable SelectedComponent { get; private set; }
     private int selectedComponentIndex = 0;
 

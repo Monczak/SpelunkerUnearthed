@@ -215,7 +215,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         canvas = new Canvas();
         uiEntity.AttachComponent(canvas);
         uiEntity.AttachComponent(new CanvasNavigator());
-        uiEntity.AttachComponent(new CanvasRenderer(graphics.GraphicsDevice, Camera));
+        uiEntity.AttachComponent(new CanvasRenderer(graphics.GraphicsDevice, Camera, redrawEveryFrame: true));
         AddEntity(uiEntity);
 
         var container = canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column });
@@ -233,6 +233,21 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
             ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
             "Button 3") { PreferredHeight = 5, TextPadding = 1 });
         
-        canvas.GetComponent<CanvasRenderer>().Redraw();
+        var sliderPanel = panel.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column });
+        
+        var slider1 = sliderPanel.AddChild(new SliderComponent(
+            ServiceRegistry.Get<SpriteLoader>().Get("SliderBackground"),
+            ServiceRegistry.Get<SpriteLoader>().Get("SliderBar"),
+            0, 10) { PreferredHeight = 1 });
+        var slider2 = sliderPanel.AddChild(new SliderComponent(
+            ServiceRegistry.Get<SpriteLoader>().Get("SliderBackground"),
+            ServiceRegistry.Get<SpriteLoader>().Get("SliderBar"),
+            0, 10) { PreferredHeight = 1 });
+        var slider3 = sliderPanel.AddChild(new SliderComponent(
+            ServiceRegistry.Get<SpriteLoader>().Get("SliderBackground"),
+            ServiceRegistry.Get<SpriteLoader>().Get("SliderBar"),
+            0, 10) { PreferredHeight = 1 });
+        
+        canvas.GetComponent<CanvasRenderer>().Redraw(recomputeLayout: true);
     }
 }

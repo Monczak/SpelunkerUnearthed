@@ -62,10 +62,18 @@ public static class LayoutEngine
     {
         var flexDirection = flexLayoutNode.FlexDirection;
         var contentAlignment = flexLayoutNode.ContentAlignment;
-        var totalFlexGrow = flexLayoutNode.Children.Where(child => !child.HasPreferredSize).Sum(child => child.FlexGrow);
-
-        if (totalFlexGrow == 0)
-            totalFlexGrow = flexLayoutNode.Children.Count;
+        // var totalFlexGrow = flexLayoutNode.Children.Where(child => !child.HasPreferredSize).Sum(child => child.FlexGrow);
+        //
+        // if (totalFlexGrow == 0)
+        //     totalFlexGrow = flexLayoutNode.Children.Count;
+        
+        var totalFlexGrow = flexLayoutNode.Children.Sum(child =>
+            child.HasPreferredSize
+                ? (child.PreferredWidth is not null && flexDirection == FlexDirection.Column) ||
+                  (child.PreferredHeight is not null && flexDirection == FlexDirection.Row)
+                    ? 1
+                    : 0
+                : child.FlexGrow);
         
         Vector2 error = Vector2.Zero;
 

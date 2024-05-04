@@ -28,6 +28,12 @@
 #begin Sprites/Player.yml
 /copy:Sprites/Player.yml
 
+#begin Sprites/SliderBackground.yml
+/copy:Sprites/SliderBackground.yml
+
+#begin Sprites/SliderBar.yml
+/copy:Sprites/SliderBar.yml
+
 #begin Sprites/TestSprite.yml
 /copy:Sprites/TestSprite.yml
 
@@ -54,6 +60,12 @@
 
 #begin Tiles/Scoria.yml
 /copy:Tiles/Scoria.yml
+
+#begin Tiles/SliderBackground.yml
+/copy:Tiles/SliderBackground.yml
+
+#begin Tiles/SliderBar.yml
+/copy:Tiles/SliderBar.yml
 
 #begin Tiles/Stone.yml
 /copy:Tiles/Stone.yml

@@ -22,10 +22,15 @@ public partial class CanvasRenderer : Renderer
 
     private ICanvasRendererVisitor rendererVisitor;
 
-    public CanvasRenderer(GraphicsDevice graphicsDevice, Camera camera, int overscan = 1, ICanvasRendererVisitor rendererVisitor = null) : base(graphicsDevice, camera)
+    private Dictionary<CanvasNode, CoordBounds> layout;
+
+    private bool redrawEveryFrame;
+    
+    public CanvasRenderer(GraphicsDevice graphicsDevice, Camera camera, int overscan = 1, ICanvasRendererVisitor rendererVisitor = null, bool redrawEveryFrame = false) : base(graphicsDevice, camera)
     {
         this.overscan = overscan;
         this.rendererVisitor = rendererVisitor ?? new CanvasRendererVisitor();
+        this.redrawEveryFrame = redrawEveryFrame;
         
         InitializeBuffer();
         
@@ -36,6 +41,7 @@ public partial class CanvasRenderer : Renderer
     private void Reinitialize()
     {
         InitializeBuffer();
+        RecomputeLayout();
         Redraw();
     }
 
@@ -53,11 +59,17 @@ public partial class CanvasRenderer : Renderer
         testTexture.SetData([Color.Aqua]);
     }
 
-    public void Redraw()
+    public void RecomputeLayout()
     {
         canvas.Root.Padding = Coord.One * overscan;
+        layout = LayoutEngine.CalculateLayout(canvas.Root, new Coord(tileBuffer.Width, tileBuffer.Height));
+    }
+    
+    public void Redraw(bool recomputeLayout = false)
+    {
+        if (recomputeLayout) RecomputeLayout();
         
-        var layout = LayoutEngine.CalculateLayout(canvas.Root, new Coord(tileBuffer.Width, tileBuffer.Height));
+        // TODO: Add dirtying system
         foreach (var (node, bounds) in layout)
         {
             // string tileId = LayoutEngine.DepthMap[node] switch
@@ -80,6 +92,8 @@ public partial class CanvasRenderer : Renderer
 
     protected override void Render(SpriteBatch spriteBatch)
     {
+        if (redrawEveryFrame) Redraw();
+        
         spriteBatch.Begin(SpriteSortMode.Texture, BlendState.AlphaBlend, SamplerState.AnisotropicClamp);
 
         foreach (var coord in tileBuffer.Coords)

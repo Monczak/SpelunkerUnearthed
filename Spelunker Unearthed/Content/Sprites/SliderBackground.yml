@@ -1,0 +1,5 @@
+﻿Tiles:
+  - "a"
+Keys:
+  a: SliderBackground
+NineSliceCornerSize: 1

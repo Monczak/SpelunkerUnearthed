@@ -31,7 +31,6 @@ public class SliderComponent(Sprite background, Sprite bar, int minValue, int ma
 
     public event Action<SliderComponent> Selected;
     public event Action<SliderComponent> Deselected;
-    public Direction InhibitedNavigationDirections { get; set; }
 
     public delegate void ValueChangedEventHandler(SliderComponent sender, int newValue);
 
@@ -48,6 +47,9 @@ public class SliderComponent(Sprite background, Sprite bar, int minValue, int ma
     }
 
     public bool Selectable { get; set; } = true;
+    
+    public Direction InhibitedNavigationDirections => Direction.Horizontal;
+
     public void HandleCommand(UiCommand command)
     {
         switch (command)

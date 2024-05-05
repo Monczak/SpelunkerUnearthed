@@ -8,6 +8,8 @@ public interface IComponentSelectable
     void OnDeselected();
 
     bool Selectable { get; set; }
+
+    Direction InhibitedNavigationDirections => Direction.None;
 }
 
 public interface IComponentSelectable<out T> : IComponentSelectable where T : ComponentNode

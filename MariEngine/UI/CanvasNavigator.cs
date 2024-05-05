@@ -69,8 +69,8 @@ public class CanvasNavigator : Component
         // BuildNavigationGraph();
     }
 
-    // TODO: Make this smarter - select first node in parent when parents are different, etc.
-    public void BuildNavigationGraph(IReadOnlyDictionary<CanvasNode, CoordBounds> layout)
+    // TODO: Make this smarter
+    private void BuildNavigationGraph(IReadOnlyDictionary<CanvasNode, CoordBounds> layout)
     {
         Direction[] directions = [Direction.Up, Direction.Down, Direction.Left, Direction.Right];
         
@@ -82,11 +82,14 @@ public class CanvasNavigator : Component
         
         foreach (var selectable in allSelectables)
         {
-            var selectableNode = selectable as CanvasNode;
+            var selectableNode = (CanvasNode)selectable;
             navigationGraph[selectable] = new Dictionary<Direction, IComponentSelectable>();
 
             foreach (var direction in directions)
             {
+                if ((selectable.InhibitedNavigationDirections & direction) != 0)
+                    continue;
+                
                 var nearestComponentInDirection = allSelectables
                     .Select(c => c as CanvasNode)
                     .Where(c => direction switch
@@ -102,8 +105,13 @@ public class CanvasNavigator : Component
                         _ => throw new ArgumentOutOfRangeException()
                     })
                     .MinBy(c => (layout[c].Center - layout[selectableNode].Center).SqrMagnitude);
-                if (nearestComponentInDirection is not null)
-                    navigationGraph[selectable][direction] = nearestComponentInDirection as IComponentSelectable;
+
+                if (nearestComponentInDirection is null) continue;
+                
+                if (nearestComponentInDirection.Parent != selectableNode.Parent)
+                    nearestComponentInDirection = nearestComponentInDirection.Parent.Children[0];
+                    
+                navigationGraph[selectable][direction] = nearestComponentInDirection as IComponentSelectable;
             }
         }
     }

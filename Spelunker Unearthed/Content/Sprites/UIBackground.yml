@@ -1,9 +1,13 @@
 ﻿Tiles:
-  - "aaa"
-  - "aba"
-  - "aaa"
+  - "abc"
+  - "ded"
+  - "fbg"
 Keys:
-  a: Basalt
-  b: Nothing
-  c: Stone
+  a: UIBorderTopLeft
+  b: UIBorderHorizontal
+  c: UIBorderTopRight
+  d: UIBorderVertical
+  e: Nothing
+  f: UIBorderBottomLeft
+  g: UIBorderBottomRight
 NineSliceCornerSize: 1

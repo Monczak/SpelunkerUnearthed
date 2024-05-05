@@ -73,6 +73,24 @@
 #begin Tiles/StoneGround.yml
 /copy:Tiles/StoneGround.yml
 
+#begin Tiles/UIBorderBottomLeft.yml
+/copy:Tiles/UIBorderBottomLeft.yml
+
+#begin Tiles/UIBorderBottomRight.yml
+/copy:Tiles/UIBorderBottomRight.yml
+
+#begin Tiles/UIBorderHorizontal.yml
+/copy:Tiles/UIBorderHorizontal.yml
+
+#begin Tiles/UIBorderTopLeft.yml
+/copy:Tiles/UIBorderTopLeft.yml
+
+#begin Tiles/UIBorderTopRight.yml
+/copy:Tiles/UIBorderTopRight.yml
+
+#begin Tiles/UIBorderVertical.yml
+/copy:Tiles/UIBorderVertical.yml
+
 #begin World Gen/Biomes/Glaciers.yml
 /copy:World Gen/Biomes/Glaciers.yml
 

@@ -1,5 +1,5 @@
 ﻿Tiles:
   - "a"
 Keys:
-  a: UISliderBar
+  a: UIDimSliderBackground
 NineSliceCornerSize: 1

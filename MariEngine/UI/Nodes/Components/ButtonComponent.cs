@@ -5,11 +5,12 @@ using MariEngine.Tiles;
 
 namespace MariEngine.UI.Nodes.Components;
 
-public class ButtonComponent(Sprite background, string label = "") : ComponentNode, IComponentSelectable<ButtonComponent>, IUiCommandReceiver
+public class ButtonComponent(Sprite background, Sprite inactiveBackground, string label = "") : ComponentNode, IComponentSelectable<ButtonComponent>, IUiCommandReceiver
 {
     public int TextPadding { get; init; } = 2;
 
     public Sprite Background { get; set; } = background;
+    public Sprite InactiveBackground { get; set; } = inactiveBackground;
     public string Label { get; set; } = label;
     
     public bool Pressed { get; private set; }
@@ -22,6 +23,9 @@ public class ButtonComponent(Sprite background, string label = "") : ComponentNo
     public event Action<ButtonComponent> Selected;
     public event Action<ButtonComponent> Deselected;
     public Direction InhibitedNavigationDirections { get; set; }
+    public bool SelectFirstChild { get; init; } = false;
+
+    public bool IsSelected { get; set; }
 
     public void OnSelected()
     {

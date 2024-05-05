@@ -23,18 +23,18 @@ public abstract class ResourceLoaderService<TItem, TProxyData> : Service where T
             .WithNamingConvention(namingConvention ?? PascalCaseNamingConvention.Instance)
             .Build();
         
-        foreach (var file in Directory.GetFiles(ContentPath))
+        foreach (var file in Directory.EnumerateFiles(ContentPath, "*.*"))
         {
-            string id = Path.GetFileNameWithoutExtension(file);
+            string id = Path.ChangeExtension(Path.GetRelativePath(ContentPath, file), null)
+                .Replace("\\", "/");
             try
             {
                 var data = deserializer.Deserialize<TProxyData>(File.ReadAllText(file));
                 var item = ResourceBuilder.Build<TItem, TProxyData>(id, data);
-                if (Content.ContainsKey(id))
+                if (!Content.TryAdd(id, item))
                 {
                     throw new ContentLoadingException($"Resource of type {typeof(TItem).Name} with ID {id} already exists.");
                 }
-                Content[id] = item;
             }
             catch (Exception e)
             {

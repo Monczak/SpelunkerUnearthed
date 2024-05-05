@@ -227,28 +227,34 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         
         var button1 = panel.AddChild(new ButtonComponent(
             ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
+            ServiceRegistry.Get<SpriteLoader>().Get("DimUIBackground"),
             "Button 1") { PreferredHeight = 5, TextPadding = 1 });
         var button2 = panel.AddChild(new ButtonComponent(
             ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
+            ServiceRegistry.Get<SpriteLoader>().Get("DimUIBackground"),
             "Button 2") { PreferredHeight = 5, TextPadding = 1 });
         var button3 = panel.AddChild(new ButtonComponent(
             ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
+            ServiceRegistry.Get<SpriteLoader>().Get("DimUIBackground"),
             "Button 3") { PreferredHeight = 5, TextPadding = 1 });
         
         var sliderPanel = panel.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column });
         
         var slider1 = sliderPanel.AddChild(new SliderComponent(
             ServiceRegistry.Get<SpriteLoader>().Get("SliderBackground"),
+            ServiceRegistry.Get<SpriteLoader>().Get("DimSliderBackground"),
             ServiceRegistry.Get<SpriteLoader>().Get("SliderBar"),
-            0, 10) { PreferredHeight = 1 });
+            0, 10) { PreferredHeight = 1, SelectFirstChild = true });
         var slider2 = sliderPanel.AddChild(new SliderComponent(
             ServiceRegistry.Get<SpriteLoader>().Get("SliderBackground"),
+            ServiceRegistry.Get<SpriteLoader>().Get("DimSliderBackground"),
             ServiceRegistry.Get<SpriteLoader>().Get("SliderBar"),
-            0, 10) { PreferredHeight = 1 });
+            0, 10) { PreferredHeight = 1, SelectFirstChild = true });
         var slider3 = sliderPanel.AddChild(new SliderComponent(
             ServiceRegistry.Get<SpriteLoader>().Get("SliderBackground"),
+            ServiceRegistry.Get<SpriteLoader>().Get("DimSliderBackground"),
             ServiceRegistry.Get<SpriteLoader>().Get("SliderBar"),
-            0, 10) { PreferredHeight = 1 });
+            0, 10) { PreferredHeight = 1, SelectFirstChild = true });
         
         canvas.GetComponent<CanvasRenderer>().Redraw(recomputeLayout: true);
     }

@@ -1,0 +1,13 @@
+﻿Tiles:
+  - "abc"
+  - "ded"
+  - "fbg"
+Keys:
+  a: UIDimBorderTopLeft
+  b: UIDimBorderHorizontal
+  c: UIDimBorderTopRight
+  d: UIDimBorderVertical
+  e: Nothing
+  f: UIDimBorderBottomLeft
+  g: UIDimBorderBottomRight
+NineSliceCornerSize: 1

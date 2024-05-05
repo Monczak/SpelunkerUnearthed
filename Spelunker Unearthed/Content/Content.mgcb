@@ -25,6 +25,12 @@
 #begin Materials/Stone.yml
 /copy:Materials/Stone.yml
 
+#begin Sprites/DimSliderBackground.yml
+/copy:Sprites/DimSliderBackground.yml
+
+#begin Sprites/DimUIBackground.yml
+/copy:Sprites/DimUIBackground.yml
+
 #begin Sprites/Player.yml
 /copy:Sprites/Player.yml
 
@@ -61,12 +67,6 @@
 #begin Tiles/Scoria.yml
 /copy:Tiles/Scoria.yml
 
-#begin Tiles/SliderBackground.yml
-/copy:Tiles/SliderBackground.yml
-
-#begin Tiles/SliderBar.yml
-/copy:Tiles/SliderBar.yml
-
 #begin Tiles/Stone.yml
 /copy:Tiles/Stone.yml
 
@@ -90,6 +90,33 @@
 
 #begin Tiles/UIBorderVertical.yml
 /copy:Tiles/UIBorderVertical.yml
+
+#begin Tiles/UIDimBorderBottomLeft.yml
+/copy:Tiles/UIDimBorderBottomLeft.yml
+
+#begin Tiles/UIDimBorderBottomRight.yml
+/copy:Tiles/UIDimBorderBottomRight.yml
+
+#begin Tiles/UIDimBorderHorizontal.yml
+/copy:Tiles/UIDimBorderHorizontal.yml
+
+#begin Tiles/UIDimBorderTopLeft.yml
+/copy:Tiles/UIDimBorderTopLeft.yml
+
+#begin Tiles/UIDimBorderTopRight.yml
+/copy:Tiles/UIDimBorderTopRight.yml
+
+#begin Tiles/UIDimBorderVertical.yml
+/copy:Tiles/UIDimBorderVertical.yml
+
+#begin Tiles/UIDimSliderBackground.yml
+/copy:Tiles/UIDimSliderBackground.yml
+
+#begin Tiles/UISliderBackground.yml
+/copy:Tiles/UISliderBackground.yml
+
+#begin Tiles/UISliderBar.yml
+/copy:Tiles/UISliderBar.yml
 
 #begin World Gen/Biomes/Glaciers.yml
 /copy:World Gen/Biomes/Glaciers.yml

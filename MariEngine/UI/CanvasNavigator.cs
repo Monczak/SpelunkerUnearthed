@@ -124,13 +124,13 @@ public class CanvasNavigator : Component
         if (SelectedComponent is not null && !navigationGraph[SelectedComponent].ContainsKey(direction))
             return;
         
-        SelectedComponent?.OnDeselected();
+        SelectedComponent?.Deselect();
 
         SelectedComponent = SelectedComponent is null
             ? components.OfType<IComponentSelectable>().FirstOrDefault()
             : navigationGraph[SelectedComponent][direction];
 
-        SelectedComponent?.OnSelected();
+        SelectedComponent?.Select();
     }
 
     protected override void OnDestroy()

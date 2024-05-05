@@ -106,8 +106,15 @@ public class CanvasRendererVisitor : ICanvasRendererVisitor
 
     public void Visit(ButtonComponent node, TileBufferFragment buffer)
     {
-        if (node.Background is not null)
-            RenderBackground(node.Background, buffer);
+        if (node.IsSelected)
+        {
+            if (node.Background is not null) RenderBackground(node.Background, buffer);
+        }
+        else
+        {
+            if (node.InactiveBackground is not null) RenderBackground(node.InactiveBackground, buffer);
+        }
+        
 
         var labelSize = buffer.Bounds.Size - Coord.One * node.TextPadding * 2;
         
@@ -120,15 +127,19 @@ public class CanvasRendererVisitor : ICanvasRendererVisitor
 
     public void Visit(SliderComponent node, TileBufferFragment buffer)
     {
-        if (node.Background is not null)
-            RenderBackground(node.Background, buffer);
+        if (node.IsSelected)
+        {
+            if (node.Background is not null) RenderBackground(node.Background, buffer);
+        }
+        else
+        {
+            if (node.InactiveBackground is not null) RenderBackground(node.InactiveBackground, buffer);
+        }
 
         var fillPercentage = node.FillAmount;
         var barBounds = new CoordBounds(buffer.Bounds.TopLeft,
             new Coord(buffer.Bounds.Size.X * fillPercentage, buffer.Bounds.Size.Y));
-        foreach (var coord in barBounds.Coords)
-        {
+        foreach (var coord in barBounds.Coords) 
             buffer.SetAbsolute(coord, node.Bar.GetNineSlice(barBounds, coord));
-        }
     }
 }

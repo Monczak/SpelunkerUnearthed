@@ -220,41 +220,47 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         uiEntity.AttachComponent(new CanvasRenderer(graphics.GraphicsDevice, Camera, redrawEveryFrame: true));
         AddEntity(uiEntity);
 
-        var container = canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column });
-        var spacer = container.AddChild(new FlexLayoutNode());
+        var container = canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Row });
+        container.AddChild(new FlexLayoutNode());
         var panel = container.AddChild(new FlexLayoutNode
-            { Background = ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"), Padding = Coord.One, PreferredHeight = 9, FlexGap = 3 });
-        
-        var button1 = panel.AddChild(new ButtonComponent(
+            { Background = ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"), Padding = Coord.One, FlexGrow = 3, FlexGap = 1, FlexDirection = FlexDirection.Column });
+        container.AddChild(new FlexLayoutNode());
+
+        for (var i = 0; i < 3; i++)
+        {
+            var row = panel.AddChild(new FlexLayoutNode { FlexGap = 1, Padding = Coord.Zero, PreferredHeight = 5 });
+            for (var j = 0; j < 2; j++)
+            {
+                row.AddChild(new ButtonComponent(
+                    ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
+                    ServiceRegistry.Get<SpriteLoader>().Get("DimUIBackground"),
+                    $"Button {j + i * 2}") { TextPadding = 1 });
+            }
+        }
+
+        var sliderContainer = panel.AddChild(new FlexLayoutNode { Padding = Coord.Zero, FlexGap = 1 });
+        for (var i = 0; i < 2; i++)
+        {
+            var sliderStack = sliderContainer.AddChild(new FlexLayoutNode { Padding = Coord.Zero, FlexDirection = FlexDirection.Column });
+            for (var j = 0; j < 4; j++)
+            {
+                var row = sliderStack.AddChild(new FlexLayoutNode { Padding = Coord.Zero, FlexDirection = FlexDirection.Row, PreferredHeight = 1 });
+                var label = new TextComponent { PreferredWidth = 2 };
+                var slider = row.AddChild(new SliderComponent(
+                    ServiceRegistry.Get<SpriteLoader>().Get("SliderBackground"),
+                    ServiceRegistry.Get<SpriteLoader>().Get("DimSliderBackground"),
+                    ServiceRegistry.Get<SpriteLoader>().Get("SliderBar"),
+                    0, 10));
+                row.AddChild(label);
+                label.Text = slider.Value.ToString();
+                slider.ValueChanged += (sender, value) => label.Text = value.ToString();
+            }
+        }
+
+        panel.AddChild(new ButtonComponent(
             ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
             ServiceRegistry.Get<SpriteLoader>().Get("DimUIBackground"),
-            "Button 1") { PreferredHeight = 5, TextPadding = 1 });
-        var button2 = panel.AddChild(new ButtonComponent(
-            ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
-            ServiceRegistry.Get<SpriteLoader>().Get("DimUIBackground"),
-            "Button 2") { PreferredHeight = 5, TextPadding = 1 });
-        var button3 = panel.AddChild(new ButtonComponent(
-            ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
-            ServiceRegistry.Get<SpriteLoader>().Get("DimUIBackground"),
-            "Button 3") { PreferredHeight = 5, TextPadding = 1 });
-        
-        var sliderPanel = panel.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column });
-        
-        var slider1 = sliderPanel.AddChild(new SliderComponent(
-            ServiceRegistry.Get<SpriteLoader>().Get("SliderBackground"),
-            ServiceRegistry.Get<SpriteLoader>().Get("DimSliderBackground"),
-            ServiceRegistry.Get<SpriteLoader>().Get("SliderBar"),
-            0, 10) { PreferredHeight = 1, SelectFirstChild = true });
-        var slider2 = sliderPanel.AddChild(new SliderComponent(
-            ServiceRegistry.Get<SpriteLoader>().Get("SliderBackground"),
-            ServiceRegistry.Get<SpriteLoader>().Get("DimSliderBackground"),
-            ServiceRegistry.Get<SpriteLoader>().Get("SliderBar"),
-            0, 10) { PreferredHeight = 1, SelectFirstChild = true });
-        var slider3 = sliderPanel.AddChild(new SliderComponent(
-            ServiceRegistry.Get<SpriteLoader>().Get("SliderBackground"),
-            ServiceRegistry.Get<SpriteLoader>().Get("DimSliderBackground"),
-            ServiceRegistry.Get<SpriteLoader>().Get("SliderBar"),
-            0, 10) { PreferredHeight = 1, SelectFirstChild = true });
+            $"Big Boi Button") { TextPadding = 1, PreferredHeight = 5 });
         
         canvas.GetComponent<CanvasRenderer>().Redraw(recomputeLayout: true);
     }

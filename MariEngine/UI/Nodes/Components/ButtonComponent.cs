@@ -30,13 +30,11 @@ public class ButtonComponent(Sprite background, Sprite inactiveBackground, strin
     public void OnSelected()
     {
         Selected?.Invoke(this);
-        Logger.LogDebug($"Selected {Label}");
     }
 
     public void OnDeselected()
     {
         Deselected?.Invoke(this);
-        Logger.LogDebug($"Deselected {Label}");
     }
 
     public bool Selectable { get; set; } = true;
@@ -51,10 +49,6 @@ public class ButtonComponent(Sprite background, Sprite inactiveBackground, strin
                 break;
             case StopInteractionUiCommand:
                 Pressed = false;
-                Logger.LogDebug($"Released {Label}");
-                break;
-            case InputKeyUiCommand inputKeyUiCommand:
-                Logger.LogDebug($"Key {inputKeyUiCommand.Key}, pressed: {inputKeyUiCommand.IsPressed}");
                 break;
         }
     }

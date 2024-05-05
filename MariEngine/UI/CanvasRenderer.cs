@@ -80,6 +80,10 @@ public partial class CanvasRenderer : Renderer
             //     1 => "Stone",
             //     2 => "Player",
             //     3 => "Scoria",
+            //     4 => "Nothing",
+            //     5 => "Stone",
+            //     6 => "Player",
+            //     7 => "Scoria",
             //     _ => "PackedIce",
             // };
             // foreach (Coord coord in bounds.Coords)

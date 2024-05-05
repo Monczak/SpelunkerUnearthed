@@ -26,8 +26,9 @@ public class CanvasRendererVisitor : ICanvasRendererVisitor
     {
         // TODO: Support non-9-sliced sprites
         foreach (Coord coord in buffer.Bounds.Coords)
-        {
-            buffer.SetAbsolute(coord, background.GetNineSlice(buffer.Bounds, coord));
+        { 
+            if (buffer.IsInOuterBounds(coord))
+                buffer.SetAbsolute(coord, background.GetNineSlice(buffer.Bounds, coord));
         }
     }
 
@@ -84,7 +85,7 @@ public class CanvasRendererVisitor : ICanvasRendererVisitor
                 }
             }
             
-            if (buffer is not null && buffer.IsInBounds(coord))
+            if (buffer is not null && buffer.IsInBounds(coord) && buffer.IsInOuterBounds(coord + buffer.Bounds.TopLeft))
             {
                 buffer[coord] = ServiceRegistry.Get<TileLoader>().GetCharacter(c);
             }
@@ -139,7 +140,10 @@ public class CanvasRendererVisitor : ICanvasRendererVisitor
         var fillPercentage = node.FillAmount;
         var barBounds = new CoordBounds(buffer.Bounds.TopLeft,
             new Coord(buffer.Bounds.Size.X * fillPercentage, buffer.Bounds.Size.Y));
-        foreach (var coord in barBounds.Coords) 
-            buffer.SetAbsolute(coord, node.Bar.GetNineSlice(barBounds, coord));
+        foreach (var coord in barBounds.Coords)
+        {
+            if (buffer.IsInOuterBounds(coord))
+                buffer.SetAbsolute(coord, node.Bar.GetNineSlice(barBounds, coord));
+        }
     }
 }

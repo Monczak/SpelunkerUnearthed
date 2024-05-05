@@ -104,11 +104,11 @@ public class CanvasNavigator : Component
                                            layout[selectableNode].BottomRight.X,
                         _ => throw new ArgumentOutOfRangeException()
                     })
-                    .MinBy(c => (layout[c].Center - layout[selectableNode].Center).SqrMagnitude);
+                    .MinBy(c => Math.Abs((layout[c].Center - layout[selectableNode].Center).X) + Math.Abs((layout[c].Center - layout[selectableNode].Center).Y));
 
                 if (nearestComponentInDirection is null) continue;
                 
-                if (nearestComponentInDirection.Parent != selectableNode.Parent)
+                if (nearestComponentInDirection.Parent != selectableNode.Parent && ((IComponentSelectable)nearestComponentInDirection).SelectFirstChild)
                     nearestComponentInDirection = nearestComponentInDirection.Parent.Children[0];
                     
                 navigationGraph[selectable][direction] = nearestComponentInDirection as IComponentSelectable;

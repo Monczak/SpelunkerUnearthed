@@ -187,13 +187,13 @@ public static class LayoutEngine
                     _ => throw new ArgumentOutOfRangeException()
                 }; 
                     
-                // var (flexGapBefore, flexGapAfter) = CalculateFlexGap(flexLayoutNode, i);
-                // usableSize -= flexDirection switch
-                // {
-                //     FlexDirection.Row => Coord.UnitX * (flexGapBefore + flexGapAfter),
-                //     FlexDirection.Column => Coord.UnitY * (flexGapBefore + flexGapAfter),
-                //     _ => throw new ArgumentOutOfRangeException()
-                // };
+                var (flexGapBefore, flexGapAfter) = CalculateFlexGap(flexLayoutNode, i);
+                usableSize -= flexDirection switch
+                {
+                    FlexDirection.Row => Coord.UnitX * (flexGapBefore + flexGapAfter),
+                    FlexDirection.Column => Coord.UnitY * (flexGapBefore + flexGapAfter),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
             }
         }
 
@@ -202,7 +202,7 @@ public static class LayoutEngine
 
     private static (float flexGapBefore, float flexGapAfter) CalculateFlexGap(FlexLayoutNode node, int indexInParent)
     {
-        float flexGapBefore = MathF.Ceiling(indexInParent == 0 ? 0 : node.FlexGap / 2.0f);
+        float flexGapBefore = 0;
         float flexGapAfter = MathF.Ceiling(indexInParent == node.Children.Count - 1 ? 0 : node.FlexGap / 2.0f);
         return (flexGapBefore, flexGapAfter);
     }

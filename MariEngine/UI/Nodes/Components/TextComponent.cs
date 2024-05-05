@@ -2,7 +2,7 @@
 
 namespace MariEngine.UI.Nodes.Components;
 
-public class TextComponent(string text) : ComponentNode
+public class TextComponent(string text = "") : ComponentNode
 {
     public string Text
     {

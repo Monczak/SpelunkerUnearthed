@@ -21,7 +21,7 @@ public abstract class CanvasNode
     public event EventHandler<CanvasNode> ChildAdded;
     public event EventHandler<CanvasNode> ChildDetached; 
 
-    public virtual CanvasNode AddChild(CanvasNode node)
+    public virtual T AddChild<T>(T node) where T : CanvasNode
     {
         node.Parent = this;
         children.Add(node);

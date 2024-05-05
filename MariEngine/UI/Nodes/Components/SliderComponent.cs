@@ -65,7 +65,6 @@ public class SliderComponent(Sprite background, Sprite inactiveBackground, Sprit
                 Value -= step;
                 break;
         }
-        Logger.LogDebug(Value);
     }
 
     public override void Accept(ICanvasRendererVisitor rendererVisitor, TileBufferFragment buffer)

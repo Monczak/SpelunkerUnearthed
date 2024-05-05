@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using MariEngine.Components;
 using MariEngine.UI.Nodes;
 using MariEngine.UI.Nodes.Components;
@@ -8,12 +9,20 @@ namespace MariEngine.UI;
 
 public class Canvas : Component
 {
+    private Dictionary<CanvasNode, CoordBounds> layout;
+    public IReadOnlyDictionary<CanvasNode, CoordBounds> Layout => layout.AsReadOnly();
+    
     public FlexLayoutNode Root { get; } = new();
 
     public Canvas()
     {
         Root.ChildAdded += RootOnChildAdded;
         Root.ChildDetached += RootOnChildDetached;
+    }
+
+    public void RecomputeLayout(Coord bufferSize)
+    {
+        layout = LayoutEngine.CalculateLayout(Root, bufferSize);
     }
 
     private void RootOnChildDetached(object sender, CanvasNode e)

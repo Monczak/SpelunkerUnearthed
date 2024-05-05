@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using MariEngine.Components;
 using MariEngine.Input;
 using MariEngine.Logging;
 using MariEngine.Services;
+using MariEngine.UI.Nodes;
 using MariEngine.UI.Nodes.Components;
 using Microsoft.Xna.Framework.Input;
 
@@ -15,6 +18,8 @@ public class CanvasNavigator : Component
     private int selectedComponentIndex = 0;
 
     private Canvas canvas;
+
+    private Dictionary<IComponentSelectable, Dictionary<Direction, IComponentSelectable>> navigationGraph = new();
     
     protected override void OnAttach()
     {
@@ -24,10 +29,13 @@ public class CanvasNavigator : Component
         canvas.ComponentAdded += CanvasOnComponentAdded;
         canvas.ComponentRemoved += CanvasOnComponentRemoved;
         
-        ServiceRegistry.Get<InputManager>().OnPressed("Up", SelectNextComponent);
-        ServiceRegistry.Get<InputManager>().OnPressed("Down", SelectPreviousComponent);
-        ServiceRegistry.Get<InputManager>().OnPressed("Mine", InteractOnPressed);
-        ServiceRegistry.Get<InputManager>().OnReleased("Mine", InteractOnReleased);
+        ServiceRegistry.Get<InputManager>().OnPressed("UI_Up", SelectComponentUp);
+        ServiceRegistry.Get<InputManager>().OnPressed("UI_Down", SelectComponentDown);
+        ServiceRegistry.Get<InputManager>().OnPressed("UI_Left", SelectComponentLeft);
+        ServiceRegistry.Get<InputManager>().OnPressed("UI_Right", SelectComponentRight);
+        
+        ServiceRegistry.Get<InputManager>().OnPressed("UI_Select", InteractOnPressed);
+        ServiceRegistry.Get<InputManager>().OnReleased("UI_Select", InteractOnReleased);
         
         ServiceRegistry.Get<InputManager>().OnPressedPassThrough(PassPressedToSelectedComponent);
         ServiceRegistry.Get<InputManager>().OnReleasedPassThrough(PassReleasedToSelectedComponent);
@@ -36,48 +44,92 @@ public class CanvasNavigator : Component
     private void PassPressedToSelectedComponent(Keys key) => (SelectedComponent as IUiCommandReceiver)?.HandleCommand(new InputKeyUiCommand(key, true));
     private void PassReleasedToSelectedComponent(Keys key) => (SelectedComponent as IUiCommandReceiver)?.HandleCommand(new InputKeyUiCommand(key, false));
 
-    private void SelectNextComponent() => SelectComponent(true);
-    private void SelectPreviousComponent() => SelectComponent(false);
+    private void SelectComponentUp() => SelectComponent(Direction.Up);
+    private void SelectComponentDown() => SelectComponent(Direction.Down);
+    private void SelectComponentLeft() => SelectComponent(Direction.Left);
+    private void SelectComponentRight() => SelectComponent(Direction.Right);
+    
+    
     private void InteractOnPressed() => (SelectedComponent as IUiCommandReceiver)?.HandleCommand(new StartInteractionUiCommand());
     private void InteractOnReleased() => (SelectedComponent as IUiCommandReceiver)?.HandleCommand(new StopInteractionUiCommand());
 
     private void CanvasOnComponentAdded(object sender, ComponentNode e)
     {
         components.Add(e);
+        // BuildNavigationGraph();
     }
     
     private void CanvasOnComponentRemoved(object sender, ComponentNode e)
     {
         components.Remove(e);
+        // BuildNavigationGraph();
     }
 
-    private void SelectComponent(bool next)
+    // TODO: Make this smarter - select first node in parent when parents are different, etc.
+    public void BuildNavigationGraph()
+    {
+        Direction[] directions = [Direction.Up, Direction.Down, Direction.Left, Direction.Right];
+        
+        navigationGraph = new Dictionary<IComponentSelectable, Dictionary<Direction, IComponentSelectable>>();
+        var allSelectables = components
+            .OfType<IComponentSelectable>()
+            .Where(c => c.Selectable)
+            .ToList();
+        
+        foreach (var selectable in allSelectables)
+        {
+            var selectableNode = selectable as CanvasNode;
+            navigationGraph[selectable] = new Dictionary<Direction, IComponentSelectable>();
+
+            foreach (var direction in directions)
+            {
+                var nearestComponentInDirection = allSelectables
+                    .Select(c => c as CanvasNode)
+                    .Where(c => direction switch
+                    {
+                        Direction.Up => canvas.Layout[c].BottomRight.Y <
+                                        canvas.Layout[selectableNode].TopLeft.Y,
+                        Direction.Down => canvas.Layout[c].TopLeft.Y >
+                                          canvas.Layout[selectableNode].BottomRight.Y,
+                        Direction.Left => canvas.Layout[c].BottomRight.X <
+                                          canvas.Layout[selectableNode].TopLeft.X,
+                        Direction.Right => canvas.Layout[c].TopLeft.X >
+                                           canvas.Layout[selectableNode].BottomRight.X,
+                        _ => throw new ArgumentOutOfRangeException()
+                    })
+                    .MinBy(c => (canvas.Layout[c].Center - canvas.Layout[selectableNode].Center).SqrMagnitude);
+                if (nearestComponentInDirection is not null)
+                    navigationGraph[selectable][direction] = nearestComponentInDirection as IComponentSelectable;
+            }
+        }
+    }
+
+    private void SelectComponent(Direction direction)
     {
         if (components.Count == 0)
             return;
-
+        
+        if (SelectedComponent is not null && !navigationGraph[SelectedComponent].ContainsKey(direction))
+            return;
+        
         SelectedComponent?.OnDeselected();
 
-        var oldIndex = selectedComponentIndex;
-        do
-        {
-            selectedComponentIndex += next ? 1 : -1;
-            selectedComponentIndex = (selectedComponentIndex + components.Count) % components.Count;
-            SelectedComponent = components[selectedComponentIndex] as IComponentSelectable;
-        } while ((SelectedComponent is null || !SelectedComponent.Selectable) && selectedComponentIndex != oldIndex);
+        SelectedComponent = SelectedComponent is null
+            ? components.OfType<IComponentSelectable>().FirstOrDefault()
+            : navigationGraph[SelectedComponent][direction];
 
         SelectedComponent?.OnSelected();
     }
 
     protected override void OnDestroy()
     {
-        ServiceRegistry.Get<InputManager>().UnbindOnPressed("Up", SelectNextComponent);
-        ServiceRegistry.Get<InputManager>().UnbindOnPressed("Down", SelectPreviousComponent);
-        ServiceRegistry.Get<InputManager>().UnbindOnPressed("Mine", InteractOnPressed);
-        ServiceRegistry.Get<InputManager>().UnbindOnReleased("Mine", InteractOnReleased);
+        ServiceRegistry.Get<InputManager>().UnbindOnPressed("UI_Up", SelectComponentUp);
+        ServiceRegistry.Get<InputManager>().UnbindOnPressed("UI_Down", SelectComponentDown);
+        ServiceRegistry.Get<InputManager>().UnbindOnPressed("UI_Left", SelectComponentLeft);
+        ServiceRegistry.Get<InputManager>().UnbindOnPressed("UI_Right", SelectComponentRight);
         
-        ServiceRegistry.Get<InputManager>().UnbindOnPressedPassThrough(PassPressedToSelectedComponent);
-        ServiceRegistry.Get<InputManager>().UnbindOnReleasedPassThrough(PassReleasedToSelectedComponent);
+        ServiceRegistry.Get<InputManager>().UnbindOnPressed("UI_Select", InteractOnPressed);
+        ServiceRegistry.Get<InputManager>().UnbindOnReleased("UI_Select", InteractOnReleased);
         
         canvas.ComponentAdded -= CanvasOnComponentAdded;
         canvas.ComponentRemoved -= CanvasOnComponentRemoved;

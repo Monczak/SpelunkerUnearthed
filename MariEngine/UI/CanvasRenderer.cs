@@ -22,8 +22,6 @@ public partial class CanvasRenderer : Renderer
 
     private ICanvasRendererVisitor rendererVisitor;
 
-    private Dictionary<CanvasNode, CoordBounds> layout;
-
     private bool redrawEveryFrame;
     
     public CanvasRenderer(GraphicsDevice graphicsDevice, Camera camera, int overscan = 1, ICanvasRendererVisitor rendererVisitor = null, bool redrawEveryFrame = false) : base(graphicsDevice, camera)
@@ -62,7 +60,10 @@ public partial class CanvasRenderer : Renderer
     public void RecomputeLayout()
     {
         canvas.Root.Padding = Coord.One * overscan;
-        layout = LayoutEngine.CalculateLayout(canvas.Root, new Coord(tileBuffer.Width, tileBuffer.Height));
+        canvas.RecomputeLayout(new Coord(tileBuffer.Width, tileBuffer.Height));
+        
+        // FIXME: This is ugly
+        canvas.GetComponent<CanvasNavigator>().BuildNavigationGraph();
     }
     
     public void Redraw(bool recomputeLayout = false)
@@ -70,7 +71,7 @@ public partial class CanvasRenderer : Renderer
         if (recomputeLayout) RecomputeLayout();
         
         // TODO: Add dirtying system
-        foreach (var (node, bounds) in layout)
+        foreach (var (node, bounds) in canvas.Layout)
         {
             // string tileId = LayoutEngine.DepthMap[node] switch
             // {

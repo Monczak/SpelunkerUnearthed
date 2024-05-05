@@ -144,6 +144,13 @@ public class SpelunkerUnearthedGame : Game
         inputManager.RegisterEvent(new InputEvent("Down", Keys.Down));
         inputManager.RegisterEvent(new InputEvent("Left", Keys.Left));
         inputManager.RegisterEvent(new InputEvent("Right", Keys.Right));
+        
+        inputManager.RegisterEvent(new InputEvent("UI_Up", Keys.Up));
+        inputManager.RegisterEvent(new InputEvent("UI_Down", Keys.Down));
+        inputManager.RegisterEvent(new InputEvent("UI_Left", Keys.Left));
+        inputManager.RegisterEvent(new InputEvent("UI_Right", Keys.Right));
+        inputManager.RegisterEvent(new InputEvent("UI_Select", Keys.Z));
+        
         inputManager.RegisterEvent(new InputEvent("Mine", Keys.Z));
         inputManager.RegisterEvent(new InputEvent("Use", Keys.X));
 

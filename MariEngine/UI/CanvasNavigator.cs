@@ -87,6 +87,12 @@ public class CanvasNavigator : Component
 
             foreach (var direction in directions)
             {
+                if (selectable.NavigationOverrides.TryGetValue(direction, out var target))
+                {
+                    navigationGraph[selectable][direction] = target;
+                    continue;
+                }
+                
                 if ((selectable.InhibitedNavigationDirections & direction) != 0)
                     continue;
                 

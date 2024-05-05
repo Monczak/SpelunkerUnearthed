@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace MariEngine.UI.Nodes.Components;
 
@@ -25,10 +26,21 @@ public interface IComponentSelectable
 
     Direction InhibitedNavigationDirections => Direction.None;
     bool SelectFirstChild { get; init; }
+
+    protected internal Dictionary<Direction, IComponentSelectable> NavigationOverrides { get; }
 }
 
 public interface IComponentSelectable<out T> : IComponentSelectable where T : ComponentNode
 {
     public event Action<T> Selected;
     public event Action<T> Deselected;
+}
+
+public static class ComponentSelectableExtensions
+{
+    public static T WithNavigationOverride<T>(this T component, Direction direction, IComponentSelectable<T> target) where T : ComponentNode
+    {
+        ((IComponentSelectable<T>)component).NavigationOverrides[direction] = target;
+        return component;
+    }
 }

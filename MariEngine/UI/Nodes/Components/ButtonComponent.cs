@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using MariEngine.Logging;
 using MariEngine.Sprites;
 using MariEngine.Tiles;
@@ -24,6 +25,7 @@ public class ButtonComponent(Sprite background, Sprite inactiveBackground, strin
     public event Action<ButtonComponent> Deselected;
     public Direction InhibitedNavigationDirections { get; set; }
     public bool SelectFirstChild { get; init; } = false;
+    public Dictionary<Direction, IComponentSelectable> NavigationOverrides { get; } = new();
 
     public bool IsSelected { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using MariEngine.Logging;
 using MariEngine.Sprites;
 using MariEngine.Tiles;
@@ -53,6 +54,7 @@ public class SliderComponent(Sprite background, Sprite inactiveBackground, Sprit
     
     public Direction InhibitedNavigationDirections => Direction.Horizontal;
     public bool SelectFirstChild { get; init; } = false;
+    public Dictionary<Direction, IComponentSelectable> NavigationOverrides { get; } = new();
 
     public void HandleCommand(UiCommand command)
     {

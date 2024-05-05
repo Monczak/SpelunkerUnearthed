@@ -226,6 +226,8 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
             { Background = ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"), Padding = Coord.One, FlexGrow = 3, FlexGap = 1, FlexDirection = FlexDirection.Column });
         container.AddChild(new FlexLayoutNode());
 
+        panel.AddChild(new TextComponent("This is a test of the new UI things in Spelunker Unearthed!") { PreferredHeight = 2 });
+        
         for (var i = 0; i < 3; i++)
         {
             var row = panel.AddChild(new FlexLayoutNode { FlexGap = 1, Padding = Coord.Zero, PreferredHeight = 5 });
@@ -258,9 +260,10 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         }
 
         panel.AddChild(new ButtonComponent(
-            ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
-            ServiceRegistry.Get<SpriteLoader>().Get("DimUIBackground"),
-            $"Big Boi Button") { TextPadding = 1, PreferredHeight = 5 });
+                ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
+                ServiceRegistry.Get<SpriteLoader>().Get("DimUIBackground"),
+                $"Big Boi Button") { TextPadding = 1, PreferredHeight = 5 }
+            .WithNavigationOverride(Direction.Down, panel.Children[1].Children[0] as IComponentSelectable<ButtonComponent>));
         
         canvas.GetComponent<CanvasRenderer>().Redraw(recomputeLayout: true);
     }

@@ -14,6 +14,7 @@ using MariEngine.Services;
 using MariEngine.Sprites;
 using MariEngine.Tiles;
 using MariEngine.UI;
+using MariEngine.UI.Nodes;
 using MariEngine.UI.Nodes.Components;
 using MariEngine.UI.Nodes.Layouts;
 using SpelunkerUnearthed.Scripts.Audio;
@@ -214,6 +215,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         Entity uiEntity = new("UI");
         canvas = new Canvas();
         uiEntity.AttachComponent(canvas);
+        uiEntity.AttachComponent(new CanvasLayoutManager());
         uiEntity.AttachComponent(new CanvasNavigator());
         uiEntity.AttachComponent(new CanvasRenderer(graphics.GraphicsDevice, Camera, redrawEveryFrame: true));
         AddEntity(uiEntity);

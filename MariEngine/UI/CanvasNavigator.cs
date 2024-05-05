@@ -18,6 +18,7 @@ public class CanvasNavigator : Component
     private int selectedComponentIndex = 0;
 
     private Canvas canvas;
+    private CanvasLayoutManager layoutManager;
 
     private Dictionary<IComponentSelectable, Dictionary<Direction, IComponentSelectable>> navigationGraph = new();
     
@@ -28,6 +29,9 @@ public class CanvasNavigator : Component
         canvas = GetComponent<Canvas>();
         canvas.ComponentAdded += CanvasOnComponentAdded;
         canvas.ComponentRemoved += CanvasOnComponentRemoved;
+
+        layoutManager = canvas.GetComponent<CanvasLayoutManager>();
+        layoutManager.LayoutRecomputed += BuildNavigationGraph;
         
         ServiceRegistry.Get<InputManager>().OnPressed("UI_Up", SelectComponentUp);
         ServiceRegistry.Get<InputManager>().OnPressed("UI_Down", SelectComponentDown);
@@ -66,7 +70,7 @@ public class CanvasNavigator : Component
     }
 
     // TODO: Make this smarter - select first node in parent when parents are different, etc.
-    public void BuildNavigationGraph()
+    public void BuildNavigationGraph(IReadOnlyDictionary<CanvasNode, CoordBounds> layout)
     {
         Direction[] directions = [Direction.Up, Direction.Down, Direction.Left, Direction.Right];
         
@@ -87,17 +91,17 @@ public class CanvasNavigator : Component
                     .Select(c => c as CanvasNode)
                     .Where(c => direction switch
                     {
-                        Direction.Up => canvas.Layout[c].BottomRight.Y <
-                                        canvas.Layout[selectableNode].TopLeft.Y,
-                        Direction.Down => canvas.Layout[c].TopLeft.Y >
-                                          canvas.Layout[selectableNode].BottomRight.Y,
-                        Direction.Left => canvas.Layout[c].BottomRight.X <
-                                          canvas.Layout[selectableNode].TopLeft.X,
-                        Direction.Right => canvas.Layout[c].TopLeft.X >
-                                           canvas.Layout[selectableNode].BottomRight.X,
+                        Direction.Up => layout[c].BottomRight.Y <
+                                        layout[selectableNode].TopLeft.Y,
+                        Direction.Down => layout[c].TopLeft.Y >
+                                          layout[selectableNode].BottomRight.Y,
+                        Direction.Left => layout[c].BottomRight.X <
+                                          layout[selectableNode].TopLeft.X,
+                        Direction.Right => layout[c].TopLeft.X >
+                                           layout[selectableNode].BottomRight.X,
                         _ => throw new ArgumentOutOfRangeException()
                     })
-                    .MinBy(c => (canvas.Layout[c].Center - canvas.Layout[selectableNode].Center).SqrMagnitude);
+                    .MinBy(c => (layout[c].Center - layout[selectableNode].Center).SqrMagnitude);
                 if (nearestComponentInDirection is not null)
                     navigationGraph[selectable][direction] = nearestComponentInDirection as IComponentSelectable;
             }

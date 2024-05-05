@@ -18,6 +18,8 @@ public partial class CanvasRenderer : Renderer
     private TileBuffer tileBuffer;
     private Texture2D testTexture;
 
+    private CanvasLayoutManager layoutManager;
+
     private int overscan;
 
     private ICanvasRendererVisitor rendererVisitor;
@@ -55,15 +57,14 @@ public partial class CanvasRenderer : Renderer
         canvas = GetComponent<Canvas>();
         testTexture = ServiceRegistry.Get<TexturePool>().RequestTexture(Coord.One, out _);
         testTexture.SetData([Color.Aqua]);
+
+        layoutManager = canvas.GetComponent<CanvasLayoutManager>();
     }
 
     public void RecomputeLayout()
     {
         canvas.Root.Padding = Coord.One * overscan;
-        canvas.RecomputeLayout(new Coord(tileBuffer.Width, tileBuffer.Height));
-        
-        // FIXME: This is ugly
-        canvas.GetComponent<CanvasNavigator>().BuildNavigationGraph();
+        layoutManager.RecomputeLayout(new Coord(tileBuffer.Width, tileBuffer.Height));
     }
     
     public void Redraw(bool recomputeLayout = false)
@@ -71,7 +72,7 @@ public partial class CanvasRenderer : Renderer
         if (recomputeLayout) RecomputeLayout();
         
         // TODO: Add dirtying system
-        foreach (var (node, bounds) in canvas.Layout)
+        foreach (var (node, bounds) in layoutManager.Layout)
         {
             // string tileId = LayoutEngine.DepthMap[node] switch
             // {

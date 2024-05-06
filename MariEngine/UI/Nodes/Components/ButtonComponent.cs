@@ -6,7 +6,7 @@ using MariEngine.Tiles;
 
 namespace MariEngine.UI.Nodes.Components;
 
-public class ButtonComponent(Sprite background, Sprite inactiveBackground, string label = "") : ComponentNode, IComponentSelectable<ButtonComponent>, IUiCommandReceiver
+public class ButtonComponent(Sprite background, Sprite inactiveBackground, string label = "") : SelectableComponentNode<ButtonComponent>, IUiCommandReceiver
 {
     public int TextPadding { get; init; } = 2;
 
@@ -20,26 +20,6 @@ public class ButtonComponent(Sprite background, Sprite inactiveBackground, strin
     {
         rendererVisitor.Visit(this, buffer);
     }
-
-    public event Action<ButtonComponent> Selected;
-    public event Action<ButtonComponent> Deselected;
-    public Direction InhibitedNavigationDirections { get; set; }
-    public bool SelectFirstChild { get; init; } = false;
-    public Dictionary<Direction, IComponentSelectable> NavigationOverrides { get; } = new();
-
-    public bool IsSelected { get; set; }
-
-    public void OnSelected()
-    {
-        Selected?.Invoke(this);
-    }
-
-    public void OnDeselected()
-    {
-        Deselected?.Invoke(this);
-    }
-
-    public bool Selectable { get; set; } = true;
 
     public void HandleCommand(UiCommand command)
     {

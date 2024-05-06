@@ -14,13 +14,13 @@ namespace MariEngine.UI;
 public class CanvasNavigator : Component
 {
     private readonly List<ComponentNode> components = [];
-    public IComponentSelectable SelectedComponent { get; private set; }
+    public SelectableComponentNode SelectedComponent { get; private set; }
     private int selectedComponentIndex = 0;
 
     private Canvas canvas;
     private CanvasLayoutManager layoutManager;
 
-    private Dictionary<IComponentSelectable, Dictionary<Direction, IComponentSelectable>> navigationGraph = new();
+    private Dictionary<SelectableComponentNode, Dictionary<Direction, SelectableComponentNode>> navigationGraph = new();
     
     protected override void OnAttach()
     {
@@ -74,17 +74,17 @@ public class CanvasNavigator : Component
     {
         Direction[] directions = [Direction.Up, Direction.Down, Direction.Left, Direction.Right];
         
-        navigationGraph = new Dictionary<IComponentSelectable, Dictionary<Direction, IComponentSelectable>>();
+        navigationGraph = new Dictionary<SelectableComponentNode, Dictionary<Direction, SelectableComponentNode>>();
         var allSelectables = components
-            .OfType<IComponentSelectable>()
-            .Where(c => c.Selectable)
+            .OfType<SelectableComponentNode>()
             .ToList();
         
         foreach (var selectable in allSelectables)
         {
-            var selectableNode = (CanvasNode)selectable;
-            navigationGraph[selectable] = new Dictionary<Direction, IComponentSelectable>();
+            navigationGraph[selectable] = new Dictionary<Direction, SelectableComponentNode>();
 
+            if (!selectable.Selectable) continue;
+            
             foreach (var direction in directions)
             {
                 if (selectable.NavigationOverrides.TryGetValue(direction, out var target))
@@ -97,27 +97,26 @@ public class CanvasNavigator : Component
                     continue;
                 
                 var nearestComponentInDirection = allSelectables
-                    .Select(c => c as CanvasNode)
                     .Where(c => direction switch
                     {
                         Direction.Up => layout[c].BottomRight.Y <
-                                        layout[selectableNode].TopLeft.Y,
+                                        layout[selectable].TopLeft.Y,
                         Direction.Down => layout[c].TopLeft.Y >
-                                          layout[selectableNode].BottomRight.Y,
+                                          layout[selectable].BottomRight.Y,
                         Direction.Left => layout[c].BottomRight.X <
-                                          layout[selectableNode].TopLeft.X,
+                                          layout[selectable].TopLeft.X,
                         Direction.Right => layout[c].TopLeft.X >
-                                           layout[selectableNode].BottomRight.X,
+                                           layout[selectable].BottomRight.X,
                         _ => throw new ArgumentOutOfRangeException()
                     })
-                    .MinBy(c => Math.Abs((layout[c].Center - layout[selectableNode].Center).X) + Math.Abs((layout[c].Center - layout[selectableNode].Center).Y));
+                    .MinBy(c => Math.Abs((layout[c].Center - layout[selectable].Center).X) + Math.Abs((layout[c].Center - layout[selectable].Center).Y));
 
                 if (nearestComponentInDirection is null) continue;
                 
-                if (nearestComponentInDirection.Parent != selectableNode.Parent && ((IComponentSelectable)nearestComponentInDirection).SelectFirstChild)
-                    nearestComponentInDirection = nearestComponentInDirection.Parent.Children[0];
+                if (nearestComponentInDirection.Parent != selectable.Parent && nearestComponentInDirection.SelectFirstChild)
+                    nearestComponentInDirection = nearestComponentInDirection.Parent.Children.OfType<SelectableComponentNode>().First();
                     
-                navigationGraph[selectable][direction] = nearestComponentInDirection as IComponentSelectable;
+                navigationGraph[selectable][direction] = nearestComponentInDirection;
             }
         }
     }
@@ -133,7 +132,7 @@ public class CanvasNavigator : Component
         SelectedComponent?.Deselect();
 
         SelectedComponent = SelectedComponent is null
-            ? components.OfType<IComponentSelectable>().FirstOrDefault()
+            ? components.OfType<SelectableComponentNode>().FirstOrDefault()
             : navigationGraph[SelectedComponent][direction];
 
         SelectedComponent?.Select();

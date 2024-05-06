@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace MariEngine.UI.Nodes.Components;
 
-public class SliderComponent(Sprite background, Sprite inactiveBackground, Sprite bar, int minValue, int maxValue, int step = 1) : ComponentNode, IComponentSelectable<SliderComponent>, IUiCommandReceiver
+public class SliderComponent(Sprite background, Sprite inactiveBackground, Sprite bar, int minValue, int maxValue, int step = 1) : SelectableComponentNode<SliderComponent>, IUiCommandReceiver
 {
     public Sprite Background => background;
     public Sprite InactiveBackground => inactiveBackground;
@@ -31,30 +31,10 @@ public class SliderComponent(Sprite background, Sprite inactiveBackground, Sprit
         }
     }
 
-    public event Action<SliderComponent> Selected;
-    public event Action<SliderComponent> Deselected;
-
     public delegate void ValueChangedEventHandler(SliderComponent sender, int newValue);
-
     public event ValueChangedEventHandler ValueChanged;
 
-    public bool IsSelected { get; set; }
-
-    public void OnSelected()
-    {
-        Selected?.Invoke(this);
-    }
-
-    public void OnDeselected()
-    {
-        Deselected?.Invoke(this);
-    }
-
-    public bool Selectable { get; set; } = true;
-    
-    public Direction InhibitedNavigationDirections => Direction.Horizontal;
-    public bool SelectFirstChild { get; init; } = false;
-    public Dictionary<Direction, IComponentSelectable> NavigationOverrides { get; } = new();
+    public override Direction InhibitedNavigationDirections => Direction.Horizontal;
 
     public void HandleCommand(UiCommand command)
     {

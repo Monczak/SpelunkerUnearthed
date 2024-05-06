@@ -263,7 +263,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
                 ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
                 ServiceRegistry.Get<SpriteLoader>().Get("DimUIBackground"),
                 $"Big Boi Button") { TextPadding = 1, PreferredHeight = 5 }
-            .WithNavigationOverride(Direction.Down, panel.Children[1].Children[0] as IComponentSelectable<ButtonComponent>));
+            .WithNavigationOverride(Direction.Down, panel.Children[1].Children[0] as SelectableComponentNode));
         
         canvas.GetComponent<CanvasRenderer>().Redraw(recomputeLayout: true);
     }

@@ -61,8 +61,8 @@ public abstract class CanvasNode
     //     newParent.AddChild(this);
     // }
 
-    public virtual void Accept(ICanvasRendererVisitor rendererVisitor, TileBufferFragment buffer)
+    public virtual void AcceptRenderer(ICanvasRendererVisitor rendererVisitor, TileBufferFragment buffer)
     {
-        rendererVisitor.Visit(this, buffer);
+        rendererVisitor.Render(this, buffer);
     }
 }

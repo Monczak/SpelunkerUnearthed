@@ -8,8 +8,8 @@ public abstract class LayoutNode : CanvasNode
     public Coord Padding { get; set; }
     public Sprite Background { get; set; }
     
-    public override void Accept(ICanvasRendererVisitor rendererVisitor, TileBufferFragment buffer)
+    public override void AcceptRenderer(ICanvasRendererVisitor rendererVisitor, TileBufferFragment buffer)
     {
-        rendererVisitor.Visit(this, buffer);
+        rendererVisitor.Render(this, buffer);
     }
 }

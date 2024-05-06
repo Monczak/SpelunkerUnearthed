@@ -10,8 +10,8 @@ public abstract class ComponentNode : CanvasNode
         throw new ArgumentException("Component nodes cannot have children.");
     }
     
-    public override void Accept(ICanvasRendererVisitor rendererVisitor, TileBufferFragment buffer)
+    public override void AcceptRenderer(ICanvasRendererVisitor rendererVisitor, TileBufferFragment buffer)
     {
-        rendererVisitor.Visit(this, buffer);
+        rendererVisitor.Render(this, buffer);
     }
 }

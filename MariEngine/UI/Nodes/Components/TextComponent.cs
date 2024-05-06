@@ -22,9 +22,9 @@ public class TextComponent(string text = "") : ComponentNode
         
     }
     
-    public override void Accept(ICanvasRendererVisitor rendererVisitor, TileBufferFragment buffer)
+    public override void AcceptRenderer(ICanvasRendererVisitor rendererVisitor, TileBufferFragment buffer)
     {
-        rendererVisitor.Visit(this, buffer);
+        rendererVisitor.Render(this, buffer);
     }
 }
 

@@ -7,10 +7,10 @@ namespace MariEngine.UI;
 
 public interface ICanvasRendererVisitor
 {
-    void Visit(CanvasNode node, TileBufferFragment buffer);
-    void Visit(LayoutNode node, TileBufferFragment buffer);
-    void Visit(ComponentNode node, TileBufferFragment buffer);
-    void Visit(TextComponent node, TileBufferFragment buffer);
-    void Visit(ButtonComponent node, TileBufferFragment buffer);
-    void Visit(SliderComponent node, TileBufferFragment buffer);
+    void Render(CanvasNode node, TileBufferFragment buffer);
+    void Render(LayoutNode node, TileBufferFragment buffer);
+    void Render(ComponentNode node, TileBufferFragment buffer);
+    void Render(TextComponent node, TileBufferFragment buffer);
+    void Render(ButtonComponent node, TileBufferFragment buffer);
+    void Render(SliderComponent node, TileBufferFragment buffer);
 }

@@ -16,9 +16,9 @@ public class ButtonComponent(Sprite background, Sprite inactiveBackground, strin
     
     public bool Pressed { get; private set; }
     
-    public override void Accept(ICanvasRendererVisitor rendererVisitor, TileBufferFragment buffer)
+    public override void AcceptRenderer(ICanvasRendererVisitor rendererVisitor, TileBufferFragment buffer)
     {
-        rendererVisitor.Visit(this, buffer);
+        rendererVisitor.Render(this, buffer);
     }
 
     public void HandleCommand(UiCommand command)

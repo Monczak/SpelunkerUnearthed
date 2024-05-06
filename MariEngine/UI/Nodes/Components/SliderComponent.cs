@@ -49,8 +49,8 @@ public class SliderComponent(Sprite background, Sprite inactiveBackground, Sprit
         }
     }
 
-    public override void Accept(ICanvasRendererVisitor rendererVisitor, TileBufferFragment buffer)
+    public override void AcceptRenderer(ICanvasRendererVisitor rendererVisitor, TileBufferFragment buffer)
     {
-        rendererVisitor.Visit(this, buffer);
+        rendererVisitor.Render(this, buffer);
     }
 }

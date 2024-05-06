@@ -11,12 +11,12 @@ namespace MariEngine.UI;
 
 public class CanvasRendererVisitor : ICanvasRendererVisitor
 {
-    public void Visit(CanvasNode node, TileBufferFragment buffer)
+    public void Render(CanvasNode node, TileBufferFragment buffer)
     {
         Logger.LogDebug("Visit CanvasNode");
     }
 
-    public void Visit(LayoutNode node, TileBufferFragment buffer)
+    public void Render(LayoutNode node, TileBufferFragment buffer)
     {
         if (node.Background is not null)
             RenderBackground(node.Background, buffer);
@@ -32,13 +32,13 @@ public class CanvasRendererVisitor : ICanvasRendererVisitor
         }
     }
 
-    public void Visit(ComponentNode node, TileBufferFragment buffer)
+    public void Render(ComponentNode node, TileBufferFragment buffer)
     {
         Logger.LogDebug("Visit ComponentNode");
     }
 
     
-    public void Visit(TextComponent node, TileBufferFragment buffer)
+    public void Render(TextComponent node, TileBufferFragment buffer)
     {
         RenderText(node, buffer);
     }
@@ -105,7 +105,7 @@ public class CanvasRendererVisitor : ICanvasRendererVisitor
         bool IsLineBreakOpportunity(char c) => c is ' ' or '\n';
     }
 
-    public void Visit(ButtonComponent node, TileBufferFragment buffer)
+    public void Render(ButtonComponent node, TileBufferFragment buffer)
     {
         if (node.IsSelected)
         {
@@ -126,7 +126,7 @@ public class CanvasRendererVisitor : ICanvasRendererVisitor
         RenderText(node.Label, 1, textBuffer);
     }
 
-    public void Visit(SliderComponent node, TileBufferFragment buffer)
+    public void Render(SliderComponent node, TileBufferFragment buffer)
     {
         if (node.IsSelected)
         {

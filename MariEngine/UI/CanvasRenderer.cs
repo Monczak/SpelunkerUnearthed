@@ -92,7 +92,7 @@ public partial class CanvasRenderer : Renderer
             //         tileBuffer[coord] = ServiceRegistry.Get<TileLoader>().Get(tileId);
             // }
             
-            node.Accept(rendererVisitor, tileBuffer.GetFragment(bounds));
+            node.AcceptRenderer(rendererVisitor, tileBuffer.GetFragment(bounds));
         }
     }
 
@@ -107,7 +107,7 @@ public partial class CanvasRenderer : Renderer
             var tile = tileBuffer[coord];
             if (tile is not null)
             {
-                ServiceRegistry.Get<TileAtlas>().DrawTile(spriteBatch, ((Vector2)coord - Vector2.One * overscan) * Camera.TileSize + CalculateCenterOffset(), tile.Id, Color.White);
+                ServiceRegistry.Get<TileAtlas>().DrawTile(spriteBatch, (Vector2)(Coord)(((Vector2)coord - Vector2.One * overscan) * Camera.TileSize + CalculateCenterOffset()), tile.Id, Color.White);
             }
         }
             

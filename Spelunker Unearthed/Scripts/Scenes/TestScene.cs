@@ -220,6 +220,13 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         uiEntity.AttachComponent(new CanvasRenderer(graphics.GraphicsDevice, Camera, redrawEveryFrame: true));
         AddEntity(uiEntity);
 
+        PrepareTestUi(canvas);
+
+        canvas.GetComponent<CanvasRenderer>().Redraw(recomputeLayout: true);
+    }
+
+    private void PrepareTestUi(Canvas canvas)
+    {
         var container = canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Row });
         container.AddChild(new FlexLayoutNode());
         var panel = container.AddChild(new FlexLayoutNode
@@ -259,12 +266,12 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
             }
         }
 
+        panel.AddChild(new InputFieldComponent(lineSpacing: 1) { Selectable = false });
+
         panel.AddChild(new ButtonComponent(
                 ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
                 ServiceRegistry.Get<SpriteLoader>().Get("DimUIBackground"),
                 $"Big Boi Button") { TextPadding = 1, PreferredHeight = 5 }
             .WithNavigationOverride(Direction.Down, panel.Children[1].Children[0] as SelectableComponentNode));
-        
-        canvas.GetComponent<CanvasRenderer>().Redraw(recomputeLayout: true);
     }
 }

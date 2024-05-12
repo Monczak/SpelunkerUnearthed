@@ -13,8 +13,24 @@ public class ButtonComponent(Sprite background, Sprite inactiveBackground, strin
     public Sprite Background { get; set; } = background;
     public Sprite InactiveBackground { get; set; } = inactiveBackground;
     public string Label { get; set; } = label;
-    
-    public bool Pressed { get; private set; }
+
+    private bool isPressed;
+
+    public bool IsPressed
+    {
+        get => isPressed;
+        set
+        {
+            isPressed = value;
+            if (isPressed)
+                Pressed?.Invoke(this);
+            else
+                Released?.Invoke(this);
+        }
+    }
+
+    public event Action<ButtonComponent> Pressed; 
+    public event Action<ButtonComponent> Released; 
     
     public override void AcceptRenderer(ICanvasRendererVisitor rendererVisitor, TileBufferFragment buffer)
     {
@@ -26,11 +42,11 @@ public class ButtonComponent(Sprite background, Sprite inactiveBackground, strin
         switch (command)
         {
             case StartInteractionUiCommand:
-                Pressed = true;
+                IsPressed = true;
                 Logger.LogDebug($"Pressed {Label}");
                 break;
             case StopInteractionUiCommand:
-                Pressed = false;
+                IsPressed = false;
                 break;
         }
     }

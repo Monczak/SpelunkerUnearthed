@@ -220,6 +220,13 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         uiEntity.AttachComponent(new CanvasRenderer(graphics.GraphicsDevice, Camera, redrawEveryFrame: true));
         AddEntity(uiEntity);
 
+        PrepareTestUi(canvas);
+
+        canvas.GetComponent<CanvasRenderer>().Redraw(recomputeLayout: true);
+    }
+
+    private void PrepareTestUi(Canvas canvas)
+    {
         var container = canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Row });
         container.AddChild(new FlexLayoutNode());
         var panel = container.AddChild(new FlexLayoutNode
@@ -230,13 +237,15 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         
         for (var i = 0; i < 3; i++)
         {
-            var row = panel.AddChild(new FlexLayoutNode { FlexGap = 1, Padding = Coord.Zero, PreferredHeight = 5 });
+            var row = panel.AddChild(new FlexLayoutNode { FlexGap = 1, Padding = Coord.One, PreferredHeight = 5 });
             for (var j = 0; j < 2; j++)
             {
-                row.AddChild(new ButtonComponent(
+                var button = new ButtonComponent(
                     ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
                     ServiceRegistry.Get<SpriteLoader>().Get("DimUIBackground"),
-                    $"Button {j + i * 2}") { TextPadding = 1 });
+                    $"Button {j + i * 2}") { TextPadding = 1 };
+                
+                row.AddChild(button);
             }
         }
 
@@ -255,16 +264,17 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
                     0, 10));
                 row.AddChild(label);
                 label.Text = slider.Value.ToString();
-                slider.ValueChanged += (sender, value) => label.Text = value.ToString();
+                slider.ValueChanged += (_, value) => label.Text = value.ToString();
             }
         }
+
+        panel.AddChild(new InputFieldComponent(lineSpacing: 1) { Selectable = true });
 
         panel.AddChild(new ButtonComponent(
                 ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
                 ServiceRegistry.Get<SpriteLoader>().Get("DimUIBackground"),
                 $"Big Boi Button") { TextPadding = 1, PreferredHeight = 5 }
-            .WithNavigationOverride(Direction.Down, panel.Children[1].Children[0] as SelectableComponentNode));
-        
-        canvas.GetComponent<CanvasRenderer>().Redraw(recomputeLayout: true);
+            .WithNavigationOverride(Direction.Down, panel.Children[1].Children[0] as SelectableComponentNode)
+        );
     }
 }

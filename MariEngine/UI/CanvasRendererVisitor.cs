@@ -146,4 +146,10 @@ public class CanvasRendererVisitor : ICanvasRendererVisitor
                 buffer.SetAbsolute(coord, node.Bar.GetNineSlice(barBounds, coord));
         }
     }
+
+    public void Render(InputFieldComponent node, TileBufferFragment buffer)
+    {
+        RenderText(node.Text, node.LineSpacing, buffer);
+        
+    }
 }

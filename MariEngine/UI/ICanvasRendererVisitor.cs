@@ -13,4 +13,5 @@ public interface ICanvasRendererVisitor
     void Render(TextComponent node, TileBufferFragment buffer);
     void Render(ButtonComponent node, TileBufferFragment buffer);
     void Render(SliderComponent node, TileBufferFragment buffer);
+    void Render(InputFieldComponent node, TileBufferFragment buffer);
 }

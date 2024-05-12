@@ -77,6 +77,7 @@ public class CanvasNavigator : Component
         navigationGraph = new Dictionary<SelectableComponentNode, Dictionary<Direction, SelectableComponentNode>>();
         var allSelectables = components
             .OfType<SelectableComponentNode>()
+            .Where(c => c.Selectable)
             .ToList();
         
         foreach (var selectable in allSelectables)

@@ -1,7 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MariEngine;
+using MariEngine.Animation;
 using MariEngine.Audio;
 using MariEngine.Collision;
 using MariEngine.Components;
@@ -225,56 +227,82 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         canvas.GetComponent<CanvasRenderer>().Redraw(recomputeLayout: true);
     }
 
+    private int tweenTransitionIndex;
+    private int tweenEasingIndex;
+
+    private void UpdateTweenText(TextComponent text)
+    {
+        text.Text =
+            $"{Enum.GetValues<TweenTransition>()[tweenTransitionIndex]}\n{Enum.GetValues<TweenEasing>()[tweenEasingIndex]}";
+    }
+    
     private void PrepareTestUi(Canvas canvas)
     {
+        var tweenTransitions = Enum.GetValues<TweenTransition>();
+        var tweenEasings = Enum.GetValues<TweenEasing>();
+        
+        var uiBackground = ServiceRegistry.Get<SpriteLoader>().Get("UIBackground");
+        var inactiveBackground = ServiceRegistry.Get<SpriteLoader>().Get("DimUIBackground");
+        var sliderBar = ServiceRegistry.Get<SpriteLoader>().Get("SliderBar");
+        var sliderBackground = ServiceRegistry.Get<SpriteLoader>().Get("SliderBackground");
+        var inactiveSliderBackground = ServiceRegistry.Get<SpriteLoader>().Get("DimSliderBackground");
+        
         var container = canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Row });
         container.AddChild(new FlexLayoutNode());
         var panel = container.AddChild(new FlexLayoutNode
-            { Background = ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"), Padding = Coord.One, FlexGrow = 3, FlexGap = 1, FlexDirection = FlexDirection.Column });
+            { Background = uiBackground, Padding = Coord.One, FlexGrow = 3, FlexGap = 1, FlexDirection = FlexDirection.Column });
         container.AddChild(new FlexLayoutNode());
 
-        panel.AddChild(new TextComponent("This is a test of the new UI things in Spelunker Unearthed!") { PreferredHeight = 2 });
+        var controls = panel.AddChild(new FlexLayoutNode
+            { FlexDirection = FlexDirection.Row, FlexGap = 0, PreferredHeight = 3 });
+        var text = controls.AddChild(new TextComponent());
+        controls.AddChild(new TextComponent("|\n|\n|") { PreferredWidth = 1 });
+        var prevTransButton = controls.AddChild(new ButtonComponent(uiBackground, inactiveBackground, "<") { PreferredWidth = 3, TextPadding = 1 });
+        var nextTransButton = controls.AddChild(new ButtonComponent(uiBackground, inactiveBackground, ">") { PreferredWidth = 3, TextPadding = 1 });
+        controls.AddChild(new TextComponent("|\n|\n|") { PreferredWidth = 1 });
+        var prevEaseButton = controls.AddChild(new ButtonComponent(uiBackground, inactiveBackground, "<") { PreferredWidth = 3, TextPadding = 1 });
+        var nextEaseButton = controls.AddChild(new ButtonComponent(uiBackground, inactiveBackground, ">") { PreferredWidth = 3, TextPadding = 1 });
         
-        for (var i = 0; i < 3; i++)
+        controls.AddChild(new TextComponent("|\n|\n|") { PreferredWidth = 1 });
+        
+        var goButton = controls.AddChild(new ButtonComponent(uiBackground, inactiveBackground, "Go!") { PreferredWidth = 5, TextPadding = 1 } );
+
+        var slider = panel.AddChild(new SliderComponent(sliderBackground, inactiveSliderBackground, sliderBar, -100, 100, 10) { PreferredHeight = 3 });
+
+        prevTransButton.Pressed += _ =>
         {
-            var row = panel.AddChild(new FlexLayoutNode { FlexGap = 1, Padding = Coord.One, PreferredHeight = 5 });
-            for (var j = 0; j < 2; j++)
-            {
-                var button = new ButtonComponent(
-                    ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
-                    ServiceRegistry.Get<SpriteLoader>().Get("DimUIBackground"),
-                    $"Button {j + i * 2}") { TextPadding = 1 };
-                
-                row.AddChild(button);
-            }
-        }
-
-        var sliderContainer = panel.AddChild(new FlexLayoutNode { Padding = Coord.Zero, FlexGap = 1 });
-        for (var i = 0; i < 2; i++)
+            tweenTransitionIndex = (tweenTransitionIndex - 1 + tweenTransitions.Length) % tweenTransitions.Length;
+            UpdateTweenText(text);
+        };
+        nextTransButton.Pressed += _ =>
         {
-            var sliderStack = sliderContainer.AddChild(new FlexLayoutNode { Padding = Coord.Zero, FlexDirection = FlexDirection.Column });
-            for (var j = 0; j < 4; j++)
-            {
-                var row = sliderStack.AddChild(new FlexLayoutNode { Padding = Coord.Zero, FlexDirection = FlexDirection.Row, PreferredHeight = 1 });
-                var label = new TextComponent { PreferredWidth = 2 };
-                var slider = row.AddChild(new SliderComponent(
-                    ServiceRegistry.Get<SpriteLoader>().Get("SliderBackground"),
-                    ServiceRegistry.Get<SpriteLoader>().Get("DimSliderBackground"),
-                    ServiceRegistry.Get<SpriteLoader>().Get("SliderBar"),
-                    0, 10));
-                row.AddChild(label);
-                label.Text = slider.Value.ToString();
-                slider.ValueChanged += (_, value) => label.Text = value.ToString();
-            }
-        }
+            tweenTransitionIndex = (tweenTransitionIndex + 1 + tweenTransitions.Length) % tweenTransitions.Length;
+            UpdateTweenText(text);
+        };
+        
+        prevEaseButton.Pressed += _ =>
+        {
+            tweenEasingIndex = (tweenEasingIndex - 1) % tweenEasings.Length;
+            UpdateTweenText(text);
+        };
+        nextEaseButton.Pressed += _ =>
+        {
+            tweenEasingIndex = (tweenEasingIndex + 1) % tweenEasings.Length;
+            UpdateTweenText(text);
+        };
 
-        panel.AddChild(new InputFieldComponent(lineSpacing: 1) { Selectable = true });
-
-        panel.AddChild(new ButtonComponent(
-                ServiceRegistry.Get<SpriteLoader>().Get("UIBackground"),
-                ServiceRegistry.Get<SpriteLoader>().Get("DimUIBackground"),
-                $"Big Boi Button") { TextPadding = 1, PreferredHeight = 5 }
-            .WithNavigationOverride(Direction.Down, panel.Children[1].Children[0] as SelectableComponentNode)
-        );
+        goButton.Pressed += _ =>
+        {
+            var target = slider.Value < 0 ? 80 : -80;
+            var tween = ServiceRegistry.Get<TweenManager>().BuildTween(builder => builder
+                .WithProperty(x => slider.Value = (int)x, slider.Value, target)
+                .WithTransition(tweenTransitions[tweenTransitionIndex])
+                .WithEasing(tweenEasings[tweenEasingIndex])
+                .WithTime(1.0f)
+            );
+            tween.Finished += _ => Logger.LogDebug("Tween done!");
+        };
+        
+        UpdateTweenText(text);
     }
 }

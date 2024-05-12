@@ -9,10 +9,10 @@ public class TweenManager : Service
 {
     private readonly List<Tween> activeTweens = [];
 
-    public Tween BuildTween(Func<TweenBuilder, TweenBuilder> builderAction)
+    public Tween BuildTween(Func<TweenBuilder, TweenBuilder> builder)
     {
-        var builder = new TweenBuilder();
-        var tween = builderAction(builder).Build();
+        var theBuilder = new TweenBuilder();
+        var tween = builder(theBuilder).Build();
         activeTweens.Add(tween);
         return tween;
     }

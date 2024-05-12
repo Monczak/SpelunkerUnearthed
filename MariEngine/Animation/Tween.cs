@@ -14,6 +14,9 @@ public class Tween
     private readonly float transitionTime;
     private double startTime;
 
+    private float initialValue;
+    private float targetValue;
+
     private bool started;
 
     public event Action<Tween> Finished;
@@ -21,12 +24,15 @@ public class Tween
     internal bool ToBeReleased { get; private set; } = false;
     private readonly bool releaseOnFinished;
 
-    public Tween(Action<float> updateAction, TransitionFunction transitionFunction, float transitionTime, bool releaseOnFinished = true)
+    public Tween(Action<float> updateAction, TransitionFunction transitionFunction, float transitionTime, float initialValue, float targetValue, bool releaseOnFinished = true)
     {
         this.updateAction = updateAction;
         this.transitionFunction = transitionFunction;
         this.transitionTime = transitionTime;
         this.releaseOnFinished = releaseOnFinished;
+        
+        this.initialValue = initialValue;
+        this.targetValue = targetValue;
         
         if (transitionTime <= 0)
             throw new ArgumentException("Tween transition time must be non-negative.");
@@ -41,7 +47,9 @@ public class Tween
         }
 
         var normalizedTime = MathUtils.Clamp((float)((gameTime.TotalGameTime.TotalSeconds - startTime) / transitionTime), 0, 1);
-        updateAction?.Invoke(transitionFunction(normalizedTime));
+        var transition = transitionFunction(normalizedTime);
+        var tweenedValue = MathUtils.LerpUnclamped(initialValue, targetValue, transition);
+        updateAction?.Invoke(tweenedValue);
         
         if (normalizedTime >= 1f)
         {

@@ -51,7 +51,7 @@ internal static class TweenFunctions
     private static float EaseInOutSine(float t) => -(MathF.Cos(t * MathF.PI) - 1) / 2;
 
     private static float EaseInExpo(float t) => MathF.Abs(t) < float.Epsilon ? 0 : MathF.Pow(2, 10 * t - 10);
-    private static float EaseOutExpo(float t) => MathF.Abs(t - 1) < float.Epsilon ? 1 : MathF.Pow(2, -10 * t);
+    private static float EaseOutExpo(float t) => MathF.Abs(t - 1) < float.Epsilon ? 1 : 1 - MathF.Pow(2, -10 * t);
 
     private static float EaseInOutExpo(float t) => MathF.Abs(t) < float.Epsilon
         ? 0
@@ -78,7 +78,7 @@ internal static class TweenFunctions
             ? 0
             : MathF.Abs(t - 1) < float.Epsilon
                 ? 1
-                : -MathF.Pow(-2, -10 * t) * MathF.Sin((t * 10 - 0.75f) * c4) + 1;
+                : MathF.Pow(2, -10 * t) * MathF.Sin((t * 10 - 0.75f) * c4) + 1;
     }
 
     private static float EaseInOutElastic(float t)

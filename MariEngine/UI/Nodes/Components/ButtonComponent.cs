@@ -43,7 +43,7 @@ public class ButtonComponent(Sprite background, Sprite inactiveBackground, strin
         {
             case StartInteractionUiCommand:
                 IsPressed = true;
-                Logger.LogDebug($"Pressed {Label}");
+                // Logger.LogDebug($"Pressed {Label}");
                 break;
             case StopInteractionUiCommand:
                 IsPressed = false;

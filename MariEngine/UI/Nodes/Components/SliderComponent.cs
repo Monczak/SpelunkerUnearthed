@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using MariEngine.Logging;
 using MariEngine.Sprites;
 using MariEngine.Tiles;
 using MariEngine.Utils;

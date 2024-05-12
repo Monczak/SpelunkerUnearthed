@@ -72,6 +72,7 @@ public class SpelunkerUnearthedGame : Game
         ServiceRegistry.RegisterService(new BiomeLoader());
         ServiceRegistry.RegisterService(new FeatureLoader());
         ServiceRegistry.RegisterService(new EventManager());
+        ServiceRegistry.RegisterService(new TweenManager());
         ServiceRegistry.RegisterService(new SaveLoadSystem("Saves"));
         
         ServiceRegistry.RegisterService(new TexturePool(Graphics.GraphicsDevice));

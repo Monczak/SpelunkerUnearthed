@@ -32,17 +32,21 @@ public class CanvasNavigator : Component
 
         layoutManager = canvas.GetComponent<CanvasLayoutManager>();
         layoutManager.LayoutRecomputed += BuildNavigationGraph;
+
+        using (var context = ServiceRegistry.Get<InputManager>().CreateContext(this))
+        {
+            context.OnPressed("UI_Up", SelectComponentUp);
+            context.OnPressed("UI_Down", SelectComponentDown);
+            context.OnPressed("UI_Left", SelectComponentLeft);
+            context.OnPressed("UI_Right", SelectComponentRight);
         
-        ServiceRegistry.Get<InputManager>().OnPressed("UI_Up", SelectComponentUp);
-        ServiceRegistry.Get<InputManager>().OnPressed("UI_Down", SelectComponentDown);
-        ServiceRegistry.Get<InputManager>().OnPressed("UI_Left", SelectComponentLeft);
-        ServiceRegistry.Get<InputManager>().OnPressed("UI_Right", SelectComponentRight);
+            context.OnPressed("UI_Select", InteractOnPressed);
+            context.OnReleased("UI_Select", InteractOnReleased);
         
-        ServiceRegistry.Get<InputManager>().OnPressed("UI_Select", InteractOnPressed);
-        ServiceRegistry.Get<InputManager>().OnReleased("UI_Select", InteractOnReleased);
+            context.OnPressedPassThrough(PassPressedToSelectedComponent);
+            context.OnReleasedPassThrough(PassReleasedToSelectedComponent);
+        }
         
-        ServiceRegistry.Get<InputManager>().OnPressedPassThrough(PassPressedToSelectedComponent);
-        ServiceRegistry.Get<InputManager>().OnReleasedPassThrough(PassReleasedToSelectedComponent);
     }
     
     private void PassPressedToSelectedComponent(Keys key) => (SelectedComponent as IUiCommandReceiver)?.HandleCommand(new InputKeyUiCommand(key, true));
@@ -141,13 +145,7 @@ public class CanvasNavigator : Component
 
     protected override void OnDestroy()
     {
-        ServiceRegistry.Get<InputManager>().UnbindOnPressed("UI_Up", SelectComponentUp);
-        ServiceRegistry.Get<InputManager>().UnbindOnPressed("UI_Down", SelectComponentDown);
-        ServiceRegistry.Get<InputManager>().UnbindOnPressed("UI_Left", SelectComponentLeft);
-        ServiceRegistry.Get<InputManager>().UnbindOnPressed("UI_Right", SelectComponentRight);
-        
-        ServiceRegistry.Get<InputManager>().UnbindOnPressed("UI_Select", InteractOnPressed);
-        ServiceRegistry.Get<InputManager>().UnbindOnReleased("UI_Select", InteractOnReleased);
+        ServiceRegistry.Get<InputManager>().UnbindAll(this);
         
         canvas.ComponentAdded -= CanvasOnComponentAdded;
         canvas.ComponentRemoved -= CanvasOnComponentRemoved;

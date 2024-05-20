@@ -87,6 +87,18 @@ public class LightMap : Component
         map = new Vector3[tilemap.Width, tilemap.Height];
     }
 
+    protected override void OnDestroy()
+    {
+        foreach (var (lightSource, lightSourceData) in lightSources)
+        {
+            lightSource.OnDirty -= dirtyLightHandler;
+            lightSourceData.RenderedLight = null;
+        }
+
+        map = null;
+        base.OnDestroy();
+    }
+
     public void Resize(Coord newSize)
     {
         map = new Vector3[newSize.X, newSize.Y];

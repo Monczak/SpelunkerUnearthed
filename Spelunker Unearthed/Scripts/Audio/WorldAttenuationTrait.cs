@@ -22,7 +22,7 @@ public class WorldAttenuationTrait(Tilemap tilemap) : AudioTrait
             if (!tilemap.IsInBounds(coord)) 
                 continue;
             
-            cumulativeAttenuation += 1 - tilemap.Get(coord, Tilemap.BaseLayer).Material.SoundTransmittance;
+            cumulativeAttenuation += 1 - (tilemap.Get(coord, Tilemap.BaseLayer)?.Material.SoundTransmittance ?? 1);
         }
         
         audioEvent.SetParameterValue("Attenuation", MathUtils.Clamp(cumulativeAttenuation, 0, 1));

@@ -17,7 +17,7 @@ public class GizmoRenderer : Renderer
         gizmoTexture = new Texture2D(graphicsDevice, 1, 1, false, SurfaceFormat.Color);
         gizmoTexture.SetData([Color.White]);
         
-        ServiceRegistry.Get<InputManager>().OnPressed("ToggleGizmos", ToggleEnabled);
+        ServiceRegistry.Get<InputManager>().OnPressed(this, "ToggleGizmos", ToggleEnabled);
     }
 
     private void ToggleEnabled()
@@ -49,6 +49,6 @@ public class GizmoRenderer : Renderer
 
     protected override void OnDestroy()
     {
-        ServiceRegistry.Get<InputManager>().UnbindOnPressed("ToggleGizmos", ToggleEnabled);
+        ServiceRegistry.Get<InputManager>().UnbindOnPressed(this, "ToggleGizmos", ToggleEnabled);
     }
 }

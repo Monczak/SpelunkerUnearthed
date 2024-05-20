@@ -15,6 +15,7 @@ using MariEngine.Services;
 using MariEngine.Tiles;
 using MariEngine.Utils;
 using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
+using SpelunkerUnearthed.Scripts.Scenes;
 
 namespace SpelunkerUnearthed.Scripts.TileEntities;
 
@@ -39,18 +40,21 @@ public class PlayerController : TileEntityComponent
         tilemapCollider = OwnerEntity.Tilemap.GetComponent<TilemapCollider>(); 
         inputManager = ServiceRegistry.Get<InputManager>();
 
-        inputManager.OnPressed("Up", OnUp);
-        inputManager.OnPressed("Down", OnDown);
-        inputManager.OnPressed("Left", OnLeft);
-        inputManager.OnPressed("Right", OnRight);
+        using (var context = inputManager.CreateContext(this))
+        {
+            context.OnPressed("Up", OnUp);
+            context.OnPressed("Down", OnDown);
+            context.OnPressed("Left", OnLeft);
+            context.OnPressed("Right", OnRight);
         
-        inputManager.OnReleased("Up", ReadInput);
-        inputManager.OnReleased("Down", ReadInput);
-        inputManager.OnReleased("Left", ReadInput);
-        inputManager.OnReleased("Right", ReadInput);
+            context.OnReleased("Up", ReadInput);
+            context.OnReleased("Down", ReadInput);
+            context.OnReleased("Left", ReadInput);
+            context.OnReleased("Right", ReadInput);
         
-        inputManager.OnPressed("Mine", Mine);
-        inputManager.OnPressed("Use", Use);
+            context.OnPressed("Mine", Mine);
+            context.OnPressed("Use", Use);
+        }
 
         playerPosDebugLine = new DebugScreenLine<(Coord, Vector2)>(tuple => $"Position: {tuple.Item1} World: ({tuple.Item2.X}, {tuple.Item2.Y})");
         ServiceRegistry.Get<DebugScreen>().AddLine(playerPosDebugLine);
@@ -59,7 +63,8 @@ public class PlayerController : TileEntityComponent
     private void Use()
     {
         // TODO: DEBUG - remove this
-        ServiceRegistry.Get<TileAtlas>().Resize(ServiceRegistry.Get<TileAtlas>().TileSize + 1);
+        // ServiceRegistry.Get<TileAtlas>().Resize(ServiceRegistry.Get<TileAtlas>().TileSize + 1);
+        ServiceRegistry.Get<SceneManager>().LoadScene<TestScene>();
     }
 
     private void Mine()
@@ -159,16 +164,6 @@ public class PlayerController : TileEntityComponent
     
     protected override void OnDestroy()
     {
-        inputManager.UnbindOnPressed("Up", OnUp);
-        inputManager.UnbindOnPressed("Down", OnDown);
-        inputManager.UnbindOnPressed("Left", OnLeft);
-        inputManager.UnbindOnPressed("Right", OnRight);
-        
-        inputManager.UnbindOnReleased("Up", ReadInput);
-        inputManager.UnbindOnReleased("Down", ReadInput);
-        inputManager.UnbindOnReleased("Left", ReadInput);
-        inputManager.UnbindOnReleased("Right", ReadInput);
-        
-        inputManager.UnbindOnPressed("Mine", Mine);
+        inputManager.UnbindAll(this);
     }
 }

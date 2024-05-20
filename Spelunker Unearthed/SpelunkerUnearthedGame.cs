@@ -32,7 +32,6 @@ namespace SpelunkerUnearthed;
 
 public class SpelunkerUnearthedGame : Game
 {
-    private DebugScreen debugScreen;
     private DebugScreenLine<TimeSpan> updateTimeDebugLine;
     private DebugScreenLine<TimeSpan> potentialUpdateTimeDebugLine;
     private DebugScreenLine<TimeSpan> drawTimeDebugLine;
@@ -41,8 +40,6 @@ public class SpelunkerUnearthedGame : Game
     
     private Stopwatch updateTimeStopwatch;
     private Stopwatch drawTimeStopwatch;
-    
-    private Scene scene;
 
     public SpelunkerUnearthedGame() : base(new DesktopNativeFmodLibrary())
     {
@@ -51,8 +48,10 @@ public class SpelunkerUnearthedGame : Game
         Window.AllowUserResizing = true;
     }
 
-    protected override void Initialize()
+    protected override void InitializeGame(string savePath = "Saves")
     {
+        base.InitializeGame(savePath);
+        
         InitializeAudio(ContentPaths.Audio);
         
         FontSystemDefaults.FontResolutionFactor = 4.0f;
@@ -62,21 +61,6 @@ public class SpelunkerUnearthedGame : Game
         updateTimeStopwatch = new Stopwatch();
         drawTimeStopwatch = new Stopwatch();
         
-        ServiceRegistry.RegisterService(new FontProvider());
-        ServiceRegistry.RegisterService(new RandomProvider());
-        ServiceRegistry.RegisterService(new MaterialLoader());
-        ServiceRegistry.RegisterService(new TileLoader());
-        ServiceRegistry.RegisterService(new SpriteLoader());
-        ServiceRegistry.RegisterService(new InputManager());
-        ServiceRegistry.RegisterService(new AudioManager());
-        ServiceRegistry.RegisterService(new BiomeLoader());
-        ServiceRegistry.RegisterService(new FeatureLoader());
-        ServiceRegistry.RegisterService(new EventManager());
-        ServiceRegistry.RegisterService(new TweenManager());
-        ServiceRegistry.RegisterService(new SaveLoadSystem("Saves"));
-        
-        ServiceRegistry.RegisterService(new TexturePool(Graphics.GraphicsDevice));
-        
         // TODO: Load this from a config file
         ServiceRegistry.Get<FontProvider>().AddFont("Tiles", "Hack-Regular");
         ServiceRegistry.Get<FontProvider>().AddFont("Tiles", "Monospace");
@@ -84,32 +68,19 @@ public class SpelunkerUnearthedGame : Game
         ServiceRegistry.Get<FontProvider>().AddFont("Monospace", "Monospace");
         ServiceRegistry.Get<FontProvider>().AddFont("UiFont", "whitrabt");
         
-        debugScreen = new DebugScreen();
-        ServiceRegistry.RegisterService(debugScreen);
-        
         InitializeDebugScreen();
-
         InitializeInputs();
 
         ServiceRegistry.Get<AudioManager>().LoadBank(this, "Master");
         ServiceRegistry.Get<AudioManager>().LoadBank(this, "Master.strings");
+    }
 
-        Window.ClientSizeChanged += (_, _) => ServiceRegistry.Get<EventManager>().Notify("ClientSizeChanged");
+    protected override void InitializeServices(string savePath)
+    {
+        base.InitializeServices(savePath);
         
-        // TODO: DEBUG - remove this
-        using (var context = ServiceRegistry.Get<SaveLoadSystem>().LoadSaveFile("TestSave"))
-        {
-            var testSaveable = new TestSaveable { Number = 5, Text = "This is some random text" };
-            context.Save(testSaveable, "TestData/TestSaveable");
-        }
-        
-        using (var context = ServiceRegistry.Get<SaveLoadSystem>().LoadSaveFile("TestSave"))
-        {
-            var testSaveable = context.Load<TestSaveable>("TestData/TestSaveable");
-            Logger.LogDebug($"{testSaveable.Number} - {testSaveable.Text}");
-        }
-        
-        base.Initialize();
+        ServiceRegistry.RegisterService(new BiomeLoader());
+        ServiceRegistry.RegisterService(new FeatureLoader());
     }
 
     private void InitializeDebugScreen()
@@ -126,11 +97,11 @@ public class SpelunkerUnearthedGame : Game
 
         activeAudioEventsDebugLine = new DebugScreenLine<int>(count => $"Active audio events: {count}");
 
-        debugScreen.AddLine(drawTimeDebugLine);
-        debugScreen.AddLine(potentialDrawTimeDebugLine);
-        debugScreen.AddLine(updateTimeDebugLine);
-        debugScreen.AddLine(potentialUpdateTimeDebugLine);
-        debugScreen.AddLine(activeAudioEventsDebugLine);
+        DebugScreen.AddLine(drawTimeDebugLine);
+        DebugScreen.AddLine(potentialDrawTimeDebugLine);
+        DebugScreen.AddLine(updateTimeDebugLine);
+        DebugScreen.AddLine(potentialUpdateTimeDebugLine);
+        DebugScreen.AddLine(activeAudioEventsDebugLine);
     }
 
     private void InitializeInputs()
@@ -155,30 +126,18 @@ public class SpelunkerUnearthedGame : Game
         inputManager.RegisterEvent(new InputEvent("Mine", Keys.Z));
         inputManager.RegisterEvent(new InputEvent("Use", Keys.X));
 
-        inputManager.OnPressed("ToggleDebugScreen", () => debugScreen.Enabled ^= true);
+        inputManager.OnPressed(this, "ToggleDebugScreen", () => DebugScreen.Enabled ^= true);
     }
 
     protected override void LoadContent()
     {
-        SpriteBatch = new SpriteBatch(GraphicsDevice);
-        
-        ServiceRegistry.RegisterService(new TileAtlas(GraphicsDevice, SpriteBatch, 16));
-
-        ServiceRegistry.Get<MaterialLoader>().LoadContent();
-        
-        ServiceRegistry.Get<TileLoader>().LoadContent();
-        ServiceRegistry.Get<SpriteLoader>().LoadContent();
-        
-        ServiceRegistry.Get<TileAtlas>().SetTiles(ServiceRegistry.Get<TileLoader>().Content);
-        ServiceRegistry.Get<TileAtlas>().CreateAtlas();
+        base.LoadContent();
         
         ServiceRegistry.Get<BiomeLoader>().LoadContent();
         ServiceRegistry.Get<FeatureLoader>().LoadContent();
         
-        scene = new TestScene(Window, Graphics);
-        scene.Load();
-        
-        base.LoadContent();
+        LoadScene<TestScene>();
+        // CurrentScene.Load();
     }
     
     protected override void UnloadContent()
@@ -196,15 +155,14 @@ public class SpelunkerUnearthedGame : Game
 
         updateTimeStopwatch.Reset();
         updateTimeStopwatch.Start();
-        
-        ServiceRegistry.UpdateServices(gameTime);
-        scene.Update(gameTime);
 
+        base.Update(gameTime);
+        
         updateTimeStopwatch.Stop();
         potentialUpdateTimeDebugLine.SetParams(updateTimeStopwatch.Elapsed);
         updateTimeDebugLine.SetParams(gameTime.ElapsedGameTime);
-        
-        base.Update(gameTime);
+                
+        activeAudioEventsDebugLine.SetParams(ServiceRegistry.Get<AudioManager>().ActiveEventCount);
     }
 
     protected override void Draw(GameTime gameTime)
@@ -212,19 +170,10 @@ public class SpelunkerUnearthedGame : Game
         drawTimeStopwatch.Reset();
         drawTimeStopwatch.Start();
         
-        GraphicsDevice.Clear(Color.Black);
-        
-        scene.Render(SpriteBatch);
-        
-        if (debugScreen.Enabled)
-            debugScreen.Render(SpriteBatch);
+        base.Draw(gameTime);
         
         drawTimeStopwatch.Stop();
         potentialDrawTimeDebugLine.SetParams(drawTimeStopwatch.Elapsed);
         drawTimeDebugLine.SetParams(gameTime.ElapsedGameTime);
-        
-        activeAudioEventsDebugLine.SetParams(ServiceRegistry.Get<AudioManager>().ActiveEventCount);
-        
-        base.Draw(gameTime);
     }
 }

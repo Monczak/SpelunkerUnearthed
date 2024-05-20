@@ -31,7 +31,7 @@ public class AudioManager : Service
         }
         
         var bank = StudioSystem.LoadBank($"{name}.bank");
-
+        
         if (!banks.ContainsKey(context))
             banks[context] = new Dictionary<string, Bank>();
 

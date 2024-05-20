@@ -24,6 +24,9 @@ public abstract class Scene(GameWindow window, GraphicsDeviceManager graphics)
 
     public virtual void Unload()
     {
+        foreach (var entity in Entities)
+            entity.Destroy();
+        
         ServiceRegistry.Get<EventManager>().UnbindAll(this);
         ServiceRegistry.Get<AudioManager>().UnloadAllBanks(this);
     }

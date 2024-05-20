@@ -19,17 +19,17 @@ public class Gizmos : Component
     
     public void DrawRectangle(Vector2 position, Vector2 size, Color color, float? lifetime = null)
     {
-        lock (lockObj) Shapes.Add(new RectangleGizmo(position, size, color, lifetime));
+        // lock (lockObj) Shapes.Add(new RectangleGizmo(position, size, color, lifetime));
     }
 
     public void DrawLine(Vector2 begin, Vector2 end, Color color, int width = 3, float? lifetime = null)
     {
-        lock (lockObj) Shapes.Add(new LineGizmo(begin, end, color, width, lifetime));
+        // lock (lockObj) Shapes.Add(new LineGizmo(begin, end, color, width, lifetime));
     }
 
     public void DrawTexture(Vector2 position, Vector2 size, Color color, Texture2D texture, float? lifetime = null)
     {
-        lock (lockObj) Shapes.Add(new TextureGizmo(position, size, color, texture, lifetime));
+        // lock (lockObj) Shapes.Add(new TextureGizmo(position, size, color, texture, lifetime));
     }
     
     protected override void Update(GameTime gameTime)

@@ -41,6 +41,7 @@ public class TileEntityComponent
 
     public void Destroy()
     {
+        OnDestroy();
         OwnerEntity.RemoveComponent(this);
     }
 

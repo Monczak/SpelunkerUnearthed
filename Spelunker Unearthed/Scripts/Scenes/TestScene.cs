@@ -65,6 +65,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         ambienceController.Play();
 
         const int seed = 1;
+        // TODO: Something might be leaking here (SharedArrayPool Int32[])
         worldManager.StartGenerateWorldTask(seed).ContinueWith(_ =>
         {
             worldManager.LoadWorld();
@@ -82,6 +83,12 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         // worldManager.StartLoadLevelTask(firstLevel);
         
         ServiceRegistry.Get<DebugScreen>().AddLine(biomeDebugLine);
+    }
+
+    public override void Unload()
+    {
+        ServiceRegistry.Get<AudioManager>().UnloadAllBanks(this);
+        base.Unload();
     }
 
     private void TestBiomeGeneration()
@@ -247,11 +254,14 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         var sliderBackground = ServiceRegistry.Get<SpriteLoader>().Get("SliderBackground");
         var inactiveSliderBackground = ServiceRegistry.Get<SpriteLoader>().Get("DimSliderBackground");
         
-        var container = canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Row });
+        var container = canvas.Root.AddChild(new FlexLayoutNode { FlexDirection = FlexDirection.Column });
+        var subContainer = container.AddChild(new FlexLayoutNode
+            { FlexDirection = FlexDirection.Row, PreferredHeight = 9 });
+        subContainer.AddChild(new FlexLayoutNode());
         container.AddChild(new FlexLayoutNode());
-        var panel = container.AddChild(new FlexLayoutNode
+        var panel = subContainer.AddChild(new FlexLayoutNode
             { Background = uiBackground, Padding = Coord.One, FlexGrow = 3, FlexGap = 1, FlexDirection = FlexDirection.Column });
-        container.AddChild(new FlexLayoutNode());
+        subContainer.AddChild(new FlexLayoutNode());
 
         var controls = panel.AddChild(new FlexLayoutNode
             { FlexDirection = FlexDirection.Row, FlexGap = 0, PreferredHeight = 3 });
@@ -282,12 +292,12 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         
         prevEaseButton.Pressed += _ =>
         {
-            tweenEasingIndex = (tweenEasingIndex - 1) % tweenEasings.Length;
+            tweenEasingIndex = (tweenEasingIndex - 1 + tweenEasings.Length) % tweenEasings.Length;
             UpdateTweenText(text);
         };
         nextEaseButton.Pressed += _ =>
         {
-            tweenEasingIndex = (tweenEasingIndex + 1) % tweenEasings.Length;
+            tweenEasingIndex = (tweenEasingIndex + 1 + tweenEasings.Length) % tweenEasings.Length;
             UpdateTweenText(text);
         };
 
@@ -298,7 +308,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
                 .WithProperty(x => slider.Value = (int)x, slider.Value, target)
                 .WithTransition(tweenTransitions[tweenTransitionIndex])
                 .WithEasing(tweenEasings[tweenEasingIndex])
-                .WithTime(1.0f)
+                .WithTime(3.0f)
             );
             tween.Finished += _ => Logger.LogDebug("Tween done!");
         };

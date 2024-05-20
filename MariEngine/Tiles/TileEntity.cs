@@ -152,7 +152,8 @@ public class TileEntity(string name) : IAudioListener
 
     protected virtual void OnDestroy()
     {
-        
+        foreach (var (type, component) in components)
+            component.Destroy();
     }
 
     public Vector2 GetPosition() => Tilemap.CoordToWorldPoint(Position);

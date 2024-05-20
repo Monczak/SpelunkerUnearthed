@@ -235,7 +235,8 @@ public class Tilemap : Component
 
     protected override void OnDestroy()
     {
-        foreach (TileEntity tileEntity in TileEntities)
+        layers.Clear();
+        foreach (var tileEntity in TileEntities)
             tileEntity.Destroy();
     }
 }

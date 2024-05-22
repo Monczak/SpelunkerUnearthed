@@ -7,13 +7,15 @@ using Microsoft.Xna.Framework;
 
 namespace MariEngine;
 
-public class Entity(string name)
+public class Entity(string name) : IPriorityItem
 {
     public string Name { get; set; } = name;
+    
+    public virtual int Priority { get; init; } = 0;
 
     public bool ToBeDestroyed { get; private set; }
-
-    private Dictionary<Type, Component> components = new();
+    
+    private readonly SortedSet<Component> components = new(new PriorityComparer<Component>());
 
     public T AddComponent<T>() where T : Component
     {
@@ -21,34 +23,33 @@ public class Entity(string name)
         
         var component = Activator.CreateInstance<T>();
         AttachComponent(component);
-        return (T)components[typeof(T)];
+        return component;
     }
 
     public T GetComponent<T>() where T : Component
     {
-        Type type = components.Keys.FirstOrDefault(t => t.IsAssignableTo(typeof(T)));
-        if (type is null) return null;
-        return (T)components[type];
+        var component = components.FirstOrDefault(c => c.GetType().IsAssignableTo(typeof(T)));
+        return (T)component;
     }
 
     public void RemoveComponent<T>() where T : Component
     {
-        T component = GetComponent<T>();
+        var component = GetComponent<T>();
         if (component is null) return;
 
-        components.Remove(typeof(T));
+        components.Remove(component);
     }
 
     public void RemoveComponent<T>(T component) where T : Component
     {
-        components.Remove(component.GetType());
+        components.Remove(component);
     }
  
     public void AttachComponent<T>(T component) where T : Component
     {
         AssertComponent<T>();
         
-        components[typeof(T)] = component;
+        components.Add(component);
         component.SetOwner(this);
     }
 
@@ -61,33 +62,33 @@ public class Entity(string name)
     private void AssertUniqueComponentType<T>() where T : Component
     {
         var type = typeof(T);
-        if (components.ContainsKey(type))
+        if (components.Any(c => c.GetType() == type))
             throw new Exception($"Entity {Name} already has a component of type {type}");
     }
 
     private void AssertExclusivity<T>() where T : Component
     {
-        Type exclusiveType = components.Keys.FirstOrDefault(t => t.IsAssignableTo(typeof(T)));
-        if (typeof(T).IsDefined(typeof(ExclusiveAttribute)) && exclusiveType is not null)
+        var exclusiveComponent = components.FirstOrDefault(c => c.GetType().IsAssignableTo(typeof(T)));
+        if (typeof(T).IsDefined(typeof(ExclusiveAttribute)) && exclusiveComponent is not null)
             throw new Exception(
-                $"Trying to add component of type {typeof(T).Name} to entity {Name}, but this component is exclusive with {exclusiveType.Name}");
+                $"Trying to add component of type {typeof(T).Name} to entity {Name}, but this component is exclusive with {exclusiveComponent.GetType().Name}");
     }
 
     public void Update(GameTime gameTime)
     {
-        foreach (Component component in components.Values)
+        foreach (var component in components)
         {
             component.DoUpdate(gameTime);
         }
     }
 
-    public bool HasComponent<T>() where T : Component => components.Keys.Any(c => c.IsAssignableTo(typeof(T)));
+    public bool HasComponent<T>() where T : Component => components.Any(c => c.GetType().IsAssignableTo(typeof(T)));
     
     public void Destroy()
     {
         ToBeDestroyed = true;
         
-        foreach (Component component in components.Values)
+        foreach (var component in components)
             component.Destroy();
     }
 }

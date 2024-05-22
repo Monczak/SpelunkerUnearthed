@@ -1,13 +1,17 @@
-﻿using MariEngine.Tiles;
+﻿using System;
+using MariEngine.Services;
+using MariEngine.Tiles;
 using Microsoft.Xna.Framework;
 
 namespace MariEngine.Components;
 
 // TODO: Refactor this to use a generic base class for all components
-public class TileEntityComponent
+public class TileEntityComponent : IPriorityItem
 {
     public TileEntity OwnerEntity { get; private set; }
-    
+
+    public virtual int Priority { get; init; } = 0;
+
     public void SetOwner(TileEntity ownerEntity)
     {
         OwnerEntity = ownerEntity;

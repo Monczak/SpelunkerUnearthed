@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using MariEngine.Components;
+using MariEngine.Services;
 using MariEngine.Utils;
 using Microsoft.Xna.Framework;
 
 namespace MariEngine.Tiles;
 
 // TODO: Refactor this to use a generic base class for a component container
-public class TileEntity(string name) : IAudioListener
+public class TileEntity(string name) : IAudioListener, IPriorityItem
 {
     public string Name { get; set; } = name;
 
+    public virtual int Priority { get; init; } = 0;
+    
     private Coord position;
 
     public Coord Position
@@ -23,7 +26,7 @@ public class TileEntity(string name) : IAudioListener
             var oldPosition = position;
             position = value;
             
-            foreach (TileEntityComponent component in components.Values)
+            foreach (var component in components)
                 component.OnPositionUpdate();
             
             PositionUpdated?.Invoke(this, oldPosition, position);
@@ -36,8 +39,8 @@ public class TileEntity(string name) : IAudioListener
     public float PositionSmoothing { get; set; }
 
     public Tilemap Tilemap { get; private set; }
-
-    private Dictionary<Type, TileEntityComponent> components = new();
+    
+    private readonly SortedSet<TileEntityComponent> components = new(new PriorityComparer<TileEntityComponent>());
 
     public delegate void PositionUpdatedHandler(TileEntity sender, Coord oldPos, Coord newPos);
     public event PositionUpdatedHandler PositionUpdated;
@@ -48,43 +51,33 @@ public class TileEntity(string name) : IAudioListener
         
         var component = Activator.CreateInstance<T>();
         AttachComponent(component);
-        return (T)components[typeof(T)];
+        return component;
     }
 
     public T GetComponent<T>() where T : TileEntityComponent
     {
-        Type type = null;
-        foreach (var t in components.Keys)
-        {
-            if (t.IsAssignableTo(typeof(T)))
-            {
-                type = t;
-                break;
-            }
-        }
-
-        if (type is null) return null;
-        return (T)components[type];
+        var component = components.FirstOrDefault(c => c.GetType().IsAssignableTo(typeof(T)));
+        return (T)component;
     }
 
     public void RemoveComponent<T>() where T : TileEntityComponent
     {
-        T component = GetComponent<T>();
+        var component = GetComponent<T>();
         if (component is null) return;
 
-        components.Remove(typeof(T));
+        components.Remove(component);
     }
 
     public void RemoveComponent<T>(T component) where T : TileEntityComponent
     {
-        components.Remove(component.GetType());
+        components.Remove(component);
     }
  
     public void AttachComponent<T>(T component) where T : TileEntityComponent
     {
         AssertComponent<T>();
-        
-        components[typeof(T)] = component;
+
+        components.Add(component);
         component.SetOwner(this);
     }
 
@@ -97,19 +90,19 @@ public class TileEntity(string name) : IAudioListener
     private void AssertUniqueComponentType<T>() where T : TileEntityComponent
     {
         var type = typeof(T);
-        if (components.ContainsKey(type))
+        if (components.Any(component => component.GetType() == type))
             throw new Exception($"Tile entity {Name} already has a component of type {type}");
     }
 
     private void AssertExclusivity<T>() where T : TileEntityComponent
     {
-        Type exclusiveType = components.Keys.FirstOrDefault(t => t.IsAssignableTo(typeof(T)));
-        if (typeof(T).IsDefined(typeof(ExclusiveAttribute)) && exclusiveType is not null)
+        var exclusiveComponent = components.FirstOrDefault(c => c.GetType().IsAssignableTo(typeof(T)));
+        if (typeof(T).IsDefined(typeof(ExclusiveAttribute)) && exclusiveComponent is not null)
             throw new Exception(
-                $"Trying to add tile entity component of type {typeof(T).Name} to entity {Name}, but this component is exclusive with {exclusiveType.Name}");
+                $"Trying to add tile entity component of type {typeof(T).Name} to entity {Name}, but this component is exclusive with {exclusiveComponent.GetType().Name}");
     }
     
-    public bool HasComponent<T>() where T : Component => components.Keys.Any(c => c.IsAssignableTo(typeof(T)));
+    public bool HasComponent<T>() where T : Component => components.Any(c => c.GetType().IsAssignableTo(typeof(T)));
 
 
     internal void AttachToTilemap(Tilemap tilemap)
@@ -125,7 +118,7 @@ public class TileEntity(string name) : IAudioListener
 
     public void Update(GameTime gameTime)
     {
-        foreach (TileEntityComponent component in components.Values)
+        foreach (var component in components)
             component.Update(gameTime);
 
         if (PositionSmoothing == 0)
@@ -152,7 +145,7 @@ public class TileEntity(string name) : IAudioListener
 
     protected virtual void OnDestroy()
     {
-        foreach (var (type, component) in components)
+        foreach (var component in components)
             component.Destroy();
     }
 

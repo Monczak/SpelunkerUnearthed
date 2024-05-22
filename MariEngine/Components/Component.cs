@@ -2,11 +2,13 @@
 
 namespace MariEngine.Components;
 
-public abstract class Component
+public abstract class Component : IPriorityItem
 {
     public bool Enabled { get; set; } = true;
     
     protected Entity OwnerEntity;
+    
+    public virtual int Priority { get; init; } = 0;
 
     public Component()
     {

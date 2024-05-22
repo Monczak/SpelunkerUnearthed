@@ -18,7 +18,7 @@ public class Tilemap : Component
 
     private List<int> layerIds = [];
     
-    public HashSet<TileEntity> TileEntities { get; }
+    public SortedSet<TileEntity> TileEntities { get; }
     
     private HashSet<TileBehavior> BehaviorsToUpdate { get; }
     
@@ -50,7 +50,7 @@ public class Tilemap : Component
         layers = new SortedDictionary<int, TileBuffer>(new DescendingComparer<int>());
         AddLayer(BaseLayer);
 
-        TileEntities = [];
+        TileEntities = new SortedSet<TileEntity>(new PriorityComparer<TileEntity>());
         BehaviorsToUpdate = [];
     }
 

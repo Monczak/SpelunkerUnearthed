@@ -192,7 +192,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         player.AttachComponent(new TileEntitySpriteCollider());
         tilemap.AddTileEntity(player);
 
-        playerController = new PlayerController();
+        playerController = new PlayerController { Priority = -10 };
         player.AttachComponent(playerController);
         player.AttachComponent(new LightEmitter { LightSource = new PointLight(new Color(237, 222, 138), 1f, 30) });
 
@@ -221,7 +221,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
         managersEntity.AttachComponent(worldManager);
 
-        Entity uiEntity = new("UI");
+        Entity uiEntity = new("UI") { Priority = 1000 };
         canvas = new Canvas();
         uiEntity.AttachComponent(canvas);
         uiEntity.AttachComponent(new CanvasLayoutManager());

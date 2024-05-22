@@ -2,6 +2,7 @@
 using System.Linq;
 using FmodForFoxes;
 using MariEngine.Audio;
+using MariEngine.Components;
 using MariEngine.Events;
 using MariEngine.Rendering;
 using Microsoft.Xna.Framework;
@@ -13,7 +14,7 @@ namespace MariEngine;
 
 public abstract class Scene(GameWindow window, GraphicsDeviceManager graphics)
 {
-    public List<Entity> Entities { get; } = [];
+    public SortedSet<Entity> Entities { get; } = new(new PriorityComparer<Entity>());
     public Camera Camera { get; } = new(window, graphics);
 
     private readonly PriorityQueue<Renderer, int> rendererQueue = new();
@@ -45,7 +46,7 @@ public abstract class Scene(GameWindow window, GraphicsDeviceManager graphics)
             entity.Update(gameTime);
         }
 
-        Entities.RemoveAll(e => e.ToBeDestroyed);
+        Entities.RemoveWhere(e => e.ToBeDestroyed);
     }
 
     public void Render(SpriteBatch spriteBatch)

@@ -32,6 +32,20 @@ public abstract class Scene(GameWindow window, GraphicsDeviceManager graphics)
         ServiceRegistry.Get<AudioManager>().UnloadAllBanks(this);
     }
 
+    internal void InitializeEntities()
+    {
+        foreach (var entity in Entities)
+        {
+            entity.InitializeComponents();
+        }
+        Initialize();
+    }
+
+    protected virtual void Initialize()
+    {
+        
+    }
+    
     public void AddEntity(Entity entity)
     {
         Entities.Add(entity);

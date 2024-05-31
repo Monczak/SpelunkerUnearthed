@@ -19,9 +19,9 @@ public class CanvasLayoutManager : Component
         LayoutRecomputed?.Invoke(Layout);
     }
 
-    protected override void OnAttach()
+    protected internal override void Initialize()
     {
-        base.OnAttach();
+        base.Initialize();
         canvas = GetComponent<Canvas>();
     }
 }

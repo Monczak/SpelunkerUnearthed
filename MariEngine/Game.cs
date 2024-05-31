@@ -109,15 +109,16 @@ public abstract class Game : Microsoft.Xna.Framework.Game
         base.Draw(gameTime);
     }
 
-    protected void LoadScene(Scene scene)
+    private void LoadScene(Scene scene)
     {
         CurrentScene?.Unload();
         
         CurrentScene = scene;
         CurrentScene.Load();
+        CurrentScene.InitializeEntities();
     }
 
-    protected void LoadScene(Type type)
+    private void LoadScene(Type type)
     {
         LoadScene(Activator.CreateInstance(type, Window, Graphics) as Scene);
     }

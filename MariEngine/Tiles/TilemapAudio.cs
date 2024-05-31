@@ -9,7 +9,7 @@ public class TilemapAudio(PositionalAudioSource source) : Component
 {
     private Tilemap tilemap;
 
-    protected override void OnAttach()
+    protected internal override void Initialize()
     {
         tilemap = GetComponent<Tilemap>();
         tilemap.TileMined += OnTileMined;

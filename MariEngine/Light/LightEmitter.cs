@@ -7,7 +7,7 @@ public class LightEmitter : TileEntityComponent
     public LightSource LightSource { get; init; }
     private LightMap lightMap;
 
-    protected override void OnAttach()
+    protected internal override void Initialize()
     {
         lightMap = OwnerEntity.Tilemap.GetComponent<LightMap>();
         lightMap.AddEmitter(this);

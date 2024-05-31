@@ -74,6 +74,14 @@ public class Entity(string name) : IPriorityItem
                 $"Trying to add component of type {typeof(T).Name} to entity {Name}, but this component is exclusive with {exclusiveComponent.GetType().Name}");
     }
 
+    internal void InitializeComponents()
+    {
+        foreach (var component in components)
+        {
+            component.Initialize();
+        }
+    }
+
     public void Update(GameTime gameTime)
     {
         foreach (var component in components)
@@ -87,8 +95,9 @@ public class Entity(string name) : IPriorityItem
     public void Destroy()
     {
         ToBeDestroyed = true;
-        
-        foreach (var component in components)
-            component.Destroy();
+
+        foreach (var component in components) 
+            component.DestroyWithoutRemove();
+        components.Clear();
     }
 }

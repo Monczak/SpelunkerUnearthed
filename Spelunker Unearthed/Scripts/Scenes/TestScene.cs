@@ -91,6 +91,11 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         base.Unload();
     }
 
+    protected override void Initialize()
+    {
+        canvas.GetComponent<CanvasRenderer>().Redraw(recomputeLayout: true);
+    }
+
     private void TestBiomeGeneration()
     {
         Texture2D texture = ServiceRegistry.Get<TexturePool>().RequestTexture(new Coord(tilemap.Width, tilemap.Height), out _);
@@ -230,8 +235,6 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         AddEntity(uiEntity);
 
         PrepareTestUi(canvas);
-
-        canvas.GetComponent<CanvasRenderer>().Redraw(recomputeLayout: true);
     }
 
     private int tweenTransitionIndex;

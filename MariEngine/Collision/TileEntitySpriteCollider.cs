@@ -7,7 +7,7 @@ public class TileEntitySpriteCollider : TileEntityCollider
 {
     private Sprite sprite;
 
-    protected override void OnAttach()
+    protected internal override void Initialize()
     {
         sprite = OwnerEntity.GetComponent<TileEntitySpriteRenderer>().Sprite;
     }

@@ -52,7 +52,7 @@ public partial class CanvasRenderer : Renderer
         tileBuffer = new TileBuffer(screenSize + Coord.One * overscan * 2);
     }
 
-    protected override void OnAttach()
+    protected internal override void Initialize()
     {
         canvas = GetComponent<Canvas>();
         testTexture = ServiceRegistry.Get<TexturePool>().RequestTexture(Coord.One, out _);

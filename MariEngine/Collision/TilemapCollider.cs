@@ -11,7 +11,7 @@ public class TilemapCollider(Coord? spatialPartitionCellSize = null) : Collider
 
     private readonly Coord cellSize = spatialPartitionCellSize ?? Coord.One * 8;
 
-    protected override void OnAttach()
+    protected internal override void Initialize()
     {
         tilemap = GetComponent<Tilemap>();
         tilemap.TileEntityAdded += OnTileEntityAdded;

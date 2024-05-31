@@ -25,7 +25,7 @@ public class GizmoRenderer : Renderer
         Enabled ^= true;
     }
 
-    protected override void OnAttach()
+    protected internal override void Initialize()
     {
         gizmos = GetComponent<Gizmos>();
     }

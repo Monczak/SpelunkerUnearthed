@@ -16,7 +16,7 @@ public class TilemapRenderer(GraphicsDevice graphicsDevice, Camera camera) : Ren
     private Tilemap tilemap;
     private LightMap lightMap;
 
-    protected override void OnAttach()
+    protected internal override void Initialize()
     {
         tilemap = GetComponent<Tilemap>();
         lightMap = GetComponent<LightMap>();

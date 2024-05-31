@@ -22,9 +22,9 @@ public class CanvasNavigator : Component
 
     private Dictionary<SelectableComponentNode, Dictionary<Direction, SelectableComponentNode>> navigationGraph = new();
     
-    protected override void OnAttach()
+    protected internal override void Initialize()
     {
-        base.OnAttach();
+        base.Initialize();
 
         canvas = GetComponent<Canvas>();
         canvas.ComponentAdded += CanvasOnComponentAdded;
@@ -33,20 +33,17 @@ public class CanvasNavigator : Component
         layoutManager = canvas.GetComponent<CanvasLayoutManager>();
         layoutManager.LayoutRecomputed += BuildNavigationGraph;
 
-        using (var context = ServiceRegistry.Get<InputManager>().CreateContext(this))
-        {
-            context.OnPressed("UI_Up", SelectComponentUp);
-            context.OnPressed("UI_Down", SelectComponentDown);
-            context.OnPressed("UI_Left", SelectComponentLeft);
-            context.OnPressed("UI_Right", SelectComponentRight);
+        using var context = ServiceRegistry.Get<InputManager>().CreateContext(this);
+        context.OnPressed("UI_Up", SelectComponentUp);
+        context.OnPressed("UI_Down", SelectComponentDown);
+        context.OnPressed("UI_Left", SelectComponentLeft);
+        context.OnPressed("UI_Right", SelectComponentRight);
         
-            context.OnPressed("UI_Select", InteractOnPressed);
-            context.OnReleased("UI_Select", InteractOnReleased);
+        context.OnPressed("UI_Select", InteractOnPressed);
+        context.OnReleased("UI_Select", InteractOnReleased);
         
-            context.OnPressedPassThrough(PassPressedToSelectedComponent);
-            context.OnReleasedPassThrough(PassReleasedToSelectedComponent);
-        }
-        
+        context.OnPressedPassThrough(PassPressedToSelectedComponent);
+        context.OnReleasedPassThrough(PassReleasedToSelectedComponent);
     }
     
     private void PassPressedToSelectedComponent(Keys key) => (SelectedComponent as IUiCommandReceiver)?.HandleCommand(new InputKeyUiCommand(key, true));

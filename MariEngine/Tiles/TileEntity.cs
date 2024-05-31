@@ -104,7 +104,13 @@ public class TileEntity(string name) : IAudioListener, IPriorityItem
     
     public bool HasComponent<T>() where T : Component => components.Any(c => c.GetType().IsAssignableTo(typeof(T)));
 
-
+    protected internal void InitializeComponents()
+    {
+        foreach (var component in components)
+            component.Initialize();
+    }
+    
+    
     internal void AttachToTilemap(Tilemap tilemap)
     {
         Tilemap = tilemap;
@@ -139,14 +145,20 @@ public class TileEntity(string name) : IAudioListener, IPriorityItem
 
     public void Destroy()
     {
+        OnDestroy();
         Tilemap.RemoveTileEntity(this);
+    }
+
+    internal void DestroyWithoutRemove()
+    {
         OnDestroy();
     }
 
     protected virtual void OnDestroy()
     {
         foreach (var component in components)
-            component.Destroy();
+            component.DestroyWithoutRemove();
+        components.Clear();
     }
 
     public Vector2 GetPosition() => Tilemap.CoordToWorldPoint(Position);

@@ -8,15 +8,13 @@ namespace MariEngine.Components;
 public class TilemapCameraBounds : CameraBounds
 {
     private Tilemap tilemap;
-    private TilemapRenderer tilemapRenderer;
 
     public override Bounds GetBounds() => Bounds.MakeCorners(tilemap.CoordToWorldPoint(tilemap.Bounds.TopLeft),
         tilemap.CoordToWorldPoint(tilemap.Bounds.BottomRight));
 
-    protected override void OnAttach()
+    protected internal override void Initialize()
     {
-        base.OnAttach();
+        base.Initialize();
         tilemap = GetComponent<Tilemap>();
-        tilemapRenderer = GetComponent<TilemapRenderer>();
     }
 }

@@ -35,7 +35,7 @@ public class PlayerController : TileEntityComponent
     private DebugScreenLine<(Coord, Vector2)> playerPosDebugLine;
     private DebugScreenLine<Biome> biomeDebugLine;
     
-    protected override void OnAttach()
+    protected override void Initialize()
     {
         tilemapCollider = OwnerEntity.Tilemap.GetComponent<TilemapCollider>(); 
         inputManager = ServiceRegistry.Get<InputManager>();

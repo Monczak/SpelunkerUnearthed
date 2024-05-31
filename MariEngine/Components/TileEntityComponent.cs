@@ -37,6 +37,11 @@ public class TileEntityComponent : IPriorityItem
     {
         
     }
+    
+    protected internal virtual void Initialize()
+    {
+        
+    }
 
     protected internal virtual void OnPositionUpdate()
     {
@@ -47,6 +52,11 @@ public class TileEntityComponent : IPriorityItem
     {
         OnDestroy();
         OwnerEntity.RemoveComponent(this);
+    }
+
+    internal void DestroyWithoutRemove()
+    {
+        OnDestroy();
     }
 
     protected virtual void OnDestroy()

@@ -54,16 +54,23 @@ public class Tilemap : Component
         BehaviorsToUpdate = [];
     }
 
-    protected override void OnAttach()
+    protected internal override void Initialize()
     {
+        base.Initialize();
+        
         transform = GetComponent<Transform>();
         
         foreach (var pair in layers)
         {
             Fill(ServiceRegistry.Get<TileLoader>().Get("Nothing"), pair.Key);
         }
+        
+        foreach (var tileEntity in TileEntities)
+        {
+            tileEntity.InitializeComponents();
+        }
     }
-
+    
     protected override void Update(GameTime gameTime)
     {
         foreach (var behavior in BehaviorsToUpdate)
@@ -235,8 +242,10 @@ public class Tilemap : Component
 
     protected override void OnDestroy()
     {
-        layers.Clear();
         foreach (var tileEntity in TileEntities)
-            tileEntity.Destroy();
+            tileEntity.DestroyWithoutRemove();
+        
+        TileEntities.Clear();
+        layers.Clear();
     }
 }

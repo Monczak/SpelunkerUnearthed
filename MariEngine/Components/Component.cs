@@ -47,10 +47,20 @@ public abstract class Component : IPriorityItem
         
     }
 
+    protected internal virtual void Initialize()
+    {
+        
+    }
+
     public void Destroy()
     {
         OnDestroy();
         OwnerEntity.RemoveComponent(this);
+    }
+
+    internal void DestroyWithoutRemove()
+    {
+        OnDestroy();
     }
 
     protected virtual void OnDestroy()

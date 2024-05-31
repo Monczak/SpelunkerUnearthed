@@ -75,7 +75,7 @@ public class LightMap : Component
         this.cacheRenderedLight = cacheRenderedLight;
     }
 
-    protected override void OnAttach()
+    protected internal override void Initialize()
     {
         tilemap = GetComponent<Tilemap>();
         lightSources = new Dictionary<LightSource, LightSourceData>();

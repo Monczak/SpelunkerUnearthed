@@ -82,18 +82,13 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         // var firstLevel = worldManager.CaveSystemManager.CaveSystem.Levels[0];
         // worldManager.StartLoadLevelTask(firstLevel);
         
-        ServiceRegistry.Get<DebugScreen>().AddLine(biomeDebugLine);
+        ServiceRegistry.Get<DebugScreen>().AddLine(this, biomeDebugLine);
     }
 
     public override void Unload()
     {
         ServiceRegistry.Get<AudioManager>().UnloadAllBanks(this);
         base.Unload();
-    }
-
-    protected override void Initialize()
-    {
-        canvas.GetComponent<CanvasRenderer>().Redraw(recomputeLayout: true);
     }
 
     private void TestBiomeGeneration()
@@ -141,7 +136,6 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
     {
         Entity debugEntity = new("Debug");
         gizmos = new Gizmos();
-        Gizmos.SetDefault(gizmos);
         debugEntity.AttachComponent(gizmos);
         debugEntity.AttachComponent(new GizmoRenderer(graphics.GraphicsDevice, Camera)
             { Layer = 100, Enabled = false });
@@ -181,9 +175,9 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         tilemapRenderer = new TilemapRenderer(graphics.GraphicsDevice, Camera);
         tilemapEntity.AttachComponent(tilemapRenderer);
 
-        tilemapEntity.AttachComponent(new TilemapCollider(spatialPartitionCellSize: Coord.One * 8));
+        tilemapEntity.AttachComponent(new TilemapCollider(spatialPartitionCellSize: Coord.One * 8) { Priority = 10 });
         tilemapEntity.AttachComponent(new TilemapCameraBounds());
-        
+
         tilemapEntity.AttachComponent(new TilemapAudio(new PositionalAudioSource()
             .WithEvent("Mine", ServiceRegistry.Get<AudioManager>().GetEvent("event:/Mining", oneShot: true))
             .WithTrait(new WorldReverbTrait(tilemap))
@@ -191,8 +185,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         ));
 
         var player = new TileEntity("Player");
-        ServiceRegistry.Get<AudioManager>().SetListener(player);
-        
+
         player.AttachComponent(new TileEntitySpriteRenderer(ServiceRegistry.Get<SpriteLoader>().Get("Player")));
         player.AttachComponent(new TileEntitySpriteCollider());
         tilemap.AddTileEntity(player);
@@ -206,7 +199,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         testTileEntity = new TileEntity("TestTileEntity");
         testTileEntity.AttachComponent(new TileEntitySpriteRenderer(ServiceRegistry.Get<SpriteLoader>().Get("Player")));
         testTileEntity.AttachComponent(new TileEntitySpriteCollider());
-        
+
         var testAudio = new TileEntityAudioSource(new PositionalAudioSource()
             .WithEvent("Test", ServiceRegistry.Get<AudioManager>().GetEvent("event:/Mining", oneShot: true))
             .WithTrait(new WorldReverbTrait(tilemap))
@@ -217,11 +210,11 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         tilemap.AddTileEntity(testTileEntity);
 
         worldManager = new WorldManager(caveSystemManager, tilemap, playerController, gizmos);
-        worldManager.AddProcessor(new RoomConnectionProcessor(worldManager.BaseRoomSize, gizmos), 0);
-        worldManager.AddProcessor(new LadderFeaturePlacementProcessor(worldManager.BaseRoomSize), -10);
-        worldManager.AddRoomMapProcessor(new PlayerSpawnPointProcessor(), 0); // TODO: Load all processors using reflection
-        worldManager.AddRoomMapProcessor(new LadderPlacementProcessor(), -10); 
-        
+        worldManager.AddMapProcessor<RoomConnectionProcessor>(0);
+        worldManager.AddMapProcessor<LadderFeaturePlacementProcessor>(-10);
+        worldManager.AddRoomMapProcessor<PlayerSpawnPointProcessor>(0); // TODO: Load all processors using reflection
+        worldManager.AddRoomMapProcessor<LadderPlacementProcessor>(-10);
+
         player.AttachComponent(new PlayerBiomeWatcher(worldManager, ambienceController));
 
         managersEntity.AttachComponent(worldManager);
@@ -233,8 +226,15 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         uiEntity.AttachComponent(new CanvasNavigator());
         uiEntity.AttachComponent(new CanvasRenderer(graphics.GraphicsDevice, Camera, redrawEveryFrame: true));
         AddEntity(uiEntity);
-
+    }
+    
+    protected override void Initialize()
+    {
         PrepareTestUi(canvas);
+        
+        Gizmos.SetDefault(gizmos);
+        ServiceRegistry.Get<AudioManager>().SetListener(playerController.OwnerEntity);
+        canvas.GetComponent<CanvasRenderer>().Redraw(recomputeLayout: true);
     }
 
     private int tweenTransitionIndex;

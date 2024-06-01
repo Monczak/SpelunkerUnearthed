@@ -57,7 +57,7 @@ public class PlayerController : TileEntityComponent
         }
 
         playerPosDebugLine = new DebugScreenLine<(Coord, Vector2)>(tuple => $"Position: {tuple.Item1} World: ({tuple.Item2.X}, {tuple.Item2.Y})");
-        ServiceRegistry.Get<DebugScreen>().AddLine(playerPosDebugLine);
+        ServiceRegistry.Get<DebugScreen>().AddLine(this, playerPosDebugLine);
     }
 
     private void Use()
@@ -164,6 +164,7 @@ public class PlayerController : TileEntityComponent
     
     protected override void OnDestroy()
     {
+        ServiceRegistry.Get<DebugScreen>().RemoveAllLines(this);
         inputManager.UnbindAll(this);
     }
 }

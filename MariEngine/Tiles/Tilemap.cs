@@ -11,7 +11,7 @@ namespace MariEngine.Tiles;
 public class Tilemap : Component
 {
     private Transform transform;
-    private SortedDictionary<int, TileBuffer> layers;
+    private SortedList<int, TileBuffer> layers;
 
     public const int BaseLayer = 0;
     public const int GroundLayer = -1;
@@ -47,7 +47,7 @@ public class Tilemap : Component
         Width = width;
         Height = height;
 
-        layers = new SortedDictionary<int, TileBuffer>(new DescendingComparer<int>());
+        layers = new SortedList<int, TileBuffer>(new DescendingComparer<int>());
         AddLayer(BaseLayer);
 
         TileEntities = new SortedSet<TileEntity>(new PriorityComparer<TileEntity>());

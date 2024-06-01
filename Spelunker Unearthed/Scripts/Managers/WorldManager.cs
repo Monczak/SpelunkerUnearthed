@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -39,14 +40,24 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
     
     public bool IsGenerating { get; private set; }
 
-    public void AddProcessor(MapProcessor processor, int priority)
+    public void AddMapProcessor(MapProcessor processor, int priority)
     {
         mapProcessors.Add(-priority, processor);
+    }
+
+    public void AddMapProcessor<T>(int priority) where T : MapProcessor
+    {
+        AddMapProcessor((T)Activator.CreateInstance(typeof(T), BaseRoomSize), priority);
     }
     
     public void AddRoomMapProcessor(IRoomMapProcessor processor, int priority)
     {
         roomMapProcessors.Add(-priority, processor);
+    }
+    
+    public void AddRoomMapProcessor<T>(int priority) where T : IRoomMapProcessor
+    {
+        AddRoomMapProcessor(Activator.CreateInstance<T>(), priority);
     }
 
     public void GenerateWorld(int worldSeed)

@@ -97,11 +97,11 @@ public class SpelunkerUnearthedGame : Game
 
         activeAudioEventsDebugLine = new DebugScreenLine<int>(count => $"Active audio events: {count}");
 
-        DebugScreen.AddLine(drawTimeDebugLine);
-        DebugScreen.AddLine(potentialDrawTimeDebugLine);
-        DebugScreen.AddLine(updateTimeDebugLine);
-        DebugScreen.AddLine(potentialUpdateTimeDebugLine);
-        DebugScreen.AddLine(activeAudioEventsDebugLine);
+        DebugScreen.AddLine(this, drawTimeDebugLine);
+        DebugScreen.AddLine(this, potentialDrawTimeDebugLine);
+        DebugScreen.AddLine(this, updateTimeDebugLine);
+        DebugScreen.AddLine(this, potentialUpdateTimeDebugLine);
+        DebugScreen.AddLine(this, activeAudioEventsDebugLine);
     }
 
     private void InitializeInputs()

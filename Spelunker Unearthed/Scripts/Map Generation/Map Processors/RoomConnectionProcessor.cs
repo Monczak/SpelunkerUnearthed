@@ -13,7 +13,7 @@ using SpelunkerUnearthed.Scripts.Utils;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
 
-public class RoomConnectionProcessor(int baseRoomSize, Gizmos gizmos) : MapProcessor(baseRoomSize)
+public class RoomConnectionProcessor(int baseRoomSize) : MapProcessor(baseRoomSize)
 {
     public override void ProcessMap(TileBuffer walls, TileBuffer ground, CaveSystemLevel level)
     {

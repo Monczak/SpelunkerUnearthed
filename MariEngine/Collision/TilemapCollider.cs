@@ -13,11 +13,15 @@ public class TilemapCollider(Coord? spatialPartitionCellSize = null) : Collider
 
     protected internal override void Initialize()
     {
+        spatialPartition = new SpatialPartition<TileEntityCollider>(cellSize);
         tilemap = GetComponent<Tilemap>();
         tilemap.TileEntityAdded += OnTileEntityAdded;
         tilemap.TileEntityRemoved += OnTileEntityRemoved;
 
-        spatialPartition = new SpatialPartition<TileEntityCollider>(cellSize);
+        foreach (var entity in tilemap.TileEntities)
+        {
+            OnTileEntityAdded(entity);
+        }
     }
     
     private void OnTileEntityAdded(TileEntity tileEntity)

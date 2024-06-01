@@ -19,4 +19,10 @@ public class TilemapAudio(PositionalAudioSource source) : Component
     {
         source.Play("Mine", tilemap.CoordToWorldPoint(position));
     }
+
+    protected override void OnDestroy()
+    {
+        source.Dispose();
+        base.OnDestroy();
+    }
 }

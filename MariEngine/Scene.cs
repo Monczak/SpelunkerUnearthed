@@ -3,6 +3,7 @@ using System.Linq;
 using FmodForFoxes;
 using MariEngine.Audio;
 using MariEngine.Components;
+using MariEngine.Debugging;
 using MariEngine.Events;
 using MariEngine.Rendering;
 using Microsoft.Xna.Framework;
@@ -28,6 +29,7 @@ public abstract class Scene(GameWindow window, GraphicsDeviceManager graphics)
         foreach (var entity in Entities)
             entity.Destroy();
         
+        ServiceRegistry.Get<DebugScreen>().RemoveAllLines(this);
         ServiceRegistry.Get<EventManager>().UnbindAll(this);
         ServiceRegistry.Get<AudioManager>().UnloadAllBanks(this);
     }

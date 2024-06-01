@@ -11,12 +11,18 @@ namespace MariEngine.Debugging;
 public class DebugScreen : Service
 {
     public bool Enabled { get; set; }
+
+    private Dictionary<object, List<DebugScreenLine>> Lines { get; } = [];
     
-    internal List<DebugScreenLine> Lines { get; private set; } = [];
-    
-    public void AddLine(DebugScreenLine line)
+    public void AddLine(object context, DebugScreenLine line)
     {
-        Lines.Add(line);
+        Lines.TryAdd(context, []);
+        Lines[context].Add(line);
+    }
+
+    public void RemoveAllLines(object context)
+    {
+        Lines.Remove(context);
     }
 
     // TODO: Refactor this out to a DebugScreenRenderer?
@@ -27,9 +33,10 @@ public class DebugScreen : Service
         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp);
 
         StringBuilder builder = new();
-        foreach (var line in Lines)
+        foreach (var (context, contextLines) in Lines)
         {
-            builder.AppendLine(line.GetLine());
+            foreach (var line in contextLines)
+                builder.AppendLine(line.GetLine());
         }
         spriteBatch.DrawString(font, builder, Vector2.Zero, Color.White);
 

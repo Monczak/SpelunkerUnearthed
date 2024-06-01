@@ -1,14 +1,96 @@
-﻿# TODO: Figure out a way to deserialize this, we'll probably switch to storing scenes like this later
+﻿Entities:
+  Debug:
+    Components:
+      - Gizmos: &gizmos
+      - GizmoRenderer:
+          Layer: 100
+          Enabled: false
 
-name: "TestScene"
-entities:
-  - Tilemap:
-      components:
-        - Transform
-        - Tilemap:
-            mapWidth: 10
-            mapHeight: 10
-            tileEntities:
-              - Player:
-                  position: (0, 0)
-        - TilemapRenderer
+  Controllers:
+    Components:
+      - AmbienceController
+  
+  Camera Controller:
+    Components:
+      - CameraController:
+          Smoothing: 10.0
+  
+  Tilemap: &tilemap
+    Properties:
+      Width: 64
+      Height: 64
+    Components:
+      - Transform
+      - LightMap:
+          AmbientLight: RGB(20 15 17)
+      - TilemapRenderer
+      - TilemapCollider:
+          SpatialPartitionCellSize: 8 8
+      - TilemapCameraBounds
+      - TilemapAudio:
+          Events:
+            Mine: 
+              Path: event:/Mining
+              OneShot: true
+          Traits:
+            - WorldReverbTrait
+            - WorldAttenuationTrait
+      - Tilemap:
+          TileEntities:
+            Player:
+              Components:
+                - TileEntitySpriteRenderer:
+                    Sprite: Player
+                - TileEntitySpriteCollider
+                - PlayerController: &playerController
+                    Priority: -10
+                - LightEmitter:
+                    LightSource:
+                      Type: Point
+                      Color: RGB(237 222 138)
+                      Intensity: 1.0
+                      Radius: 30
+                - PlayerBiomeWatcher
+            TestTileEntity:
+              Components:
+                - TileEntitySpriteRenderer:
+                    Sprite: Player
+                - TileEntitySpriteCollider
+                - TileEntityAudioSource:
+                    Events:
+                      Test:
+                        Path: event:/Mining
+                        OneShot: true
+                    Traits:
+                      - WorldReverbTrait
+                      - WorldAttenuationTrait
+                - AudioTester
+  
+  Managers:
+    Components:
+      - CaveSystemManager: &caveSystemManager
+          BiomeProvider: SimpleBiomeProvider
+          RoomDecisionEngine: TestDecisionEngine
+          RoomLayoutProcessors:
+            - LadderRoomProcessor
+      - WorldManager:
+          CaveSystemManager: *caveSystemManager
+          Tilemap: *tilemap
+          PlayerController: *playerController
+          Gizmos: *gizmos
+          Processors:
+            - RoomConnectionProcessor
+            - LadderFeaturePlacementProcessor:
+                Priority: -10
+            - PlayerSpawnPointProcessor
+            - LadderPlacementProcessor:
+                Priority: -10
+                
+  UI:
+    Priority: 1000
+    Components:
+      - Canvas
+      - CanvasLayoutManager
+      - CanvasNavigator
+      - CanvasRenderer:
+          RedrawEveryFrame: true

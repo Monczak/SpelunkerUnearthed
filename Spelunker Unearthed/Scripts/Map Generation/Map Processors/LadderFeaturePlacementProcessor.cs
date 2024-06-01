@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using MariEngine.Debugging;
 using MariEngine.Tiles;
 using SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 using SpelunkerUnearthed.Scripts.MapGeneration.Features;
@@ -16,9 +17,9 @@ public class LadderFeaturePlacementProcessor(int baseRoomSize) : MapProcessor(ba
             var ladderUpPois = room.PointsOfInterest.GetValueOrDefault(PointOfInterestType.LadderUp) ?? [];
             
             foreach (var poi in ladderDownPois)
-                FeaturePlacer.Place(new Ladder(isDown: true), ground, RoomMath.RoomPosToTilemapPos(level, room, poi.Position, baseRoomSize));
+                FeaturePlacer.Place(new Ladder(isDown: true), ground, RoomMath.RoomPosToTilemapPos(level, room, poi.Position, BaseRoomSize));
             foreach (var poi in ladderUpPois)
-                FeaturePlacer.Place(new Ladder(isDown: false), ground, RoomMath.RoomPosToTilemapPos(level, room, poi.Position, baseRoomSize));
+                FeaturePlacer.Place(new Ladder(isDown: false), ground, RoomMath.RoomPosToTilemapPos(level, room, poi.Position, BaseRoomSize));
         }
     }
 }

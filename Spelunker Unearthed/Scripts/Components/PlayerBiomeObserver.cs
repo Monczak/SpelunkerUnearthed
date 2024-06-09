@@ -8,7 +8,7 @@ using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
 
 namespace SpelunkerUnearthed.Scripts.Components;
 
-public class PlayerBiomeWatcher(WorldManager worldManager, AmbienceController ambienceController) : TileEntityComponent
+public class PlayerBiomeObserver(WorldManager worldManager, AmbienceController ambienceController) : TileEntityComponent
 {
     private Biome currentBiome, prevBiome;
 

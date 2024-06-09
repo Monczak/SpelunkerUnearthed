@@ -127,4 +127,10 @@ public abstract class Game : Microsoft.Xna.Framework.Game
     {
         LoadScene((T)Activator.CreateInstance(typeof(T), Window, Graphics));
     }
+
+    protected override void OnExiting(object sender, EventArgs args)
+    {
+        CurrentScene.Unload();
+        base.OnExiting(sender, args);
+    }
 }

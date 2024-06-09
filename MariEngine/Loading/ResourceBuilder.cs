@@ -8,7 +8,7 @@ public static class ResourceBuilder
         {
             Id = id
         };
-        obj.BuildFromData(data);
+        obj.Build(data);
         return obj;
     }
 }

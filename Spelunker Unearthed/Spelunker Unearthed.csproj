@@ -113,6 +113,9 @@
             <TargetPath>libfmodstudioL.so.13.19</TargetPath>
         </ContentWithTargetPath>
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Content\Scenes\TestScene\" />
+    </ItemGroup>
     <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
         <Message Text="Restoring dotnet tools" Importance="High"/>
         <Exec Command="dotnet tool restore"/>

@@ -1,4 +1,5 @@
 ﻿using System;
+using MariEngine.Loading;
 using MariEngine.Services;
 using MariEngine.Tiles;
 using Microsoft.Xna.Framework;
@@ -6,7 +7,7 @@ using Microsoft.Xna.Framework;
 namespace MariEngine.Components;
 
 // TODO: Refactor this to use a generic base class for all components
-public class TileEntityComponent : IPriorityItem
+public abstract class TileEntityComponent : IPriorityItem
 {
     public TileEntity OwnerEntity { get; private set; }
 
@@ -60,6 +61,14 @@ public class TileEntityComponent : IPriorityItem
     }
 
     protected virtual void OnDestroy()
+    {
+        
+    }
+}
+
+public abstract class TileEntityComponent<TData> : TileEntityComponent, IProxyBuildable<TData>
+{
+    public virtual void Build(TData data)
     {
         
     }

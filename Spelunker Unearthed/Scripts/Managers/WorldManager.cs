@@ -40,24 +40,28 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
     
     public bool IsGenerating { get; private set; }
 
-    public void AddMapProcessor(MapProcessor processor, int priority)
+    public WorldManager AddMapProcessor(MapProcessor processor, int priority)
     {
         mapProcessors.Add(-priority, processor);
+        return this;
     }
 
-    public void AddMapProcessor<T>(int priority) where T : MapProcessor
+    public WorldManager AddMapProcessor<T>(int priority) where T : MapProcessor
     {
         AddMapProcessor((T)Activator.CreateInstance(typeof(T), BaseRoomSize), priority);
+        return this;
     }
     
-    public void AddRoomMapProcessor(IRoomMapProcessor processor, int priority)
+    public WorldManager AddRoomMapProcessor(IRoomMapProcessor processor, int priority)
     {
         roomMapProcessors.Add(-priority, processor);
+        return this;
     }
     
-    public void AddRoomMapProcessor<T>(int priority) where T : IRoomMapProcessor
+    public WorldManager AddRoomMapProcessor<T>(int priority) where T : IRoomMapProcessor
     {
         AddRoomMapProcessor(Activator.CreateInstance<T>(), priority);
+        return this;
     }
 
     public void GenerateWorld(int worldSeed)

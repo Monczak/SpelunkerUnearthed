@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using MariEngine.Loading;
+using Microsoft.Xna.Framework;
 
 namespace MariEngine.Components;
 
@@ -9,11 +10,6 @@ public abstract class Component : IPriorityItem
     protected Entity OwnerEntity;
     
     public virtual int Priority { get; init; } = 0;
-
-    public Component()
-    {
-        
-    }
 
     public void SetOwner(Entity ownerEntity)
     {
@@ -64,6 +60,14 @@ public abstract class Component : IPriorityItem
     }
 
     protected virtual void OnDestroy()
+    {
+        
+    }
+}
+
+public abstract class Component<TData> : Component, IProxyBuildable<TData>
+{
+    public virtual void Build(TData data)
     {
         
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -27,6 +28,7 @@ using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
 using SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 using SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
 using SpelunkerUnearthed.Scripts.TileEntities;
+using YamlDotNet.Serialization;
 
 namespace SpelunkerUnearthed.Scripts.Scenes;
 
@@ -209,13 +211,13 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         testTileEntity.AttachComponent(new AudioTester());
         tilemap.AddTileEntity(testTileEntity);
 
-        worldManager = new WorldManager(caveSystemManager, tilemap, playerController, gizmos);
-        worldManager.AddMapProcessor<RoomConnectionProcessor>(0);
-        worldManager.AddMapProcessor<LadderFeaturePlacementProcessor>(-10);
-        worldManager.AddRoomMapProcessor<PlayerSpawnPointProcessor>(0); // TODO: Load all processors using reflection
-        worldManager.AddRoomMapProcessor<LadderPlacementProcessor>(-10);
+        worldManager = new WorldManager(caveSystemManager, tilemap, playerController, gizmos)
+            .AddMapProcessor<RoomConnectionProcessor>(0)
+            .AddMapProcessor<LadderFeaturePlacementProcessor>(-10)
+            .AddRoomMapProcessor<PlayerSpawnPointProcessor>(0) // TODO: Load all processors using reflection
+            .AddRoomMapProcessor<LadderPlacementProcessor>(-10);
 
-        player.AttachComponent(new PlayerBiomeWatcher(worldManager, ambienceController));
+        player.AttachComponent(new PlayerBiomeObserver(worldManager, ambienceController));
 
         managersEntity.AttachComponent(worldManager);
 
@@ -235,6 +237,8 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         Gizmos.SetDefault(gizmos);
         ServiceRegistry.Get<AudioManager>().SetListener(playerController.OwnerEntity);
         canvas.GetComponent<CanvasRenderer>().Redraw(recomputeLayout: true);
+        
+        File.WriteAllText("test", new SerializerBuilder().Build().Serialize(this));
     }
 
     private int tweenTransitionIndex;

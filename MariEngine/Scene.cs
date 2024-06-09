@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MariEngine.Logging;
 using MariEngine.Services;
+using YamlDotNet.Serialization;
 
 namespace MariEngine;
 

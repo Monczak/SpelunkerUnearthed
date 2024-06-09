@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace MariEngine.Rendering;
 
 [Exclusive]
-public abstract class Renderer(GraphicsDevice graphicsDevice, Camera camera) : Component
+public abstract class Renderer([Inject] GraphicsDevice graphicsDevice, [Inject] Camera camera) : Component
 {
     protected readonly Camera Camera = camera;
     protected readonly GraphicsDevice GraphicsDevice = graphicsDevice;

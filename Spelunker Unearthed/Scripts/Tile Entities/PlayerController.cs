@@ -64,7 +64,7 @@ public class PlayerController : TileEntityComponent
     {
         // TODO: DEBUG - remove this
         // ServiceRegistry.Get<TileAtlas>().Resize(ServiceRegistry.Get<TileAtlas>().TileSize + 1);
-        ServiceRegistry.Get<SceneManager>().LoadScene<TestScene>();
+        ServiceRegistry.Get<SceneManager>().LoadScene<EmptyScene>();
     }
 
     private void Mine()

@@ -4,6 +4,7 @@ using MariEngine;
 using MariEngine.Components;
 using MariEngine.Debugging;
 using MariEngine.Input;
+using MariEngine.Loading;
 using MariEngine.Logging;
 using MariEngine.Services;
 using MariEngine.Tiles;
@@ -16,7 +17,7 @@ using SpelunkerUnearthed.Scripts.Utils;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration;
 
-public class CaveSystemManager(IBiomeProvider biomeProvider, RoomDecisionEngine roomDecisionEngine, IEnumerable<IRoomLayoutProcessor> roomLayoutProcessors) : Component
+public class CaveSystemManager([Inject] IBiomeProvider biomeProvider, [Inject] RoomDecisionEngine roomDecisionEngine, [Inject] IEnumerable<IRoomLayoutProcessor> roomLayoutProcessors) : Component
 {
     public CaveSystem CaveSystem { get; private set; } = new(biomeProvider, roomDecisionEngine, roomLayoutProcessors);
 

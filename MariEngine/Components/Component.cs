@@ -67,8 +67,5 @@ public abstract class Component : IPriorityItem
 
 public abstract class Component<TData> : Component, IProxyBuildable<TData>
 {
-    public virtual void Build(TData data)
-    {
-        
-    }
+    public abstract void Build(TData data);
 }

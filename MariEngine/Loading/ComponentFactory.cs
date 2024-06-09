@@ -34,9 +34,12 @@ public class ComponentFactory
 
     public class ComponentBuilder(DependencyStorage dependencyStorage, Type componentType, params object[] args)
     {
-        private Dictionary<PropertyInfo, object> specialValues = new();
+        private readonly Dictionary<PropertyInfo, object> specialValues = new();
 
-        public ComponentBuilder SetSpecial(string specialName, object value)
+        private Type proxyType;
+        private object proxyObj;
+
+        public ComponentBuilder WithSpecial(string specialName, object value)
         {
             var specialPropInfo = componentType
                 .GetProperties()
@@ -50,6 +53,15 @@ public class ComponentFactory
             }
 
             specialValues[specialPropInfo] = value;
+            return this;
+        }
+
+        public ComponentBuilder WithProxy<T>(T proxyObj) => WithProxy(typeof(T), proxyObj);
+
+        public ComponentBuilder WithProxy(Type proxyType, object proxyObj)
+        {
+            this.proxyType = proxyType;
+            this.proxyObj = proxyObj;
             return this;
         }
 
@@ -75,7 +87,7 @@ public class ComponentFactory
 
             if (constructorInfo is null)
             {
-                throw new ComponentLoadingException("The provided component type does not have a constructor? Weird");
+                throw new ComponentLoadingException("The provided component type does not have a constructor? Weird.");
             }
 
             var constructorParameters = constructorInfo.GetParameters();
@@ -94,8 +106,8 @@ public class ComponentFactory
                 else
                 {
                     if (paramIndex >= args.Length)
-                        throw new ComponentLoadingException(
-                            $"Not enough arguments provided for component {componentType.Name}.");
+                        throw new ComponentLoadingException($"Not enough arguments provided for component {componentType.Name}.");
+
                     constructorParameterValues[i] = args[paramIndex++];
                 }
             }
@@ -107,7 +119,21 @@ public class ComponentFactory
 
             try
             {
-                return constructorInfo.Invoke(constructorParameterValues) as Component;
+                var component = constructorInfo.Invoke(constructorParameterValues) as Component;
+                foreach (var (propInfo, value) in specialValues) propInfo.SetValue(component, value);
+
+                if (proxyType is not null)
+                {
+                    var proxyBuildableComponentType = typeof(Component<>).MakeGenericType(proxyType);
+                    
+                    var buildMethod = proxyBuildableComponentType.GetMethod("Build");
+                    if (buildMethod is null)
+                        throw new ComponentLoadingException($"Component {proxyBuildableComponentType.Name} has no Build method? Weird.");
+                    
+                    buildMethod.Invoke(component, [proxyObj]);
+                }
+                
+                return component;
             }
             catch (ArgumentException e)
             {

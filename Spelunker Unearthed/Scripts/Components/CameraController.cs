@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MariEngine;
 using Microsoft.Xna.Framework;
 using MariEngine.Components;
+using MariEngine.Loading;
 using MariEngine.Logging;
 using MariEngine.Rendering;
 using MariEngine.Tiles;
@@ -10,7 +11,7 @@ using MariEngine.Utils;
 
 namespace SpelunkerUnearthed.Scripts.Components;
 
-public class CameraController(Camera camera) : Component
+public class CameraController([Inject] Camera camera) : Component<CameraData>
 {
     public float Smoothing { get; set; }
     public Vector2 TargetPosition { get; set; }
@@ -19,6 +20,11 @@ public class CameraController(Camera camera) : Component
     private TileEntity trackedTileEntity;
 
     private SortedDictionary<int, CameraBounds> boundsDict = new();
+
+    public override void Build(CameraData data)
+    {
+        Smoothing = data.Smoothing;
+    }
 
     protected override void Update(GameTime gameTime)
     {
@@ -100,3 +106,5 @@ public class CameraController(Camera camera) : Component
         boundsDict.Remove(priority);
     }
 }
+
+public readonly record struct CameraData(float Smoothing);

@@ -139,13 +139,20 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
     private void LoadEntities()
     {
+        ComponentFactory
+            .AddDependency(new SimpleBiomeProvider())
+            .AddDependency(new TestDecisionEngine())
+            .AddDependency(new List<IRoomLayoutProcessor> { new LadderRoomProcessor() });
+        
         var test1 = ComponentFactory.CreateBuilder<Gizmos>().Build();
         var test2 = ComponentFactory.CreateBuilder<GizmoRenderer>()
-            .SetSpecial("Layer", 100)
-            .SetSpecial("Enabled", false)
+            .WithSpecial("Layer", 100)
+            .WithSpecial("Enabled", false)
             .Build();
-        var test3 = ComponentFactory.CreateBuilder<CaveSystemManager>(new SimpleBiomeProvider(), new TestDecisionEngine(),
-            new List<IRoomLayoutProcessor> { new LadderRoomProcessor() }).Build();
+        var test3 = ComponentFactory.CreateBuilder<CaveSystemManager>().Build();
+        var test4 = ComponentFactory.CreateBuilder<CameraController>()
+            .WithProxy(new CameraData(10.0f))
+            .Build();
         
         Entity debugEntity = new("Debug");
         gizmos = new Gizmos();

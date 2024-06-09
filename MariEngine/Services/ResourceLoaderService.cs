@@ -9,7 +9,8 @@ using YamlDotNet.Serialization.NamingConventions;
 
 namespace MariEngine.Services;
 
-public abstract class ResourceLoaderService<TItem, TProxyData> : Service where TItem : Resource<TProxyData>, new()
+
+public abstract class ResourceLoaderService<TItem, TProxyData> : Service, IResourceLoaderService where TItem : Resource<TProxyData>, new()
 {
     protected abstract string ContentPath { get; }
 
@@ -46,4 +47,10 @@ public abstract class ResourceLoaderService<TItem, TProxyData> : Service where T
     }
 
     public TItem Get(string id) => Content[id];
+    object IResourceLoaderService.Get(string id) => Content[id];
+}
+
+internal interface IResourceLoaderService
+{
+    public object Get(string id);
 }

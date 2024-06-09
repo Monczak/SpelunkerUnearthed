@@ -2,7 +2,7 @@ using System;
 
 namespace MariEngine.Loading;
 
-public abstract class Resource<TData> : IProxyBuildable<TData>
+public abstract class Resource<TData> : IResource, IProxyBuildable<TData>
 {
     public string Id { get; protected internal set; }
 
@@ -20,3 +20,5 @@ public abstract class Resource<TData> : IProxyBuildable<TData>
 
     protected internal abstract void BuildFromData(TData data);
 }
+
+internal interface IResource;

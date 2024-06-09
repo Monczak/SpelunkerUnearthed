@@ -224,6 +224,10 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
         AddEntity(tilemapEntity);
 
+        var test8 = ComponentFactory.CreateTileEntityComponentBuilder<TileEntitySpriteRenderer>(tilemap)
+            .WithResource("Sprite", "Player")
+            .Build();
+        
         testTileEntity = new TileEntity("TestTileEntity");
         testTileEntity.AttachComponent(new TileEntitySpriteRenderer(ServiceRegistry.Get<SpriteLoader>().Get("Player")));
         testTileEntity.AttachComponent(new TileEntitySpriteCollider());
@@ -245,7 +249,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
         ComponentFactory.AddDependency(worldManager);
         ComponentFactory.AddDependency(ambienceController);
-        var test8 = ComponentFactory.CreateTileEntityComponentBuilder<PlayerBiomeObserver>(tilemap).Build();
+        var test9 = ComponentFactory.CreateTileEntityComponentBuilder<PlayerBiomeObserver>(tilemap).Build();
         
         player.AttachComponent(new PlayerBiomeObserver(worldManager, ambienceController));
 

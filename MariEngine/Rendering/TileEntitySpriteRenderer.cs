@@ -1,4 +1,5 @@
 using MariEngine.Light;
+using MariEngine.Loading;
 using MariEngine.Services;
 using MariEngine.Sprites;
 using MariEngine.Tiles;
@@ -7,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MariEngine.Rendering;
 
-public class TileEntitySpriteRenderer(Sprite sprite) : TileEntityRenderer
+public class TileEntitySpriteRenderer([InjectResource] Sprite sprite) : TileEntityRenderer
 {
     public Sprite Sprite => sprite;
     

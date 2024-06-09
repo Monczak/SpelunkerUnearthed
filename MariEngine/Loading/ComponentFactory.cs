@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using MariEngine.Components;
 using MariEngine.Logging;
+using MariEngine.Services;
 using MariEngine.Tiles;
 
 namespace MariEngine.Loading;
@@ -50,6 +51,7 @@ public class ComponentFactory
         params object[] args) where TBuilder : BaseComponentBuilder<TComponent, TBuilder>
     {
         private readonly Dictionary<PropertyInfo, object> specialValues = new();
+        private readonly Dictionary<string, string> resources = new();
 
         private Type proxyType;
         private object proxyObj;
@@ -68,6 +70,12 @@ public class ComponentFactory
             }
 
             specialValues[specialPropInfo] = value;
+            return (TBuilder)this;
+        }
+        
+        public TBuilder WithResource(string resourceParamName, string resourceId)
+        {
+            resources[resourceParamName.ToLower()] = resourceId;
             return (TBuilder)this;
         }
 
@@ -117,6 +125,21 @@ public class ComponentFactory
                     if (dependency is null)
                         throw new ComponentLoadingException($"Could not inject required dependency {constructorParameters[i].Name} for component {componentType.Name}.");
                     constructorParameterValues[i] = dependency;
+                }
+                else if (constructorParameters[i].ParameterType.IsAssignableTo(typeof(IResource)) 
+                         && constructorParameters[i].CustomAttributes.Any(a => a.AttributeType == typeof(InjectResourceAttribute)))
+                {
+                    var resourceLoaderType = ServiceRegistry.Services
+                        .Select(pair => pair.Key)
+                        .Where(t => t.IsAssignableTo(typeof(IResourceLoaderService)) && !t.IsAbstract)
+                        .FirstOrDefault(t =>
+                            t.BaseType!.GenericTypeArguments[0].IsAssignableTo(constructorParameters[i].ParameterType));
+                    if (resourceLoaderType is null)
+                        throw new ComponentLoadingException($"No resource loader service is registered for resource of type {constructorParameters[i].ParameterType.Name}.");
+
+                    var resourceLoader = (IResourceLoaderService)ServiceRegistry.Get(resourceLoaderType);
+                    var resource = resourceLoader.Get(resources[constructorParameters[i].Name!.ToLower()]);
+                    constructorParameterValues[i] = resource;
                 }
                 else
                 {

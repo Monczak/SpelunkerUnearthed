@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MariEngine.Loading;
 using MariEngine.Logging;
 using Microsoft.Xna.Framework;
 
@@ -8,6 +9,8 @@ namespace MariEngine.Services;
 public static class ServiceRegistry
 {
     private static Dictionary<Type, Service> services;
+
+    internal static IEnumerable<KeyValuePair<Type, Service>> Services => services;
 
     public static void RegisterService<T>(T service) where T : Service
     {
@@ -20,16 +23,18 @@ public static class ServiceRegistry
         Logger.Log($"Registered service {typeof(T).Name}");
     }
 
-    public static T Get<T>() where T : Service
+    public static T Get<T>() where T : Service => (T)Get(typeof(T));
+
+    internal static Service Get(Type type)
     {
-        if (!services.ContainsKey(typeof(T)))
-            throw new ArgumentException($"Service of type {typeof(T).Name} has not been registered");
-        return (T)services[typeof(T)];
+        if (!services.TryGetValue(type, out var service))
+            throw new ArgumentException($"Service of type {type.Name} has not been registered");
+        return service;
     }
 
     public static void UpdateServices(GameTime gameTime)
     {
-        foreach (Service service in services.Values)
+        foreach (var service in services.Values)
             service.Update(gameTime);
     }
 }

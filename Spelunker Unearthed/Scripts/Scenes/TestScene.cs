@@ -144,13 +144,13 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
             .AddDependency(new TestDecisionEngine())
             .AddDependency(new List<IRoomLayoutProcessor> { new LadderRoomProcessor() });
         
-        var test1 = ComponentFactory.CreateBuilder<Gizmos>().Build();
-        var test2 = ComponentFactory.CreateBuilder<GizmoRenderer>()
+        var test1 = ComponentFactory.CreateComponentBuilder<Gizmos>().Build();
+        var test2 = ComponentFactory.CreateComponentBuilder<GizmoRenderer>()
             .WithSpecial("Layer", 100)
             .WithSpecial("Enabled", false)
             .Build();
-        var test3 = ComponentFactory.CreateBuilder<CaveSystemManager>().Build();
-        var test4 = ComponentFactory.CreateBuilder<CameraController>()
+        var test3 = ComponentFactory.CreateComponentBuilder<CaveSystemManager>().Build();
+        var test4 = ComponentFactory.CreateComponentBuilder<CameraController>()
             .WithProxy(new CameraData(10.0f))
             .Build();
         
@@ -180,6 +180,14 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         Entity tilemapEntity = new("Tilemap");
         tilemap = new Tilemap(64, 64);
         tilemap.AddLayer(Tilemap.GroundLayer);
+
+        var test5 = ComponentFactory.CreateTileEntityComponentBuilder<PlayerController>(tilemap).Build();
+        var test6 = ComponentFactory.CreateTileEntityComponentBuilder<PlayerController>(tilemap)
+            .WithSpecial("Priority", -10)
+            .Build();
+        var test7 = ComponentFactory.CreateTileEntityComponentBuilder<LightEmitter>(tilemap)
+            .WithProxy(new LightEmitterData(new PointLight(new Color(237, 222, 138), 1f, 30)))
+            .Build();
 
         tilemapEntity.AttachComponent(new Transform());
         tilemapEntity.AttachComponent(tilemap);
@@ -235,6 +243,10 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
             .AddRoomMapProcessor<PlayerSpawnPointProcessor>(0) // TODO: Load all processors using reflection
             .AddRoomMapProcessor<LadderPlacementProcessor>(-10);
 
+        ComponentFactory.AddDependency(worldManager);
+        ComponentFactory.AddDependency(ambienceController);
+        var test8 = ComponentFactory.CreateTileEntityComponentBuilder<PlayerBiomeObserver>(tilemap).Build();
+        
         player.AttachComponent(new PlayerBiomeObserver(worldManager, ambienceController));
 
         managersEntity.AttachComponent(worldManager);

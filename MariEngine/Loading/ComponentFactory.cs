@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using MariEngine.Components;
 using MariEngine.Logging;
+using MariEngine.Tiles;
 
 namespace MariEngine.Loading;
 
@@ -21,25 +22,39 @@ public class ComponentFactory
     {
         private readonly List<(Type type, object dependency)> dependencies = [];
 
-        public void AddDependency<T>(T dependency) where T : class
+        public DependencyStorage AddDependency<T>(T dependency) where T : class => AddDependency(typeof(T), dependency);
+
+        public DependencyStorage AddDependency(Type type, object dependency)
         {
-            dependencies.Add((typeof(T), dependency));
+            dependencies.Add((type, dependency));
+            return this;
         }
 
         public T GetDependency<T>() where T : class => GetDependency(typeof(T)) as T;
 
         public object GetDependency(Type type) =>
             dependencies.FirstOrDefault(pair => pair.type.IsAssignableTo(type)).dependency;
+
+        public DependencyStorage Clone()
+        {
+            var storage = new DependencyStorage();
+            foreach (var (type, dependency) in dependencies)
+                storage.AddDependency(type, dependency);
+            return storage;
+        }
     }
 
-    public class ComponentBuilder(DependencyStorage dependencyStorage, Type componentType, params object[] args)
+    public abstract class BaseComponentBuilder<TComponent, TBuilder>(
+        DependencyStorage dependencyStorage,
+        Type componentType,
+        params object[] args) where TBuilder : BaseComponentBuilder<TComponent, TBuilder>
     {
         private readonly Dictionary<PropertyInfo, object> specialValues = new();
 
         private Type proxyType;
         private object proxyObj;
 
-        public ComponentBuilder WithSpecial(string specialName, object value)
+        public TBuilder WithSpecial(string specialName, object value)
         {
             var specialPropInfo = componentType
                 .GetProperties()
@@ -53,21 +68,21 @@ public class ComponentFactory
             }
 
             specialValues[specialPropInfo] = value;
-            return this;
+            return (TBuilder)this;
         }
 
-        public ComponentBuilder WithProxy<T>(T proxyObj) => WithProxy(typeof(T), proxyObj);
+        public TBuilder WithProxy<TProxy>(TProxy proxyObj) => WithProxy(typeof(TProxy), proxyObj);
 
-        public ComponentBuilder WithProxy(Type proxyType, object proxyObj)
+        public TBuilder WithProxy(Type proxyType, object proxyObj)
         {
             this.proxyType = proxyType;
             this.proxyObj = proxyObj;
-            return this;
+            return (TBuilder)this;
         }
 
-        public Component Build()
+        public TComponent Build()
         {
-            if (!componentType.IsAssignableTo(typeof(Component)))
+            if (!componentType.IsAssignableTo(typeof(TComponent)))
                 throw new ArgumentException($"{componentType.Name} is not a component type.");
         
             // Take the first constructor that has [Inject] params
@@ -119,12 +134,17 @@ public class ComponentFactory
 
             try
             {
-                var component = constructorInfo.Invoke(constructorParameterValues) as Component;
+                var component = constructorInfo.Invoke(constructorParameterValues);
                 foreach (var (propInfo, value) in specialValues) propInfo.SetValue(component, value);
 
                 if (proxyType is not null)
                 {
-                    var proxyBuildableComponentType = typeof(Component<>).MakeGenericType(proxyType);
+                    var proxyBuildableComponentType = (typeof(TComponent) switch
+                    {
+                        var t when t.IsAssignableTo(typeof(Component)) => typeof(Component<>),
+                        var t when t.IsAssignableTo(typeof(TileEntityComponent)) => typeof(TileEntityComponent<>),
+                        _ => throw new ArgumentException($"{typeof(TComponent).Name} is not a component type.")
+                    }).MakeGenericType(proxyType);
                     
                     var buildMethod = proxyBuildableComponentType.GetMethod("Build");
                     if (buildMethod is null)
@@ -132,8 +152,8 @@ public class ComponentFactory
                     
                     buildMethod.Invoke(component, [proxyObj]);
                 }
-                
-                return component;
+
+                return (TComponent)component;
             }
             catch (ArgumentException e)
             {
@@ -142,7 +162,21 @@ public class ComponentFactory
         }
     }
 
-    public ComponentBuilder CreateBuilder<T>(params object[] args) where T : Component => CreateBuilder(typeof(T), args);
+    public class TileEntityComponentBuilder(
+        Tilemap tilemap,
+        DependencyStorage dependencyStorage,
+        Type componentType,
+        params object[] args) : BaseComponentBuilder<TileEntityComponent, TileEntityComponentBuilder>(dependencyStorage.Clone().AddDependency(tilemap), componentType, args);
 
-    public ComponentBuilder CreateBuilder(Type componentType, params object[] args) => new(dependencyStorage, componentType, args);
+    public class ComponentBuilder(DependencyStorage dependencyStorage, Type componentType, params object[] args)
+        : BaseComponentBuilder<Component, ComponentBuilder>(dependencyStorage, componentType, args);
+    
+
+    public ComponentBuilder CreateComponentBuilder<T>(params object[] args) where T : Component => CreateComponentBuilder(typeof(T), args);
+
+    public ComponentBuilder CreateComponentBuilder(Type componentType, params object[] args) => new(dependencyStorage, componentType, args);
+    
+    public TileEntityComponentBuilder CreateTileEntityComponentBuilder<T>(Tilemap tilemap, params object[] args) where T : TileEntityComponent => CreateTileEntityComponentBuilder(tilemap, typeof(T), args);
+
+    public TileEntityComponentBuilder CreateTileEntityComponentBuilder(Tilemap tilemap, Type componentType, params object[] args) => new(tilemap, dependencyStorage, componentType, args);
 }

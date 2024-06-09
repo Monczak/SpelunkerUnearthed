@@ -2,10 +2,15 @@
 
 namespace MariEngine.Light;
 
-public class LightEmitter : TileEntityComponent
+public class LightEmitter : TileEntityComponent<LightEmitterData>
 {
-    public LightSource LightSource { get; init; }
+    public LightSource LightSource { get; set; }
     private LightMap lightMap;
+
+    public override void Build(LightEmitterData data)
+    {
+        LightSource = data.LightSource;
+    }
 
     protected internal override void Initialize()
     {
@@ -23,3 +28,5 @@ public class LightEmitter : TileEntityComponent
         lightMap.UpdatePosition(LightSource, OwnerEntity.Position);
     }
 }
+
+public readonly record struct LightEmitterData(LightSource LightSource);

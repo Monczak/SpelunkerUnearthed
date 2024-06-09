@@ -11,7 +11,7 @@ public abstract class TileEntityComponent : IPriorityItem
 {
     public TileEntity OwnerEntity { get; private set; }
 
-    public virtual int Priority { get; init; } = 0;
+    [Special] public virtual int Priority { get; init; } = 0;
 
     public void SetOwner(TileEntity ownerEntity)
     {
@@ -68,8 +68,5 @@ public abstract class TileEntityComponent : IPriorityItem
 
 public abstract class TileEntityComponent<TData> : TileEntityComponent, IProxyBuildable<TData>
 {
-    public virtual void Build(TData data)
-    {
-        
-    }
+    public abstract void Build(TData data);
 }

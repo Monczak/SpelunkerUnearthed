@@ -1,6 +1,7 @@
 ﻿using System;
 using MariEngine.Components;
 using MariEngine.Events;
+using MariEngine.Loading;
 using MariEngine.Services;
 using Microsoft.Xna.Framework;
 using SpelunkerUnearthed.Scripts.Managers;
@@ -8,7 +9,7 @@ using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
 
 namespace SpelunkerUnearthed.Scripts.Components;
 
-public class PlayerBiomeObserver(WorldManager worldManager, AmbienceController ambienceController) : TileEntityComponent
+public class PlayerBiomeObserver([Inject] WorldManager worldManager, [Inject] AmbienceController ambienceController) : TileEntityComponent
 {
     private Biome currentBiome, prevBiome;
 

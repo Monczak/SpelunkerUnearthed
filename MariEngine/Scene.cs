@@ -5,6 +5,7 @@ using MariEngine.Audio;
 using MariEngine.Components;
 using MariEngine.Debugging;
 using MariEngine.Events;
+using MariEngine.Loading;
 using MariEngine.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -22,8 +23,16 @@ public abstract class Scene(GameWindow window, GraphicsDeviceManager graphics)
     private readonly PriorityQueue<Renderer, int> rendererQueue = new();
 
     protected GraphicsDeviceManager graphics = graphics;
-
-    public abstract void Load();
+    
+    protected ComponentFactory ComponentFactory { get; private set; } = new();
+    
+    public virtual void Load()
+    {
+        ComponentFactory
+            .AddDependency(window)
+            .AddDependency(graphics.GraphicsDevice)
+            .AddDependency(Camera);
+    }
 
     public virtual void Unload()
     {

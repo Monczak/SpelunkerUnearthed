@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
@@ -56,6 +57,8 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
     
     public override void Load()
     {
+        base.Load();
+        
         ServiceRegistry.Get<AudioManager>().LoadBank(this, "Ambience");
         ServiceRegistry.Get<AudioManager>().LoadBank(this, "SFX");
         
@@ -136,6 +139,14 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
     private void LoadEntities()
     {
+        var test1 = ComponentFactory.CreateBuilder<Gizmos>().Build();
+        var test2 = ComponentFactory.CreateBuilder<GizmoRenderer>()
+            .SetSpecial("Layer", 100)
+            .SetSpecial("Enabled", false)
+            .Build();
+        var test3 = ComponentFactory.CreateBuilder<CaveSystemManager>(new SimpleBiomeProvider(), new TestDecisionEngine(),
+            new List<IRoomLayoutProcessor> { new LadderRoomProcessor() }).Build();
+        
         Entity debugEntity = new("Debug");
         gizmos = new Gizmos();
         debugEntity.AttachComponent(gizmos);

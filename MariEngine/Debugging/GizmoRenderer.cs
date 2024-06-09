@@ -1,4 +1,5 @@
 using MariEngine.Input;
+using MariEngine.Loading;
 using MariEngine.Rendering;
 using MariEngine.Services;
 using Microsoft.Xna.Framework;
@@ -12,7 +13,7 @@ public class GizmoRenderer : Renderer
     
     private readonly Texture2D gizmoTexture;
     
-    public GizmoRenderer(GraphicsDevice graphicsDevice, Camera camera) : base(graphicsDevice, camera)
+    public GizmoRenderer([Inject] GraphicsDevice graphicsDevice, [Inject] Camera camera) : base(graphicsDevice, camera)
     {
         gizmoTexture = new Texture2D(graphicsDevice, 1, 1, false, SurfaceFormat.Color);
         gizmoTexture.SetData([Color.White]);

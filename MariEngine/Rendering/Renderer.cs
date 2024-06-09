@@ -11,7 +11,7 @@ public abstract class Renderer([Inject] GraphicsDevice graphicsDevice, [Inject] 
     protected readonly Camera Camera = camera;
     protected readonly GraphicsDevice GraphicsDevice = graphicsDevice;
 
-    public int Layer { get; set; } = 0;
+    [Special] public int Layer { get; set; } = 0;
 
     internal void DoRender(SpriteBatch spriteBatch)
     {

@@ -139,21 +139,6 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
     private void LoadEntities()
     {
-        ComponentFactory
-            .AddDependency(new SimpleBiomeProvider())
-            .AddDependency(new TestDecisionEngine())
-            .AddDependency(new List<IRoomLayoutProcessor> { new LadderRoomProcessor() });
-        
-        var test1 = ComponentFactory.CreateComponentBuilder<Gizmos>().Build();
-        var test2 = ComponentFactory.CreateComponentBuilder<GizmoRenderer>()
-            .WithSpecial("Layer", 100)
-            .WithSpecial("Enabled", false)
-            .Build();
-        var test3 = ComponentFactory.CreateComponentBuilder<CaveSystemManager>().Build();
-        var test4 = ComponentFactory.CreateComponentBuilder<CameraController>()
-            .WithProxy(new CameraData(10.0f))
-            .Build();
-        
         Entity debugEntity = new("Debug");
         gizmos = new Gizmos();
         debugEntity.AttachComponent(gizmos);
@@ -180,14 +165,6 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         Entity tilemapEntity = new("Tilemap");
         tilemap = new Tilemap(64, 64);
         tilemap.AddLayer(Tilemap.GroundLayer);
-
-        var test5 = ComponentFactory.CreateTileEntityComponentBuilder<PlayerController>(tilemap).Build();
-        var test6 = ComponentFactory.CreateTileEntityComponentBuilder<PlayerController>(tilemap)
-            .WithSpecial("Priority", -10)
-            .Build();
-        var test7 = ComponentFactory.CreateTileEntityComponentBuilder<LightEmitter>(tilemap)
-            .WithProxy(new LightEmitterData(new PointLight(new Color(237, 222, 138), 1f, 30)))
-            .Build();
 
         tilemapEntity.AttachComponent(new Transform());
         tilemapEntity.AttachComponent(tilemap);

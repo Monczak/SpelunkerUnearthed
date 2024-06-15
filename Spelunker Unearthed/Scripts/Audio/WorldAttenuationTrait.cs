@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 
 namespace SpelunkerUnearthed.Scripts.Audio;
 
-public class WorldAttenuationTrait(Tilemap tilemap) : AudioTrait
+public class WorldAttenuationTrait(Tilemap tilemap) : WorldAudioTrait(tilemap)
 {
     protected override void Apply(AudioEvent audioEvent)
     {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using MariEngine.Events;
+using MariEngine.Loading;
 using MariEngine.Logging;
 using MariEngine.Rendering;
 using MariEngine.Services;
@@ -26,7 +27,7 @@ public partial class CanvasRenderer : Renderer
 
     private bool redrawEveryFrame;
     
-    public CanvasRenderer(GraphicsDevice graphicsDevice, Camera camera, int overscan = 1, ICanvasRendererVisitor rendererVisitor = null, bool redrawEveryFrame = false) : base(graphicsDevice, camera)
+    public CanvasRenderer([Inject] GraphicsDevice graphicsDevice, [Inject] Camera camera, int overscan = 1, ICanvasRendererVisitor rendererVisitor = null, bool redrawEveryFrame = false) : base(graphicsDevice, camera)
     {
         this.overscan = overscan;
         this.rendererVisitor = rendererVisitor ?? new CanvasRendererVisitor();

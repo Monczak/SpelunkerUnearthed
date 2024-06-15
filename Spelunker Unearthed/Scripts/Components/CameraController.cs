@@ -107,4 +107,7 @@ public class CameraController([Inject] Camera camera) : Component<CameraData>
     }
 }
 
-public readonly record struct CameraData(float Smoothing);
+public class CameraData : ComponentData
+{
+    public float Smoothing { get; init; }
+}

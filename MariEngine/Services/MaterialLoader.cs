@@ -18,7 +18,7 @@ public class MaterialLoader : ResourceLoaderService<Material, MaterialData>
     
     protected override string ContentPath => ContentPaths.Materials;
 
-    public override void LoadContent(INamingConvention namingConvention = null)
+    public override void LoadContent(INamingConvention namingConvention = null, IDeserializer deserializer = null)
     {
         base.LoadContent(namingConvention);
         

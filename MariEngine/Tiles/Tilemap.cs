@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Reflection;
 using MariEngine.Components;
 using MariEngine.Exceptions;
 using MariEngine.Light;
+using MariEngine.Loading;
 using MariEngine.Services;
 using Microsoft.Xna.Framework;
 
 namespace MariEngine.Tiles;
 
-public class Tilemap : Component
+public class Tilemap : Component<TilemapData>
 {
     private Transform transform;
     private SortedList<int, TileBuffer> layers;
@@ -42,7 +46,7 @@ public class Tilemap : Component
         }
     }
     
-    public Tilemap(int width, int height)
+    public Tilemap(int width = 64, int height = 64)
     {
         Width = width;
         Height = height;
@@ -53,6 +57,8 @@ public class Tilemap : Component
         TileEntities = new SortedSet<TileEntity>(new PriorityComparer<TileEntity>());
         BehaviorsToUpdate = [];
     }
+
+    public TileEntity GetTileEntity(string name) => TileEntities.FirstOrDefault(e => e.Name == name);
 
     protected internal override void Initialize()
     {
@@ -69,8 +75,10 @@ public class Tilemap : Component
         {
             tileEntity.InitializeComponents();
         }
+        
+        GetComponent<LightMap>()?.Resize(new Coord(Width, Height));
     }
-    
+
     protected override void Update(GameTime gameTime)
     {
         foreach (var behavior in BehaviorsToUpdate)
@@ -248,4 +256,47 @@ public class Tilemap : Component
         TileEntities.Clear();
         layers.Clear();
     }
+    
+    public override void Build(TilemapData data)
+    {
+       Resize(new Coord(data.Width, data.Height));
+       foreach (var (entityName, entityData) in data.TileEntities)
+       {
+           var tileEntity = new TileEntity(entityName);
+           AddTileEntity(tileEntity);
+           foreach (var (componentTypeName, componentData) in entityData.Components)
+           {
+               var componentType = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes())
+                   .FirstOrDefault(t => t.IsAssignableTo(typeof(TileEntityComponent)) && t.Name == componentTypeName);
+               if (componentType is null)
+                   throw new Exception($"{componentTypeName} is not a valid tile entity component type.");
+
+               var builder = OwnerEntity.OwnerScene.ComponentFactory.CreateTileEntityComponentBuilder(this, componentType);
+               if (componentData is not null)
+               {
+                   if (componentData.GetType() != typeof(ComponentData) && componentData.GetType() != typeof(RendererData))
+                       builder.WithProxy(componentData.GetType(), componentData);
+                   
+                   foreach (var (resourceParam, resourceId) in componentData.Resources) 
+                       builder.WithResource(resourceParam, resourceId);
+
+                   foreach (var (specialParam, specialValue) in componentData.Specials) 
+                       builder.WithSpecial(specialParam, specialValue);
+               }
+
+               var component = builder.Build(ownerTileEntity: tileEntity);
+               tileEntity.AttachComponent(component);
+
+               if (componentData is not null && componentData.IsDependency)
+                   OwnerEntity.OwnerScene.ComponentFactory.AddDependency(componentType, component);
+           }
+       }
+    }
+}
+
+public class TilemapData : ComponentData
+{
+    public int Width { get; init; }
+    public int Height { get; init; }
+    public Dictionary<string, EntityData> TileEntities { get; init; }
 }

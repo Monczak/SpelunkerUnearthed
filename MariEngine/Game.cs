@@ -52,6 +52,7 @@ public abstract class Game : Microsoft.Xna.Framework.Game
         ServiceRegistry.RegisterService(new TweenManager());
         ServiceRegistry.RegisterService(new SaveLoadSystem(savePath));
         ServiceRegistry.RegisterService(new SceneManager());
+        ServiceRegistry.RegisterService(new SceneLoader());
         
         ServiceRegistry.RegisterService(new TexturePool(Graphics.GraphicsDevice));
         
@@ -78,6 +79,8 @@ public abstract class Game : Microsoft.Xna.Framework.Game
         
         ServiceRegistry.Get<TileAtlas>().SetTiles(ServiceRegistry.Get<TileLoader>().Content);
         ServiceRegistry.Get<TileAtlas>().CreateAtlas();
+        
+        ServiceRegistry.Get<SceneLoader>().LoadContent();
     }
 
     protected void InitializeAudio(string contentPath)

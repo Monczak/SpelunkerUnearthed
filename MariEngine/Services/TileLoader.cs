@@ -40,7 +40,7 @@ public class TileLoader : ResourceLoaderService<Tile, TileData>
             }));
     }
 
-    public override void LoadContent(INamingConvention convention = null)
+    public override void LoadContent(INamingConvention convention = null, IDeserializer deserializer = null)
     {
         base.LoadContent(convention);
 

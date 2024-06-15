@@ -9,6 +9,8 @@ namespace MariEngine;
 
 public class Entity(string name) : IPriorityItem
 {
+    public Scene OwnerScene { get; internal set; }
+    
     public string Name { get; set; } = name;
     
     public virtual int Priority { get; init; } = 0;

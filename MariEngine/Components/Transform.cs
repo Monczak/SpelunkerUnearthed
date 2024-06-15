@@ -2,11 +2,7 @@
 
 namespace MariEngine.Components;
 
-public class Transform(Vector2 position) : Component
+public class Transform : Component
 {
-    public Vector2 Position { get; set; } = position;
-
-    public Transform() : this(Vector2.Zero)
-    {
-    }
+    public Vector2 Position { get; set; } = Vector2.Zero;
 }

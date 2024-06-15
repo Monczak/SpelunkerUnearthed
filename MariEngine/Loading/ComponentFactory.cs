@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using MariEngine.Components;
 using MariEngine.Logging;
 using MariEngine.Services;
 using MariEngine.Tiles;
+using Component = MariEngine.Components.Component;
 
 namespace MariEngine.Loading;
 
@@ -16,6 +18,12 @@ public class ComponentFactory
     public ComponentFactory AddDependency<T>(T dependency) where T : class
     {
         dependencyStorage.AddDependency(dependency);
+        return this;
+    }
+    
+    public ComponentFactory AddDependency(Type type, object dependency)
+    {
+        dependencyStorage.AddDependency(type, dependency);
         return this;
     }
 
@@ -88,7 +96,7 @@ public class ComponentFactory
             return (TBuilder)this;
         }
 
-        public TComponent Build()
+        public TComponent Build(Entity ownerEntity = null, TileEntity ownerTileEntity = null)
         {
             if (!componentType.IsAssignableTo(typeof(TComponent)))
                 throw new ArgumentException($"{componentType.Name} is not a component type.");
@@ -119,6 +127,9 @@ public class ComponentFactory
             var paramIndex = 0;
             for (var i = 0; i < constructorParameterValues.Length; i++)
             {
+                if (constructorParameters[i].IsOptional)
+                    continue;
+                
                 if (constructorParameters[i].CustomAttributes.Any(a => a.AttributeType == typeof(InjectAttribute)))
                 {
                     var dependency = dependencyStorage.GetDependency(constructorParameters[i].ParameterType);
@@ -158,7 +169,22 @@ public class ComponentFactory
             try
             {
                 var component = constructorInfo.Invoke(constructorParameterValues);
-                foreach (var (propInfo, value) in specialValues) propInfo.SetValue(component, value);
+
+                if (ownerEntity is not null)
+                {
+                    typeof(Component).GetProperty("OwnerEntity")?.SetValue(component, ownerEntity);
+                }
+                
+                if (ownerTileEntity is not null)
+                {
+                    typeof(TileEntityComponent).GetProperty("OwnerEntity")?.SetValue(component, ownerTileEntity);
+                }
+
+                foreach (var (propInfo, value) in specialValues)
+                {
+                    var converter = TypeDescriptor.GetConverter(propInfo.PropertyType);
+                    propInfo.SetValue(component, converter.ConvertFrom(value));
+                }
 
                 if (proxyType is not null)
                 {

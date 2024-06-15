@@ -1,96 +1,103 @@
 ﻿Entities:
   Debug:
     Components:
-      - Gizmos: &gizmos
-      - GizmoRenderer:
+      Gizmos:
+        IsDependency: true
+      GizmoRenderer:
+        Specials:
           Layer: 100
           Enabled: false
 
   Controllers:
     Components:
-      - AmbienceController
-  
+      AmbienceController:
+        IsDependency: true
+
   Camera Controller:
     Components:
-      - CameraController:
-          Smoothing: 10.0
+      CameraController:
+        ProxyType: CameraController
+        Smoothing: 10.0
   
-  Tilemap: &tilemap
-    Properties:
-      Width: 64
-      Height: 64
+  Tilemap:
     Components:
-      - Transform
-      - LightMap:
-          AmbientLight: RGB(20 15 17)
-      - TilemapRenderer
-      - TilemapCollider:
-          SpatialPartitionCellSize: 8 8
-      - TilemapCameraBounds
-      - TilemapAudio:
-          Events:
-            Mine: 
-              Path: event:/Mining
-              OneShot: true
-          Traits:
-            - WorldReverbTrait
-            - WorldAttenuationTrait
-      - Tilemap:
-          TileEntities:
-            Player:
-              Components:
-                - TileEntitySpriteRenderer:
-                    Sprite: Player
-                - TileEntitySpriteCollider
-                - PlayerController: &playerController
-                    Priority: -10
-                - LightEmitter:
-                    LightSource:
-                      Type: Point
-                      Color: RGB(237 222 138)
-                      Intensity: 1.0
-                      Radius: 30
-                - PlayerBiomeWatcher
-            TestTileEntity:
-              Components:
-                - TileEntitySpriteRenderer:
-                    Sprite: Player
-                - TileEntitySpriteCollider
-                - TileEntityAudioSource:
-                    Events:
-                      Test:
-                        Path: event:/Mining
-                        OneShot: true
-                    Traits:
-                      - WorldReverbTrait
-                      - WorldAttenuationTrait
-                - AudioTester
-  
+      Transform:
+      LightMap:
+        ProxyType: LightMap
+        AmbientLight: "#140f11" 
+      TilemapRenderer:
+      TilemapCollider:
+      TilemapCameraBounds:
+      Tilemap:
+        ProxyType: Tilemap
+        Width: 64
+        Height: 64
+        IsDependency: true
+        TileEntities:
+          Player:
+            Components:
+              TileEntitySpriteRenderer:
+                Resources:
+                  Sprite: Player
+              TileEntitySpriteCollider:
+              PlayerController:
+                Specials:
+                  Priority: -10
+                IsDependency: true
+              LightEmitter:
+                ProxyType: LightEmitter
+                LightSource:
+                  Type: Point
+                  Color: "#EDDE8A"
+                  Intensity: 1.0
+                  Radius: 30
+              # PlayerBiomeObserver:
+          TestTileEntity:
+            Components:
+              TileEntitySpriteRenderer:
+                Resources:
+                  Sprite: Player
+              TileEntitySpriteCollider:
+              TileEntityAudioSource:
+                ProxyType: TileEntityAudioSource
+                Events:
+                  Test:
+                    Path: event:/Mining
+                    OneShot: true
+                Traits:
+                  - WorldReverbTrait
+                  - WorldAttenuationTrait
+              AudioTester:
+      TilemapAudio:
+        ProxyType: TilemapAudio
+        Events:
+          Mine:
+            Path: event:/Mining
+            OneShot: true
+        Traits:
+          - WorldReverbTrait
+          - WorldAttenuationTrait
+
   Managers:
     Components:
-      - CaveSystemManager: &caveSystemManager
-          BiomeProvider: SimpleBiomeProvider
-          RoomDecisionEngine: TestDecisionEngine
-          RoomLayoutProcessors:
-            - LadderRoomProcessor
-      - WorldManager:
-          CaveSystemManager: *caveSystemManager
-          Tilemap: *tilemap
-          PlayerController: *playerController
-          Gizmos: *gizmos
-          Processors:
-            - RoomConnectionProcessor
-            - LadderFeaturePlacementProcessor:
-                Priority: -10
-            - PlayerSpawnPointProcessor
-            - LadderPlacementProcessor:
-                Priority: -10
-                
+      CaveSystemManager:
+        IsDependency: true
+      WorldManager:
+        ProxyType: WorldManager
+        MapProcessors:
+          RoomConnectionProcessor:
+          LadderFeaturePlacementProcessor:
+            Priority: -10
+        RoomMapProcessors:
+          PlayerSpawnPointProcessor:
+          LadderPlacementProcessor:
+            Priority: -10
+        IsDependency: true
+
   UI:
     Priority: 1000
     Components:
-      - Canvas
-      - CanvasLayoutManager
-      - CanvasNavigator
-      - CanvasRenderer:
-          RedrawEveryFrame: true
+      Canvas:
+      CanvasLayoutManager:
+      CanvasNavigator:
+      CanvasRenderer:

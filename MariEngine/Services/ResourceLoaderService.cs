@@ -16,11 +16,11 @@ public abstract class ResourceLoaderService<TItem, TProxyData> : Service, IResou
 
     public SortedDictionary<string, TItem> Content { get; private set; }
 
-    public virtual void LoadContent(INamingConvention namingConvention = null)
+    public virtual void LoadContent(INamingConvention namingConvention = null, IDeserializer deserializer = null)
     {
         Content = new SortedDictionary<string, TItem>();
-
-        var deserializer = new DeserializerBuilder()
+        
+        deserializer ??= new DeserializerBuilder()
             .WithNamingConvention(namingConvention ?? PascalCaseNamingConvention.Instance)
             .Build();
         

@@ -10,4 +10,5 @@ public class ContentPaths
     public static string Fonts => Path.Combine(Content, "Fonts");
     public static string Sprites => Path.Combine(Content, "Sprites");
     public static string Materials => Path.Combine(Content, "Materials");
+    public static string Scenes => Path.Combine(Content, "Scenes");
 }

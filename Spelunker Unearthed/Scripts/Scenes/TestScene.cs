@@ -63,6 +63,23 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         ServiceRegistry.Get<AudioManager>().LoadBank(this, "SFX");
         
         LoadEntities();
+
+        // tilemap = GetEntity("Tilemap").GetComponent<Tilemap>();
+        // tilemapRenderer = tilemap.GetComponent<TilemapRenderer>();
+        // lightMap = tilemap.GetComponent<LightMap>();
+        // playerController = tilemap.GetTileEntity("Player").GetComponent<PlayerController>();
+        //
+        // caveSystemManager = GetEntity("Managers").GetComponent<CaveSystemManager>();
+        // worldManager = GetEntity("Managers").GetComponent<WorldManager>();
+        //
+        // cameraController = GetEntity("Camera Controller").GetComponent<CameraController>();
+        // ambienceController = GetEntity("Controllers").GetComponent<AmbienceController>();
+        //
+        // gizmos = GetEntity("Debug").GetComponent<Gizmos>();
+        // canvas = GetEntity("UI").GetComponent<Canvas>();
+        // testTileEntity = tilemap.GetTileEntity("TestTileEntity");
+        //
+        // tilemap.AddLayer(Tilemap.GroundLayer);
         
         cameraController.TrackTileEntity(playerController.OwnerEntity);
         cameraController.SetBounds(100, tilemap.GetComponent<CameraBounds>());
@@ -139,20 +156,12 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
     private void LoadEntities()
     {
-        ComponentFactory
-            .AddDependency(new SimpleBiomeProvider())
-            .AddDependency(new TestDecisionEngine())
-            .AddDependency(new List<IRoomLayoutProcessor> { new LadderRoomProcessor() });
-        
-        var test1 = ComponentFactory.CreateComponentBuilder<Gizmos>().Build();
-        var test2 = ComponentFactory.CreateComponentBuilder<GizmoRenderer>()
-            .WithSpecial("Layer", 100)
-            .WithSpecial("Enabled", false)
-            .Build();
-        var test3 = ComponentFactory.CreateComponentBuilder<CaveSystemManager>().Build();
-        var test4 = ComponentFactory.CreateComponentBuilder<CameraController>()
-            .WithProxy(new CameraData(10.0f))
-            .Build();
+        // ComponentFactory
+        //     .AddDependency(new SimpleBiomeProvider())
+        //     .AddDependency(new TestDecisionEngine())
+        //     .AddDependency(new List<IRoomLayoutProcessor> { new LadderRoomProcessor() });
+        //
+        // Build(ServiceRegistry.Get<SceneLoader>().Get("TestScene"));
         
         Entity debugEntity = new("Debug");
         gizmos = new Gizmos();
@@ -160,38 +169,30 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         debugEntity.AttachComponent(new GizmoRenderer(graphics.GraphicsDevice, Camera)
             { Layer = 100, Enabled = false });
         AddEntity(debugEntity);
-
+        
         Entity managersEntity = new("Managers");
         caveSystemManager = new CaveSystemManager(new SimpleBiomeProvider(), new TestDecisionEngine(), [
             new LadderRoomProcessor()
         ]);
         managersEntity.AttachComponent(caveSystemManager);
-
+        
         Entity controllersEntity = new("Controllers");
         ambienceController = new AmbienceController();
         controllersEntity.AttachComponent(ambienceController);
         AddEntity(controllersEntity);
-
+        
         Entity cameraControllerEntity = new("Camera Controller");
         cameraController = new CameraController(Camera) { Smoothing = 10f };
         cameraControllerEntity.AttachComponent(cameraController);
         AddEntity(cameraControllerEntity);
-
+        
         Entity tilemapEntity = new("Tilemap");
         tilemap = new Tilemap(64, 64);
         tilemap.AddLayer(Tilemap.GroundLayer);
-
-        var test5 = ComponentFactory.CreateTileEntityComponentBuilder<PlayerController>(tilemap).Build();
-        var test6 = ComponentFactory.CreateTileEntityComponentBuilder<PlayerController>(tilemap)
-            .WithSpecial("Priority", -10)
-            .Build();
-        var test7 = ComponentFactory.CreateTileEntityComponentBuilder<LightEmitter>(tilemap)
-            .WithProxy(new LightEmitterData(new PointLight(new Color(237, 222, 138), 1f, 30)))
-            .Build();
-
+        
         tilemapEntity.AttachComponent(new Transform());
         tilemapEntity.AttachComponent(tilemap);
-
+        
         lightMap = new LightMap
         {
             // AmbientLight = Color.White,
@@ -199,68 +200,59 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
             // AmbientLight = Color.Black,
         };
         tilemapEntity.AttachComponent(lightMap);
-
+        
         tilemapRenderer = new TilemapRenderer(graphics.GraphicsDevice, Camera);
         tilemapEntity.AttachComponent(tilemapRenderer);
-
+        
         tilemapEntity.AttachComponent(new TilemapCollider(spatialPartitionCellSize: Coord.One * 8) { Priority = 10 });
         tilemapEntity.AttachComponent(new TilemapCameraBounds());
-
-        tilemapEntity.AttachComponent(new TilemapAudio(new PositionalAudioSource()
+        
+        tilemapEntity.AttachComponent(new TilemapAudio()
             .WithEvent("Mine", ServiceRegistry.Get<AudioManager>().GetEvent("event:/Mining", oneShot: true))
             .WithTrait(new WorldReverbTrait(tilemap))
             .WithTrait(new WorldAttenuationTrait(tilemap))
-        ));
-
+        );
+        
         var player = new TileEntity("Player");
-
+        
         player.AttachComponent(new TileEntitySpriteRenderer(ServiceRegistry.Get<SpriteLoader>().Get("Player")));
         player.AttachComponent(new TileEntitySpriteCollider());
         tilemap.AddTileEntity(player);
-
+        
         playerController = new PlayerController { Priority = -10 };
         player.AttachComponent(playerController);
         player.AttachComponent(new LightEmitter { LightSource = new PointLight(new Color(237, 222, 138), 1f, 30) });
-
+        
         AddEntity(tilemapEntity);
-
-        var test8 = ComponentFactory.CreateTileEntityComponentBuilder<TileEntitySpriteRenderer>(tilemap)
-            .WithResource("Sprite", "Player")
-            .Build();
         
         testTileEntity = new TileEntity("TestTileEntity");
         testTileEntity.AttachComponent(new TileEntitySpriteRenderer(ServiceRegistry.Get<SpriteLoader>().Get("Player")));
         testTileEntity.AttachComponent(new TileEntitySpriteCollider());
-
-        var testAudio = new TileEntityAudioSource(new PositionalAudioSource()
+        
+        var testAudio = new TileEntityAudioSource()
             .WithEvent("Test", ServiceRegistry.Get<AudioManager>().GetEvent("event:/Mining", oneShot: true))
             .WithTrait(new WorldReverbTrait(tilemap))
-            .WithTrait(new WorldAttenuationTrait(tilemap))
-        );
+            .WithTrait(new WorldAttenuationTrait(tilemap));
         testTileEntity.AttachComponent(testAudio);
         testTileEntity.AttachComponent(new AudioTester());
         tilemap.AddTileEntity(testTileEntity);
-
+        
         worldManager = new WorldManager(caveSystemManager, tilemap, playerController, gizmos)
             .AddMapProcessor<RoomConnectionProcessor>(0)
             .AddMapProcessor<LadderFeaturePlacementProcessor>(-10)
             .AddRoomMapProcessor<PlayerSpawnPointProcessor>(0) // TODO: Load all processors using reflection
             .AddRoomMapProcessor<LadderPlacementProcessor>(-10);
-
-        ComponentFactory.AddDependency(worldManager);
-        ComponentFactory.AddDependency(ambienceController);
-        var test9 = ComponentFactory.CreateTileEntityComponentBuilder<PlayerBiomeObserver>(tilemap).Build();
         
         player.AttachComponent(new PlayerBiomeObserver(worldManager, ambienceController));
-
+        
         managersEntity.AttachComponent(worldManager);
-
+        
         Entity uiEntity = new("UI") { Priority = 1000 };
         canvas = new Canvas();
         uiEntity.AttachComponent(canvas);
         uiEntity.AttachComponent(new CanvasLayoutManager());
         uiEntity.AttachComponent(new CanvasNavigator());
-        uiEntity.AttachComponent(new CanvasRenderer(graphics.GraphicsDevice, Camera, redrawEveryFrame: true));
+        uiEntity.AttachComponent(new CanvasRenderer(graphics.GraphicsDevice, Camera));
         AddEntity(uiEntity);
     }
     
@@ -271,8 +263,6 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         Gizmos.SetDefault(gizmos);
         ServiceRegistry.Get<AudioManager>().SetListener(playerController.OwnerEntity);
         canvas.GetComponent<CanvasRenderer>().Redraw(recomputeLayout: true);
-        
-        File.WriteAllText("test", new SerializerBuilder().Build().Serialize(this));
     }
 
     private int tweenTransitionIndex;

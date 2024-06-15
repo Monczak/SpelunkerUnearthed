@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FmodForFoxes;
 using MariEngine.Audio;
@@ -15,7 +16,7 @@ using YamlDotNet.Serialization;
 
 namespace MariEngine;
 
-public abstract class Scene(GameWindow window, GraphicsDeviceManager graphics)
+public abstract class Scene(GameWindow window, GraphicsDeviceManager graphics) : IProxyBuildable<PackedScene>
 {
     public SortedSet<Entity> Entities { get; } = new(new PriorityComparer<Entity>());
     public Camera Camera { get; } = new(window, graphics);
@@ -23,8 +24,10 @@ public abstract class Scene(GameWindow window, GraphicsDeviceManager graphics)
     private readonly PriorityQueue<Renderer, int> rendererQueue = new();
 
     protected GraphicsDeviceManager graphics = graphics;
-    
-    protected ComponentFactory ComponentFactory { get; private set; } = new();
+
+    public ComponentFactory ComponentFactory { get; private set; } = new();
+
+    protected Entity GetEntity(string name) => Entities.FirstOrDefault(e => e.Name == name);
     
     public virtual void Load()
     {
@@ -61,13 +64,14 @@ public abstract class Scene(GameWindow window, GraphicsDeviceManager graphics)
     public void AddEntity(Entity entity)
     {
         Entities.Add(entity);
+        entity.OwnerScene = this;
     }
 
     public virtual void Update(GameTime gameTime)
     {
         FmodManager.Update();
         
-        foreach (Entity entity in Entities)
+        foreach (var entity in Entities)
         {
             entity.Update(gameTime);
         }
@@ -84,9 +88,45 @@ public abstract class Scene(GameWindow window, GraphicsDeviceManager graphics)
             .Where(renderer => renderer is not null)
             .Select(renderer => (renderer, renderer.Layer)));
 
-        while (rendererQueue.TryDequeue(out Renderer renderer, out _))
+        while (rendererQueue.TryDequeue(out var renderer, out _))
         {
             renderer.DoRender(spriteBatch);
+        }
+    }
+    
+    public void Build(PackedScene data)
+    {
+        foreach (var (entityName, entityData) in data.SceneData.Entities)
+        {
+            var entity = new Entity(entityName);
+            entity.OwnerScene = this;
+            foreach (var (componentTypeName, componentData) in entityData.Components)
+            {
+                var componentType = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes())
+                    .FirstOrDefault(t => t.IsAssignableTo(typeof(Component)) && t.Name == componentTypeName);
+                if (componentType is null)
+                    throw new Exception($"{componentTypeName} is not a valid component type.");
+
+                var builder = ComponentFactory.CreateComponentBuilder(componentType);
+                if (componentData is not null)
+                {
+                    if (componentData.GetType() != typeof(ComponentData))
+                        builder.WithProxy(componentData.GetType(), componentData);
+                   
+                    foreach (var (resourceParam, resourceId) in componentData.Resources) 
+                        builder.WithResource(resourceParam, resourceId);
+
+                    foreach (var (specialParam, specialValue) in componentData.Specials) 
+                        builder.WithSpecial(specialParam, specialValue);
+                }
+
+                var component = builder.Build(entity);
+                entity.AttachComponent(component);
+
+                if (componentData is not null && componentData.IsDependency)
+                    ComponentFactory.AddDependency(componentType, component);
+            }
+            AddEntity(entity);
         }
     }
 }

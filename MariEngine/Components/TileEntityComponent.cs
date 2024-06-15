@@ -66,7 +66,7 @@ public abstract class TileEntityComponent : IPriorityItem
     }
 }
 
-public abstract class TileEntityComponent<TData> : TileEntityComponent, IProxyBuildable<TData>
+public abstract class TileEntityComponent<TData> : TileEntityComponent where TData : ComponentData
 {
     public abstract void Build(TData data);
 }

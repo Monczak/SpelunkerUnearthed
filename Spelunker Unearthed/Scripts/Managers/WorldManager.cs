@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using MariEngine;
 using MariEngine.Components;
 using MariEngine.Debugging;
 using MariEngine.Light;
+using MariEngine.Loading;
 using MariEngine.Logging;
 using MariEngine.Services;
 using MariEngine.Tiles;
@@ -23,9 +25,9 @@ using CaveSystem = SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration
 
 namespace SpelunkerUnearthed.Scripts.Managers;
 
-public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, PlayerController playerController,
-        Gizmos gizmos)
-    : Component
+public class WorldManager([Inject] CaveSystemManager caveSystemManager, [Inject] Tilemap tilemap, [Inject] PlayerController playerController,
+    [Inject] Gizmos gizmos)
+    : Component<WorldManagerData>
 {
     public CaveSystemManager CaveSystemManager { get; } = caveSystemManager;
 
@@ -303,4 +305,36 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
             }
         }
     }
+
+    public override void Build(WorldManagerData data)
+    {
+        foreach (var (name, processorData) in data.MapProcessors)
+        {
+            var processorType = Assembly.GetExecutingAssembly().GetTypes().FirstOrDefault(t => t.Name == name && t.IsAssignableTo(typeof(MapProcessor)));
+            if (processorType is null) throw new Exception($"{name} is not a valid map processor type.");
+
+            AddMapProcessor((MapProcessor)Activator.CreateInstance(processorType, [BaseRoomSize]),
+                (processorData ?? new WorldManagerData.ProcessorData()).Priority);
+        }
+        
+        foreach (var (name, processorData) in data.RoomMapProcessors)
+        {
+            var processorType = Assembly.GetExecutingAssembly().GetTypes().FirstOrDefault(t => t.Name == name && t.IsAssignableTo(typeof(IRoomMapProcessor)));
+            if (processorType is null) throw new Exception($"{name} is not a valid room map processor type.");
+
+            AddRoomMapProcessor((IRoomMapProcessor)Activator.CreateInstance(processorType),
+                (processorData ?? new WorldManagerData.ProcessorData()).Priority);
+        }
+    }
+}
+
+public class WorldManagerData : ComponentData
+{
+    public class ProcessorData
+    {
+        public int Priority { get; init; } = 0;
+    }
+
+    public Dictionary<string, ProcessorData> MapProcessors { get; init; }
+    public Dictionary<string, ProcessorData> RoomMapProcessors { get; init; }
 }

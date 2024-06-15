@@ -25,6 +25,9 @@
 #begin Materials/Stone.yml
 /copy:Materials/Stone.yml
 
+#begin Scenes/TestScene.yml
+/copy:Scenes/TestScene.yml
+
 #begin Sprites/DimSliderBackground.yml
 /copy:Sprites/DimSliderBackground.yml
 

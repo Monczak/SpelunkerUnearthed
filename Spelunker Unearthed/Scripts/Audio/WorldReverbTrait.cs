@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework;
 
 namespace SpelunkerUnearthed.Scripts.Audio;
 
-public class WorldReverbTrait(Tilemap tilemap) : AudioTrait
+public class WorldReverbTrait(Tilemap tilemap) : WorldAudioTrait(tilemap)
 {
     private const int EnvironmentEvaluationRayCount = 24;
     private const int EnvironmentEvaluationRayBounceCount = 8;

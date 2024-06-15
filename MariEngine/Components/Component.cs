@@ -7,7 +7,7 @@ public abstract class Component : IPriorityItem
 {
     [Special] public bool Enabled { get; set; } = true;
     
-    protected Entity OwnerEntity;
+    public Entity OwnerEntity { get; private set; }
     
     [Special] public virtual int Priority { get; init; } = 0;
 
@@ -24,7 +24,7 @@ public abstract class Component : IPriorityItem
 
     public T GetComponent<T>() where T : Component
     {
-        return OwnerEntity.GetComponent<T>();
+        return OwnerEntity?.GetComponent<T>();
     }
 
     internal void DoUpdate(GameTime gameTime)
@@ -65,7 +65,7 @@ public abstract class Component : IPriorityItem
     }
 }
 
-public abstract class Component<TData> : Component, IProxyBuildable<TData>
+public abstract class Component<TData> : Component where TData : ComponentData
 {
     public abstract void Build(TData data);
 }

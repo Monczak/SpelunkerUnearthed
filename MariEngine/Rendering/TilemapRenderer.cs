@@ -3,6 +3,7 @@ using System.IO;
 using FontStashSharp;
 using MariEngine.Components;
 using MariEngine.Light;
+using MariEngine.Loading;
 using MariEngine.Services;
 using MariEngine.Tiles;
 using Microsoft.Xna.Framework;
@@ -11,7 +12,7 @@ using MariEngine.Logging;
 
 namespace MariEngine.Rendering;
 
-public class TilemapRenderer(GraphicsDevice graphicsDevice, Camera camera) : Renderer(graphicsDevice, camera)
+public class TilemapRenderer([Inject] GraphicsDevice graphicsDevice, [Inject] Camera camera) : Renderer(graphicsDevice, camera)
 {
     private Tilemap tilemap;
     private LightMap lightMap;

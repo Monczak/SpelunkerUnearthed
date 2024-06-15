@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using MariEngine.Components;
+using MariEngine.Loading;
 using MariEngine.Logging;
 using MariEngine.Rendering;
 using MariEngine.Services;
@@ -14,17 +15,17 @@ using Microsoft.Xna.Framework;
 
 namespace MariEngine.Light;
 
-public class LightMap : Component
+public class LightMap : Component<LightMapData>
 {
     private Tilemap tilemap;
     public Color AmbientLight { get; set; }
 
     // This WILL BREAK LIGHTING if not set, unless we come up with a neater method to calculate/store light rendered before world updates
     // (the memory savings, tho... D:)
-    private readonly bool cacheRenderedLight;
+    private bool cacheRenderedLight;
     
-    private Dictionary<LightSource, LightSourceData> lightSources;
-    private Dictionary<Coord, LightSourceData> staticLightSources;
+    private Dictionary<LightSource, LightSourceData> lightSources = new();
+    private Dictionary<Coord, LightSourceData> staticLightSources = new();
 
     private HashSet<LightSourceData> dirtyLightSources = [];
     private HashSet<LightSourceData> toRemove = [];
@@ -78,8 +79,8 @@ public class LightMap : Component
     protected internal override void Initialize()
     {
         tilemap = GetComponent<Tilemap>();
-        lightSources = new Dictionary<LightSource, LightSourceData>();
-        staticLightSources = new Dictionary<Coord, LightSourceData>();
+        lightSources ??= new Dictionary<LightSource, LightSourceData>();
+        staticLightSources ??= new Dictionary<Coord, LightSourceData>();
 
         toRemove = [];
         dirtyLightSources = [];
@@ -273,4 +274,15 @@ public class LightMap : Component
             color /= max;
         return new Color(color);
     }
+    
+    public override void Build(LightMapData data)
+    {
+        AmbientLight = ColorUtils.FromHex(data.AmbientLight);
+        cacheRenderedLight = true;
+    }
+}
+
+public class LightMapData : ComponentData
+{
+    public string AmbientLight { get; init; }
 }

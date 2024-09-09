@@ -107,7 +107,7 @@ public partial class CanvasRenderer : Renderer
             var tile = tileBuffer[coord];
             if (tile is not null)
             {
-                ServiceRegistry.Get<TileAtlas>().DrawTile(spriteBatch, (Vector2)(Coord)(((Vector2)coord - Vector2.One * overscan) * Camera.TileSize + CalculateCenterOffset()), tile.Id, Color.White);
+                ServiceRegistry.Get<TileAtlas>().DrawTile(spriteBatch, (Vector2)(Coord)(((Vector2)coord - Vector2.One * overscan) * Camera.TileSize + CalculateCenterOffset()), tile.Id, tile.ForegroundColor, tile.BackgroundColor);
             }
         }
             

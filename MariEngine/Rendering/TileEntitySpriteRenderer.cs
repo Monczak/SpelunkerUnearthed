@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using MariEngine.Light;
 using MariEngine.Loading;
 using MariEngine.Services;
@@ -12,21 +13,33 @@ public class TileEntitySpriteRenderer([InjectResource] Sprite sprite) : TileEnti
 {
     public Sprite Sprite => sprite;
     
-    public override void Render(SpriteBatch spriteBatch, Camera camera, GraphicsDevice graphicsDevice, LightMap lightMap)
+    public override void Render(SpriteBatch spriteBatch, Camera camera, GraphicsDevice graphicsDevice,
+        IList<RendererEffect> effects)
     {
         if (sprite is null) return;
         
         foreach (Coord coord in sprite.Tiles.Coords)
         {
-            var tint = lightMap.GetRenderedLight(OwnerEntity.Position + coord - GetSpriteOffset());
             var tile = sprite.Tiles[coord];
             if (tile is null) continue;
+            
+            var foregroundColor = tile.ForegroundColor;
+            var backgroundColor = tile.BackgroundColor;
+
+            var tilePos = OwnerEntity.Position + coord - GetSpriteOffset();
+            
+            foreach (var effect in effects)
+            {
+                foregroundColor = effect.Apply(foregroundColor, tilePos);
+                backgroundColor = effect.Apply(backgroundColor, tilePos);
+            }
             
             ServiceRegistry.Get<TileAtlas>().DrawTile(
                 spriteBatch,
                 OwnerEntity.Tilemap.Vector2ToWorldPoint(OwnerEntity.SmoothedPosition + (Vector2)coord - (Vector2)GetSpriteOffset()) * camera.TileSize,
                 tile.Id,
-                tint
+                foregroundColor,
+                backgroundColor
             );
         }
     }

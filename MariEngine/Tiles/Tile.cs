@@ -54,7 +54,9 @@ public class Tile : Resource<TileData>
     protected internal override void BuildFromData(TileData data)
     {
         ForegroundColor = ColorUtils.FromHex(data.ForegroundColor);
+        ForegroundColor = new Color(ForegroundColor.R, ForegroundColor.G, ForegroundColor.B, (byte)255);
         BackgroundColor = ColorUtils.FromHex(data.BackgroundColor);
+        BackgroundColor = new Color(BackgroundColor.R, BackgroundColor.G, BackgroundColor.B, (byte)255);
         Character = data.Character;
 
         if (data.Tags is not null)

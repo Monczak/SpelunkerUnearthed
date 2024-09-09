@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using MariEngine.Light;
 using MariEngine.Services;
 using MariEngine.Tiles;
@@ -8,19 +9,27 @@ namespace MariEngine.Rendering;
 
 public class BasicTileEntityRenderer(Tile tile) : TileEntityRenderer
 {
-    public override void Render(SpriteBatch spriteBatch, Camera camera, GraphicsDevice graphicsDevice, LightMap lightMap)
+    public override void Render(SpriteBatch spriteBatch, Camera camera, GraphicsDevice graphicsDevice,
+        IList<RendererEffect> effects)
     {
-        var tint = lightMap.GetRenderedLight(OwnerEntity.Position);
+        if (tile is null) return;
+        
+        var foregroundColor = tile.ForegroundColor;
+        var backgroundColor = tile.BackgroundColor;
 
-        if (tile is not null)
+        foreach (var effect in effects)
         {
-            ServiceRegistry.Get<TileAtlas>().DrawTile(
-                spriteBatch,
-                OwnerEntity.Tilemap.Vector2ToWorldPoint(OwnerEntity.SmoothedPosition) * camera.TileSize,
-                tile.Id,
-                tint
-            );
+            foregroundColor = effect.Apply(foregroundColor, OwnerEntity.Position);
+            backgroundColor = effect.Apply(backgroundColor, OwnerEntity.Position);
         }
+            
+        ServiceRegistry.Get<TileAtlas>().DrawTile(
+            spriteBatch,
+            OwnerEntity.Tilemap.Vector2ToWorldPoint(OwnerEntity.SmoothedPosition) * camera.TileSize,
+            tile.Id,
+            foregroundColor,
+            backgroundColor
+        );
     }
 
     public override Bounds GetCullingBounds() => new(OwnerEntity.SmoothedPosition, Vector2.One);

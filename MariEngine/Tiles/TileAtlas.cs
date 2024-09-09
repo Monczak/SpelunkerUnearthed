@@ -124,7 +124,7 @@ public class TileAtlas : Service
         foreach (Tile tile in tiles)
         {
             Coord coord = tileAtlasCoords[tile.Id];
-            spriteBatch.Draw(backgroundTexture, new Rectangle(coord.X * TileSizeWithMargin, coord.Y * TileSizeWithMargin, TileSizeWithMargin, TileSizeWithMargin), tile.BackgroundColor);
+            spriteBatch.Draw(backgroundTexture, new Rectangle(coord.X * TileSizeWithMargin, coord.Y * TileSizeWithMargin, TileSizeWithMargin, TileSizeWithMargin), Color.White);
         }
 
         spriteBatch.End();
@@ -146,7 +146,7 @@ public class TileAtlas : Service
         {
             Coord coord = tileAtlasCoords[tile.Id];
             var font = tile.Type is TileType.Ui ? uiFont : worldFont;
-            spriteBatch.DrawString(font, tile.Character.ToString(), (Vector2)coord * TileSizeWithMargin + Vector2.One * tileMarginSize + CalculateTextOffset(font, tile.Character), tile.ForegroundColor);
+            spriteBatch.DrawString(font, tile.Character.ToString(), (Vector2)coord * TileSizeWithMargin + Vector2.One * tileMarginSize + CalculateTextOffset(font, tile.Character), Color.White);
         }
 
         spriteBatch.End();
@@ -162,10 +162,11 @@ public class TileAtlas : Service
         return new Coord(atlasSizeX, atlasSizeY);
     }
 
-    public void DrawTile(SpriteBatch localSpriteBatch, Vector2 pos, string tileId, Color tint)
+    public void DrawTile(SpriteBatch localSpriteBatch, Vector2 pos, string tileId, Color foregroundTint, Color backgroundTint)
     {
-        Coord atlasCoord = tileAtlasCoords[tileId];
-        localSpriteBatch.Draw(backgroundRenderTarget, pos, new Rectangle(atlasCoord.X * TileSizeWithMargin + tileMarginSize, atlasCoord.Y * TileSizeWithMargin + tileMarginSize, TileSize, TileSize), tint);
-        localSpriteBatch.Draw(foregroundRenderTarget, pos, new Rectangle(atlasCoord.X * TileSizeWithMargin + tileMarginSize, atlasCoord.Y * TileSizeWithMargin + tileMarginSize, TileSize, TileSize), tint);
+        var atlasCoord = tileAtlasCoords[tileId];
+
+        localSpriteBatch.Draw(backgroundRenderTarget, pos, new Rectangle(atlasCoord.X * TileSizeWithMargin + tileMarginSize, atlasCoord.Y * TileSizeWithMargin + tileMarginSize, TileSize, TileSize), backgroundTint);
+        localSpriteBatch.Draw(foregroundRenderTarget, pos, new Rectangle(atlasCoord.X * TileSizeWithMargin + tileMarginSize, atlasCoord.Y * TileSizeWithMargin + tileMarginSize, TileSize, TileSize), foregroundTint);
     }
 }

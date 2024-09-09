@@ -101,7 +101,7 @@ public abstract class Game : Microsoft.Xna.Framework.Game
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.Black);
-        CurrentScene.Render(SpriteBatch);
+        CurrentScene.Render(SpriteBatch, gameTime);
         
         if (DebugScreen.Enabled)
             DebugScreen.Render(SpriteBatch);

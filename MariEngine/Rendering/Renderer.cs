@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MariEngine.Components;
 using MariEngine.Loading;
 using Microsoft.Xna.Framework;
@@ -12,23 +13,15 @@ public abstract class Renderer([Inject] GraphicsDevice graphicsDevice, [Inject] 
     protected readonly Camera Camera = camera;
     protected readonly GraphicsDevice GraphicsDevice = graphicsDevice;
 
-    protected readonly List<RendererEffect> Effects = [];
-
-    public void AddEffect(RendererEffect effect)
-    {
-        Effects.Add(effect);
-        Effects.Sort((effect1, effect2) => effect1.Priority - effect2.Priority);
-    }
-
     [Special] public int Layer { get; set; } = 0;
 
-    internal void DoRender(SpriteBatch spriteBatch)
+    internal void DoRender(SpriteBatch spriteBatch, GameTime gameTime)
     {
         if (Enabled)
-            Render(spriteBatch);
+            Render(spriteBatch, gameTime);
     }
 
-    protected abstract void Render(SpriteBatch spriteBatch);
+    protected abstract void Render(SpriteBatch spriteBatch, GameTime gameTime);
 
     protected abstract Vector2 CalculateCenterOffset();
 }

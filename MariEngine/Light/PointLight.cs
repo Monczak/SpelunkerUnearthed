@@ -42,7 +42,7 @@ public class PointLight(Color color, float intensity, int radius) : LightSource(
         {
             if (!tilemap.IsInBounds(coord)) continue;
             
-            Tile tile = tilemap.Get(coord, Tilemap.BaseLayer);
+            Tile tile = tilemap.Get(coord, TilemapLayer.Base);
             if (tile is null) continue;
             
             tileAttenuation *= 1 - tile.LightAttenuation;

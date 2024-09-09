@@ -33,7 +33,7 @@ public class WorldReverbTrait(Tilemap tilemap) : AudioTrait
         var currentRay = ray;
         for (var i = 0; i < EnvironmentEvaluationRayBounceCount; i++)
         {
-            var hitInfo = Raycasting.Raycast(tilemap.GetLayer(Tilemap.BaseLayer), currentRay);
+            var hitInfo = Raycasting.Raycast(tilemap.GetLayer(TilemapLayer.Base), currentRay);
             if (hitInfo is null)
                 yield break;
 

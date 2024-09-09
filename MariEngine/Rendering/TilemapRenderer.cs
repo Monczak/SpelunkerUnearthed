@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using FontStashSharp;
@@ -16,6 +17,27 @@ public class TilemapRenderer(GraphicsDevice graphicsDevice, Camera camera) : Ren
 {
     private Tilemap tilemap;
     private LightMap lightMap;
+    
+    protected readonly List<TilemapRendererEffect> Effects = [];
+    protected readonly Dictionary<Type, TilemapRendererEffect> EffectsByType = new();
+
+    public void AddEffect(TilemapRendererEffect effect)
+    {
+        Effects.Add(effect);
+        EffectsByType.Add(effect.GetType(), effect);
+        Effects.Sort((effect1, effect2) => effect1.Priority - effect2.Priority);
+    }
+
+    public void RemoveEffect(TilemapRendererEffect effect)
+    {
+        EffectsByType.Remove(effect.GetType());
+        Effects.Remove(effect);
+    }
+
+    public T GetEffect<T>() where T : TilemapRendererEffect
+    {
+        return (T)EffectsByType[typeof(T)];
+    }
 
     protected internal override void Initialize()
     {
@@ -25,7 +47,7 @@ public class TilemapRenderer(GraphicsDevice graphicsDevice, Camera camera) : Ren
         Effects.Add(new LightMapEffect(lightMap) { Priority = -1000 });
     }
 
-    protected override void Render(SpriteBatch spriteBatch)
+    protected override void Render(SpriteBatch spriteBatch, GameTime gameTime)
     {
         var cullingBounds = GetCullingBounds();
         if (cullingBounds is null) return;
@@ -38,7 +60,9 @@ public class TilemapRenderer(GraphicsDevice graphicsDevice, Camera camera) : Ren
             {
                 Coord coord = new(x, y);
                 if (!tilemap.IsInBounds(coord)) continue;
-                RenderTile(spriteBatch, coord, tilemap.GetTop(coord));
+
+                var tile = tilemap.GetTop(coord, out var layer);
+                RenderTile(spriteBatch, coord, tile, layer, gameTime);
             }
         }
         
@@ -53,7 +77,7 @@ public class TilemapRenderer(GraphicsDevice graphicsDevice, Camera camera) : Ren
             if (renderer is null) return;
             if (Bounds.Overlap(cullingBounds.Value, renderer.GetCullingBounds()) is null) return;
 
-            renderer.Render(spriteBatch, camera, graphicsDevice, Effects);
+            renderer.Render(spriteBatch, camera, graphicsDevice, Effects, gameTime);
         });
 
         spriteBatch.End();
@@ -79,7 +103,7 @@ public class TilemapRenderer(GraphicsDevice graphicsDevice, Camera camera) : Ren
 
     protected override Vector2 CalculateCenterOffset() => tilemap.CalculateCenterOffset();
 
-    private void RenderTile(SpriteBatch spriteBatch, Coord pos, Tile tile)
+    private void RenderTile(SpriteBatch spriteBatch, Coord pos, Tile tile, TilemapLayer layer, GameTime gameTime)
     {
         // TODO: Add scaling support back (it was nuked when switching over to the tile atlas)
         
@@ -93,8 +117,10 @@ public class TilemapRenderer(GraphicsDevice graphicsDevice, Camera camera) : Ren
 
         foreach (var effect in Effects)
         {
-            foregroundTint = effect.Apply(foregroundTint, pos);
-            backgroundTint = effect.Apply(backgroundTint, pos);
+            if ((layer & effect.LayerMask) == 0) continue;
+            
+            foregroundTint = effect.Apply(foregroundTint, pos, gameTime);
+            backgroundTint = effect.Apply(backgroundTint, pos, gameTime);
         }
             
         ServiceRegistry.Get<TileAtlas>().DrawTile(spriteBatch,  tilemap.CoordToWorldPoint(pos) * Camera.TileSize, tile.Id, foregroundTint, backgroundTint);

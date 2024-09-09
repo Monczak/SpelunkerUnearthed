@@ -30,7 +30,7 @@ public class PlayerController : TileEntityComponent
     private float movementSpeed = 8;
     private Vector2 moveCooldown;
 
-    private Coord facingDirection;
+    public Coord FacingDirection { get; private set; }
 
     private DebugScreenLine<(Coord, Vector2)> playerPosDebugLine;
     private DebugScreenLine<Biome> biomeDebugLine;
@@ -69,10 +69,10 @@ public class PlayerController : TileEntityComponent
 
     private void Mine()
     {
-        var tilePos = OwnerEntity.Position + facingDirection;
+        var tilePos = OwnerEntity.Position + FacingDirection;
         if (OwnerEntity.Tilemap.IsInBounds(tilePos))
         {
-            OwnerEntity.Tilemap.Mine(tilePos, Tilemap.BaseLayer);
+            OwnerEntity.Tilemap.Mine(tilePos, TilemapLayer.Base);
         }
     }
 
@@ -122,7 +122,7 @@ public class PlayerController : TileEntityComponent
     {
         // TODO: Figure out what to do when mining diagonally
         if (input != Coord.Zero)
-            facingDirection = input;
+            FacingDirection = input;
         
         // TODO: Better movement on diagonals
         MoveDirection(new Coord(1, 0));
@@ -166,5 +166,11 @@ public class PlayerController : TileEntityComponent
     {
         ServiceRegistry.Get<DebugScreen>().RemoveAllLines(this);
         inputManager.UnbindAll(this);
+    }
+
+    protected override void OnPositionUpdate()
+    {
+        base.OnPositionUpdate();
+        ServiceRegistry.Get<EventManager>().Notify("PlayerMoved", this);
     }
 }

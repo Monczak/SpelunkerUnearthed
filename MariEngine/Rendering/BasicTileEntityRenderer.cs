@@ -10,7 +10,7 @@ namespace MariEngine.Rendering;
 public class BasicTileEntityRenderer(Tile tile) : TileEntityRenderer
 {
     public override void Render(SpriteBatch spriteBatch, Camera camera, GraphicsDevice graphicsDevice,
-        IList<RendererEffect> effects)
+        IList<TilemapRendererEffect> effects, GameTime gameTime)
     {
         if (tile is null) return;
         
@@ -19,8 +19,8 @@ public class BasicTileEntityRenderer(Tile tile) : TileEntityRenderer
 
         foreach (var effect in effects)
         {
-            foregroundColor = effect.Apply(foregroundColor, OwnerEntity.Position);
-            backgroundColor = effect.Apply(backgroundColor, OwnerEntity.Position);
+            foregroundColor = effect.Apply(foregroundColor, OwnerEntity.Position, gameTime);
+            backgroundColor = effect.Apply(backgroundColor, OwnerEntity.Position, gameTime);
         }
             
         ServiceRegistry.Get<TileAtlas>().DrawTile(

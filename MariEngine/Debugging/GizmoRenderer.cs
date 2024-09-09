@@ -31,7 +31,7 @@ public class GizmoRenderer : Renderer
         gizmos = GetComponent<Gizmos>();
     }
 
-    protected override void Render(SpriteBatch spriteBatch)
+    protected override void Render(SpriteBatch spriteBatch, GameTime gameTime)
     {
         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: Camera.TransformMatrix);
         

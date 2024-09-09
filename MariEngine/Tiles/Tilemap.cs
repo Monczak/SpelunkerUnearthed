@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using MariEngine.Components;
 using MariEngine.Exceptions;
@@ -11,12 +12,9 @@ namespace MariEngine.Tiles;
 public class Tilemap : Component
 {
     private Transform transform;
-    private SortedList<int, TileBuffer> layers;
+    private SortedList<TilemapLayer, TileBuffer> layers;
 
-    public const int BaseLayer = 0;
-    public const int GroundLayer = -1;
-
-    private List<int> layerIds = [];
+    private List<TilemapLayer> layerIds = [];
     
     public SortedSet<TileEntity> TileEntities { get; }
     
@@ -34,11 +32,11 @@ public class Tilemap : Component
 
     public event TileUpdateDelegate TileMined;
 
-    private class DescendingComparer<T> : IComparer<T> where T : IComparable<T>
+    private class TilemapLayerDescendingComparer : IComparer<TilemapLayer>
     {
-        public int Compare(T x, T y)
+        public int Compare(TilemapLayer x, TilemapLayer y)
         {
-            return y.CompareTo(x);
+            return ((int)y).CompareTo((int)x);
         }
     }
     
@@ -47,8 +45,8 @@ public class Tilemap : Component
         Width = width;
         Height = height;
 
-        layers = new SortedList<int, TileBuffer>(new DescendingComparer<int>());
-        AddLayer(BaseLayer);
+        layers = new SortedList<TilemapLayer, TileBuffer>(new TilemapLayerDescendingComparer());
+        AddLayer(TilemapLayer.Base);
 
         TileEntities = new SortedSet<TileEntity>(new PriorityComparer<TileEntity>());
         BehaviorsToUpdate = [];
@@ -85,23 +83,23 @@ public class Tilemap : Component
         }
     }
 
-    public void AddLayer(int layerId)
+    public void AddLayer(TilemapLayer layerId)
     {
         layers.Add(layerId, new TileBuffer(Width, Height));
         layerIds = [..layers.Keys];
     }
 
-    public TileBuffer GetLayer(int layerId) => layers[layerId];
+    public TileBuffer GetLayer(TilemapLayer layerId) => layers[layerId];
 
     public void Resize(Coord newSize)
     {
         (Width, Height) = newSize;
-        foreach (int layerId in layerIds) layers[layerId] = new TileBuffer(Width, Height);
+        foreach (var layerId in layerIds) layers[layerId] = new TileBuffer(Width, Height);
 
         GetComponent<LightMap>()?.Resize(newSize);
     }
 
-    public void Place(Tile tile, Coord coord, int layerId)
+    public void Place(Tile tile, Coord coord, TilemapLayer layerId)
     {
         Tile theTile = Get(coord, layerId);
         // TODO: Update light map for all tile entity light emitters that affect this tile when tilemap is changed
@@ -123,7 +121,7 @@ public class Tilemap : Component
         }
     }
     
-    public bool Mine(Coord tileCoord, int layerId)
+    public bool Mine(Coord tileCoord, TilemapLayer layerId)
     {
         // TODO: Update light map for all tile entity light emitters that affect this tile when tilemap is changed
         var tile = Get(tileCoord, layerId);
@@ -141,13 +139,13 @@ public class Tilemap : Component
 
     public void StepOn(TileEntity steppingEntity, Coord tileCoord)
     {
-        foreach (int layerId in layers.Keys)
+        foreach (var layerId in layers.Keys)
         {
             Get(tileCoord, layerId)?.OnSteppedOn(tileCoord, steppingEntity);    // TODO: Step only on tiles below the base layer?
         }
     }
 
-    public void Fill(Tile tile, int layerId)
+    public void Fill(Tile tile, TilemapLayer layerId)
     {
         for (int y = 0; y < Height; y++)
         {
@@ -158,7 +156,7 @@ public class Tilemap : Component
         }
     }
 
-    public void PasteAt(TileBuffer buffer, Coord position, int layerId, bool maskNulls = true)
+    public void PasteAt(TileBuffer buffer, Coord position, TilemapLayer layerId, bool maskNulls = true)
     {
         foreach (Coord coord in buffer.Coords)
         {
@@ -170,7 +168,7 @@ public class Tilemap : Component
         }
     }
 
-    public Tile Get(Coord coord, int layerId)
+    public Tile Get(Coord coord, TilemapLayer layerId)
     {
         if (!layers.TryGetValue(layerId, out var layer))
             throw new ArgumentException($"Layer {layerId} does not exist.");
@@ -181,18 +179,20 @@ public class Tilemap : Component
         return layer[coord];
     }
 
-    public Tile GetTop(Coord coord)
+    public Tile GetTop(Coord coord, out TilemapLayer layer)
     {
-        foreach (int layerId in layerIds)
+        foreach (var layerId in layerIds)
         {
-            Tile tile = layers[layerId][coord];
+            layer = layerId;
+            var tile = layers[layerId][coord];
             if (tile is null || tile.Id != "Nothing")
                 return Get(coord, layerId);
         }
-        return Get(coord, BaseLayer);
+        layer = TilemapLayer.Base;
+        return Get(coord, TilemapLayer.Base);
     }
 
-    public void Set(Tile tile, Coord coord, int layerId)
+    public void Set(Tile tile, Coord coord, TilemapLayer layerId)
     {
         if (!layers.TryGetValue(layerId, out var layer))
             throw new ArgumentException($"Layer {layerId} does not exist.");
@@ -205,7 +205,7 @@ public class Tilemap : Component
 
     public bool IsInBounds(Coord coord) => Bounds.PointInside(coord);
 
-    public TileBufferFragment GetFragment(CoordBounds bounds, int layerId) => layers[layerId].GetFragment(bounds);
+    public TileBufferFragment GetFragment(CoordBounds bounds, TilemapLayer layerId) => layers[layerId].GetFragment(bounds);
 
     public void AddTileEntity(TileEntity tileEntity)
     {

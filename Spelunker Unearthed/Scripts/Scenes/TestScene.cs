@@ -23,6 +23,7 @@ using MariEngine.UI.Nodes.Components;
 using MariEngine.UI.Nodes.Layouts;
 using SpelunkerUnearthed.Scripts.Audio;
 using SpelunkerUnearthed.Scripts.Components;
+using SpelunkerUnearthed.Scripts.Effects;
 using SpelunkerUnearthed.Scripts.Managers;
 using SpelunkerUnearthed.Scripts.MapGeneration;
 using SpelunkerUnearthed.Scripts.MapGeneration.Biomes;
@@ -164,7 +165,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
         Entity tilemapEntity = new("Tilemap");
         tilemap = new Tilemap(64, 64);
-        tilemap.AddLayer(Tilemap.GroundLayer);
+        tilemap.AddLayer(TilemapLayer.Ground);
 
         tilemapEntity.AttachComponent(new Transform());
         tilemapEntity.AttachComponent(tilemap);
@@ -178,6 +179,10 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         tilemapEntity.AttachComponent(lightMap);
 
         tilemapRenderer = new TilemapRenderer(graphics.GraphicsDevice, Camera);
+
+        var highlightEffect = new TileHighlightEffect();
+        tilemapRenderer.AddEffect(highlightEffect);
+        tilemapEntity.AttachComponent(new TilemapTileHighlighter(highlightEffect));
         tilemapEntity.AttachComponent(tilemapRenderer);
 
         tilemapEntity.AttachComponent(new TilemapCollider(spatialPartitionCellSize: Coord.One * 8) { Priority = 10 });

@@ -174,8 +174,8 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
         Logger.Log($"Loading level: copying tile buffers", stopwatch);
         Parallel.ForEach(walls.Coords, coord =>
         {
-            tilemap.Place(walls[coord], coord, Tilemap.BaseLayer);
-            tilemap.Place(ground[coord], coord, Tilemap.GroundLayer);
+            tilemap.Place(walls[coord], coord, TilemapLayer.Base);
+            tilemap.Place(ground[coord], coord, TilemapLayer.Ground);
         });
         
         SetupRoomCameraBounds(level);

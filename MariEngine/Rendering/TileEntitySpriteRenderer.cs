@@ -14,7 +14,7 @@ public class TileEntitySpriteRenderer([InjectResource] Sprite sprite) : TileEnti
     public Sprite Sprite => sprite;
     
     public override void Render(SpriteBatch spriteBatch, Camera camera, GraphicsDevice graphicsDevice,
-        IList<RendererEffect> effects)
+        IList<TilemapRendererEffect> effects, GameTime gameTime)
     {
         if (sprite is null) return;
         
@@ -30,8 +30,10 @@ public class TileEntitySpriteRenderer([InjectResource] Sprite sprite) : TileEnti
             
             foreach (var effect in effects)
             {
-                foregroundColor = effect.Apply(foregroundColor, tilePos);
-                backgroundColor = effect.Apply(backgroundColor, tilePos);
+                if (!effect.ApplyToTileEntities) continue;
+                
+                foregroundColor = effect.Apply(foregroundColor, tilePos, gameTime);
+                backgroundColor = effect.Apply(backgroundColor, tilePos, gameTime);
             }
             
             ServiceRegistry.Get<TileAtlas>().DrawTile(

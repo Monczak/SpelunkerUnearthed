@@ -76,7 +76,7 @@ public class TilemapCollider(Coord? spatialPartitionCellSize = null) : Collider
         var collides = false;
         foreach (var worldPos in colliderBounds.Coords)
         {
-            var tilemapTileColGroup = tilemap.Get(worldPos, Tilemap.BaseLayer).CollisionGroup; // TODO: Handle collision on other layers?
+            var tilemapTileColGroup = tilemap.Get(worldPos, TilemapLayer.Base).CollisionGroup; // TODO: Handle collision on other layers?
             var tileEntityColGroup = collider.GetCollisionGroup(worldPos - colliderBounds.TopLeft);
             if (tileEntityColGroup is null) continue;
             

@@ -96,7 +96,7 @@ public partial class CanvasRenderer : Renderer
         }
     }
 
-    protected override void Render(SpriteBatch spriteBatch)
+    protected override void Render(SpriteBatch spriteBatch, GameTime gameTime)
     {
         if (redrawEveryFrame) Redraw();
         

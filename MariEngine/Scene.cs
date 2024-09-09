@@ -75,7 +75,7 @@ public abstract class Scene(GameWindow window, GraphicsDeviceManager graphics)
         Entities.RemoveWhere(e => e.ToBeDestroyed);
     }
 
-    public void Render(SpriteBatch spriteBatch)
+    public void Render(SpriteBatch spriteBatch, GameTime gameTime)
     {
         // TODO: Check if this needs to be optimized for memory / GC
         rendererQueue.Clear(); 
@@ -86,7 +86,7 @@ public abstract class Scene(GameWindow window, GraphicsDeviceManager graphics)
 
         while (rendererQueue.TryDequeue(out Renderer renderer, out _))
         {
-            renderer.DoRender(spriteBatch);
+            renderer.DoRender(spriteBatch, gameTime);
         }
     }
 }

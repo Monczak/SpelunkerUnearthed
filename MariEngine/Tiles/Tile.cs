@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MariEngine.Collision;
+using MariEngine.Exceptions;
 using MariEngine.Light;
 using MariEngine.Loading;
 using MariEngine.Services;
@@ -103,5 +105,16 @@ public class Tile : Resource<TileData>
         }
         
         Behaviors = [];
+        if (data.Behaviors is not null)
+        {
+            foreach (var behaviorName in data.Behaviors)
+            {
+                if (Behaviors.Any(b => b.GetType().Name == behaviorName))
+                    throw new ContentLoadingException($"Found duplicate behavior {behaviorName}");
+            
+                var behavior = ServiceRegistry.Get<TileBehaviorProvider>().CreateBehavior(behaviorName);
+                Behaviors.Add(behavior);
+            }   
+        }
     }
 }

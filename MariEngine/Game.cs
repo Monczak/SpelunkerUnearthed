@@ -44,6 +44,7 @@ public abstract class Game : Microsoft.Xna.Framework.Game
         ServiceRegistry.RegisterService(new FontProvider());
         ServiceRegistry.RegisterService(new RandomProvider());
         ServiceRegistry.RegisterService(new MaterialLoader());
+        ServiceRegistry.RegisterService(new TileBehaviorProvider());
         ServiceRegistry.RegisterService(new TileLoader());
         ServiceRegistry.RegisterService(new SpriteLoader());
         ServiceRegistry.RegisterService(new InputManager());

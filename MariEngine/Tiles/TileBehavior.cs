@@ -2,7 +2,7 @@
 
 namespace MariEngine.Tiles;
 
-public class TileBehavior
+public abstract class TileBehavior
 {
     public virtual void Update(GameTime gameTime)
     {

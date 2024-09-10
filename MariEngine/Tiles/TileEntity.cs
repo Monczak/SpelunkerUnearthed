@@ -136,9 +136,10 @@ public class TileEntity(string name) : IAudioListener, IPriorityItem
 
     public void Move(int dx = 0, int dy = 0)
     {
-        Position += new Coord(dx, dy);
-        Position = new Coord(MathHelper.Clamp(Position.X, 0, Tilemap.Width - 1),
-            MathHelper.Clamp(Position.Y, 0, Tilemap.Height - 1));
+        var newPos = Position + new Coord(dx, dy);
+        newPos = new Coord(MathHelper.Clamp(newPos.X, 0, Tilemap.Width - 1),
+            MathHelper.Clamp(newPos.Y, 0, Tilemap.Height - 1));
+        Position = newPos;
     }
 
     public void Move(Coord delta) => Move(delta.X, delta.Y);

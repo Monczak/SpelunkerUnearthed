@@ -102,6 +102,8 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
         var levels = context.GetHierarchy(Save.World.Levels)
             .Select(levelName => context.Load<CaveSystemLevel>(Save.World.Levels.Level(levelName).LevelData))
             .ToList();
+        
+        ServiceRegistry.Get<RandomProvider>().Request(Constants.BiomeGenRng).Seed(CaveSystemManager.CaveSystem.Seed);
 
         CaveSystemManager.CaveSystem.Levels = levels;
     }

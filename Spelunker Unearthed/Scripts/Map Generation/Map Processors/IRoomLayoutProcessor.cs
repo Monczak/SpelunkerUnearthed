@@ -5,5 +5,5 @@ namespace SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
 
 public interface IRoomLayoutProcessor
 {
-    void ProcessRooms(IList<Room> rooms);
+    void ProcessRooms(CaveSystemLevel level);
 }

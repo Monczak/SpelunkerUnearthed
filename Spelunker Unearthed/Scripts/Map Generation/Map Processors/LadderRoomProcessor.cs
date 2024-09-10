@@ -12,13 +12,17 @@ public class LadderRoomProcessor : IRoomLayoutProcessor
         return 1f / (maxDistance - room.Distance + 1);
     }
     
-    public void ProcessRooms(IList<Room> rooms)
+    public void ProcessRooms(CaveSystemLevel level)
     {
+        // TODO: Better depth limiting (cave system properties maybe)
+        if (level.Depth > 4)
+            return;
+        
         var random = ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGenRng);
-        var maxDistance = rooms.Max(room => room.Distance);
+        var maxDistance = level.Rooms.Max(room => room.Distance);
 
         List<(Room, float)> ladderRoomChances = [];
-        foreach (var room in rooms)
+        foreach (var room in level.Rooms)
         {
             ladderRoomChances.Add((room, CalculateLadderRoomChance(room, maxDistance)));
         }

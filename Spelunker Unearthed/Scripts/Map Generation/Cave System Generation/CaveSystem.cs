@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using MariEngine;
 using MariEngine.Logging;
 using MariEngine.Persistence;
 using MariEngine.Services;
@@ -34,13 +36,18 @@ public class CaveSystem(IBiomeProvider biomeProvider, RoomDecisionEngine roomDec
         
         Levels.Clear();
         
-        // TODO: Add levels procedurally
-        Levels.Add(new CaveSystemLevel { Depth = 0, MapGenSeed = ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGenRng).Next()});
-        
-        for (int i = 0; i < Levels.Count; i++)
+        var levelQueue = new Queue<CaveSystemLevel>();
+
+        var firstLevel = new CaveSystemLevel(new CaveSystemLevelProperties(new Coord(0, 0), new Coord(3, 3)))
         {
-            var level = Levels[i];
-            int attempt = 0;
+            Depth = 0, 
+            MapGenSeed = ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGenRng).Next()
+        };
+        levelQueue.Enqueue(firstLevel);
+        
+        while (levelQueue.TryDequeue(out var level))
+        {
+            var attempt = 0;
             while (attempt < MaxGenerationAttempts)
             {
                 level.Generate(roomDecisionEngine, roomLayoutProcessors);
@@ -51,7 +58,25 @@ public class CaveSystem(IBiomeProvider biomeProvider, RoomDecisionEngine roomDec
             }
 
             if (attempt == MaxGenerationAttempts)
-                Logger.LogWarning($"Exceeded max generation attempts for level {i}");
+            {
+                Logger.LogWarning($"Exceeded max generation attempts for level {level.Depth}");
+            }
+            else
+            {
+                Levels.Add(level);
+                
+                var ladderRoom = level.Rooms.FirstOrDefault(r => (r.Flags & RoomFlags.LadderRoom) == RoomFlags.LadderRoom);
+                if (ladderRoom is not null)
+                {
+                    var newLevel =
+                        new CaveSystemLevel(new CaveSystemLevelProperties(ladderRoom.Position, new Coord(3, 3)))
+                        {
+                            Depth = level.Depth + 1,
+                            MapGenSeed = ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGenRng).Next()
+                        };
+                    levelQueue.Enqueue(newLevel);
+                }
+            }
         }
     }
 

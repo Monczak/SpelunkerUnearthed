@@ -70,23 +70,23 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         
         ambienceController.Play();
 
-        const int seed = 1;
-        // TODO: Something might be leaking here (SharedArrayPool Int32[])
-        worldManager.StartGenerateWorldTask(seed).ContinueWith(_ =>
-        {
-            worldManager.LoadWorld();
-            var firstLevel = worldManager.CaveSystemManager.CaveSystem.Levels[0];
-            return worldManager.StartLoadLevelTask(firstLevel);
-        })
-        .ContinueWith(task =>
-        {
-            if (task.IsFaulted)
-                Logger.LogError($"Level loading failed: {task.Exception}");
-        });
+        // const int seed = 1;
+        // // TODO: Something might be leaking here (SharedArrayPool Int32[])
+        // worldManager.StartGenerateWorldTask(seed).ContinueWith(_ =>
+        // {
+        //     worldManager.LoadWorld();
+        //     var firstLevel = worldManager.CaveSystemManager.CaveSystem.Levels[1];
+        //     return worldManager.StartLoadLevelTask(firstLevel).ContinueWith(_ => TestBiomeGeneration());
+        // })
+        // .ContinueWith(task =>
+        // {
+        //     if (task.IsFaulted)
+        //         Logger.LogError($"Level loading failed: {task.Exception}");
+        // });
         
-        // worldManager.LoadWorld();
-        // var firstLevel = worldManager.CaveSystemManager.CaveSystem.Levels[0];
-        // worldManager.StartLoadLevelTask(firstLevel);
+        worldManager.LoadWorld();
+        var firstLevel = worldManager.CaveSystemManager.CaveSystem.Levels[1];
+        worldManager.StartLoadLevelTask(firstLevel).ContinueWith(_ => TestBiomeGeneration());
         
         ServiceRegistry.Get<DebugScreen>().AddLine(this, biomeDebugLine);
     }

@@ -16,7 +16,7 @@ using Random = MariEngine.Utils.Random;
 namespace SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 
 [SerializeCompressed]
-public partial class CaveSystemLevel : ISaveable<CaveSystemLevel>
+public partial class CaveSystemLevel(CaveSystemLevelProperties properties) : ISaveable<CaveSystemLevel>
 {
     public required int Depth { get; init; }
     public int MapGenSeed { get; init; }
@@ -40,8 +40,7 @@ public partial class CaveSystemLevel : ISaveable<CaveSystemLevel>
 
         random = ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGenRng);
         
-        // TODO: Get entrance room properties from a properties struct
-        Room entranceRoom = new Room(new Coord(0, 0), new Coord(3, 3), 0, RoomFlags.Entrance);
+        var entranceRoom = new Room(properties.EntranceRoomPosition, properties.EntranceRoomSize, 0, RoomFlags.Entrance);
         AddRoom(entranceRoom, decisionEngine);
         
         while (roomQueue.Count > 0)
@@ -50,7 +49,7 @@ public partial class CaveSystemLevel : ISaveable<CaveSystemLevel>
         }
         
         foreach (var processor in roomLayoutProcessors)
-            processor.ProcessRooms(Rooms);
+            processor.ProcessRooms(this);
 
         BoundingBox = CalculateBoundingBox();
     }
@@ -174,6 +173,7 @@ public partial class CaveSystemLevel : ISaveable<CaveSystemLevel>
         public List<Room> Rooms { get; init; }
         public CoordBounds BoundingBox { get; init; }
         public Dictionary<Room, HashSet<SubRoomConnection>> Connections { get; init; }
+        public CaveSystemLevelProperties Properties { get; init; }
     }
 
     public void Serialize(Stream stream)
@@ -185,7 +185,8 @@ public partial class CaveSystemLevel : ISaveable<CaveSystemLevel>
             Rooms = Rooms,
             BoundingBox = BoundingBox,
             Connections = Rooms.Select(room => new { room, connections = room.Connections })
-                .ToDictionary(data => data.room, data => data.connections)
+                .ToDictionary(data => data.room, data => data.connections),
+            Properties = properties
         };
         
         var writer = new StreamWriter(stream);
@@ -210,7 +211,7 @@ public partial class CaveSystemLevel : ISaveable<CaveSystemLevel>
             .Build()
             .Deserialize<SerializationProxy>(reader.ReadToEnd());
 
-        var level = new CaveSystemLevel
+        var level = new CaveSystemLevel(data.Properties)
         {
             Depth = data.Depth,
             MapGenSeed = data.MapGenSeed,

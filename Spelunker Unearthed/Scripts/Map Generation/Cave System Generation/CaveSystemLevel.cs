@@ -21,7 +21,11 @@ public partial class CaveSystemLevel(CaveSystemLevelProperties properties) : ISa
     public required int Depth { get; init; }
     public int MapGenSeed { get; init; }
     
+    public int BaseRoomSize { get; init; }
+    
     public List<Room> Rooms { get; private init; } = [];
+    
+    public List<MapWarp> MapWarps { get; private init; } = [];
 
     private Dictionary<Coord, Room> map = new();
 
@@ -170,6 +174,7 @@ public partial class CaveSystemLevel(CaveSystemLevelProperties properties) : ISa
     {
         public int Depth { get; init; }
         public int MapGenSeed { get; init; }
+        public int BaseRoomSize { get; init; }
         public List<Room> Rooms { get; init; }
         public CoordBounds BoundingBox { get; init; }
         public Dictionary<Room, HashSet<SubRoomConnection>> Connections { get; init; }
@@ -182,6 +187,7 @@ public partial class CaveSystemLevel(CaveSystemLevelProperties properties) : ISa
         {
             Depth = Depth,
             MapGenSeed = MapGenSeed,
+            BaseRoomSize = BaseRoomSize,
             Rooms = Rooms,
             BoundingBox = BoundingBox,
             Connections = Rooms.Select(room => new { room, connections = room.Connections })
@@ -215,6 +221,7 @@ public partial class CaveSystemLevel(CaveSystemLevelProperties properties) : ISa
         {
             Depth = data.Depth,
             MapGenSeed = data.MapGenSeed,
+            BaseRoomSize = data.BaseRoomSize,
             Rooms = data.Rooms,
             BoundingBox = data.BoundingBox
         };

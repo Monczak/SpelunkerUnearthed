@@ -23,9 +23,9 @@ public class CaveSystemManager([Inject] IBiomeProvider biomeProvider, [Inject] R
 
     public CaveSystemLevel CurrentLevel { get; set; }
 
-    public void Generate(int worldSeed)
+    public void Generate(int worldSeed, int baseRoomSize)
     {
-        CaveSystem.Generate(worldSeed);
+        CaveSystem.Generate(worldSeed, baseRoomSize);
     }
 
     public void Load(CaveSystem caveSystem)

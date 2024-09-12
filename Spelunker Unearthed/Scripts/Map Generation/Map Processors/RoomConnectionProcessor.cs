@@ -13,7 +13,7 @@ using SpelunkerUnearthed.Scripts.Utils;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
 
-public class RoomConnectionProcessor(int baseRoomSize) : MapProcessor(baseRoomSize)
+public class RoomConnectionProcessor : MapProcessor
 {
     public override void ProcessMap(TileBuffer walls, TileBuffer ground, CaveSystemLevel level)
     {
@@ -28,8 +28,8 @@ public class RoomConnectionProcessor(int baseRoomSize) : MapProcessor(baseRoomSi
 
     private void HandleConnection(TileBuffer map, CaveSystemLevel level, SubRoomConnection connection)
     {
-        Coord fromPoint = RoomMath.TransformRoomPos(level, connection.From.Position, BaseRoomSize) + Coord.One * BaseRoomSize / 2;
-        Coord toPoint = RoomMath.TransformRoomPos(level, connection.To.Position, BaseRoomSize) + Coord.One * BaseRoomSize / 2;
+        Coord fromPoint = RoomMath.TransformRoomPos(level, connection.From.Position) + Coord.One * level.BaseRoomSize / 2;
+        Coord toPoint = RoomMath.TransformRoomPos(level, connection.To.Position) + Coord.One * level.BaseRoomSize / 2;
         Coord midpoint = (fromPoint + toPoint) / 2;
 
         var (from, to) = FindConnectionCoords(map, level, connection.From.Room, connection.To.Room, midpoint);
@@ -56,8 +56,8 @@ public class RoomConnectionProcessor(int baseRoomSize) : MapProcessor(baseRoomSi
     private CoordBounds GetRoomBoundsOnTilemap(CaveSystemLevel level, Room room)
     {
         return CoordBounds.MakeCorners(
-            RoomMath.RoomPosToTilemapPos(level, room, Coord.Zero, BaseRoomSize),
-            RoomMath.RoomPosToTilemapPos(level, room, room.Size * BaseRoomSize, BaseRoomSize) - Coord.One
+            RoomMath.RoomPosToTilemapPos(level, room, Coord.Zero),
+            RoomMath.RoomPosToTilemapPos(level, room, room.Size * level.BaseRoomSize) - Coord.One
         );
     }
 

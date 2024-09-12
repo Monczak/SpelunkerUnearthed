@@ -48,7 +48,7 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
 
     public WorldManager AddMapProcessor<T>(int priority) where T : MapProcessor
     {
-        AddMapProcessor((T)Activator.CreateInstance(typeof(T), BaseRoomSize), priority);
+        AddMapProcessor(Activator.CreateInstance<T>(), priority);
         return this;
     }
     
@@ -66,7 +66,7 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
 
     public void GenerateWorld(int worldSeed)
     {
-        CaveSystemManager.Generate(worldSeed);
+        CaveSystemManager.Generate(worldSeed, BaseRoomSize);
     }
 
     public Task StartGenerateWorldTask(int worldSeed)
@@ -148,8 +148,8 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
         Logger.Log($"Level generation started", stopwatch);
 
         CoordBounds bounds = level.BoundingBox;
-        TileBuffer walls = new(bounds.Size * BaseRoomSize);
-        TileBuffer ground = new(bounds.Size * BaseRoomSize);
+        TileBuffer walls = new(bounds.Size * level.BaseRoomSize);
+        TileBuffer ground = new(bounds.Size * level.BaseRoomSize);
         
         Logger.Log($"Level generation: generating rooms", stopwatch);
         GenerateRooms(walls, ground, level);
@@ -171,7 +171,7 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
         
         Logger.Log($"Loading level", stopwatch);
         tilemap.Resize(new Coord(walls.Width, walls.Height));
-        tilemap.GetComponent<Transform>().Position = level.BoundingBox.ExactCenter * BaseRoomSize;
+        tilemap.GetComponent<Transform>().Position = level.BoundingBox.ExactCenter * level.BaseRoomSize;
 
         Logger.Log($"Loading level: copying tile buffers", stopwatch);
         Parallel.ForEach(walls.Coords, coord =>
@@ -199,7 +199,7 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
             if ((room.Flags & RoomFlags.Entrance) != 0)
             {
                 playerController.OwnerEntity.Position = RoomMath.RoomPosToTilemapPos(level, room,
-                    room.PointsOfInterest[PointOfInterestType.PlayerSpawnPoint][0].Position, BaseRoomSize);
+                    room.PointsOfInterest[PointOfInterestType.PlayerSpawnPoint][0].Position);
                 break;
             }
         }
@@ -211,7 +211,7 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
         
         foreach (Room room in level.Rooms)
         {
-            CoordBounds bounds = RoomMath.GetRoomBounds(level, room, BaseRoomSize);
+            CoordBounds bounds = RoomMath.GetRoomBounds(level, room);
             Bounds worldBounds = Bounds.MakeCorners(tilemap.CoordToWorldPoint(bounds.TopLeft) - Vector2.One * cameraBoundsOversize,
                 tilemap.CoordToWorldPoint(bounds.BottomRight) + Vector2.One * cameraBoundsOversize);
             cameraBoundsMap[room] = new CameraBounds(worldBounds);
@@ -236,14 +236,14 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
                 BorderGradientFillAmount = 0.6f,
             };
 
-            var pastePosition = RoomMath.TransformRoomPos(level, room.Position, BaseRoomSize);
+            var pastePosition = RoomMath.TransformRoomPos(level, room.Position);
             var (roomWalls, roomGround) = new RoomMapGenerator(
                     roomMapProcessors.Values,
                     level.Depth,
                     room,
                     CaveSystemManager.CaveSystem.BiomeMap,
                     parameters,
-                    BaseRoomSize
+                    level.BaseRoomSize
                 )
                 .GenerateRoomMap(pastePosition);
 
@@ -256,7 +256,7 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
     {
         foreach (Room room in level.Rooms)
         {
-            CoordBounds roomBounds = RoomMath.GetRoomBounds(level, room, BaseRoomSize);
+            CoordBounds roomBounds = RoomMath.GetRoomBounds(level, room);
             if (roomBounds.PointInside(tilemapPos))
                 return room;
         }
@@ -278,10 +278,10 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
         
         foreach (Room room in level.Rooms)
         {
-            Coord topLeft = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, room.Bounds.TopLeft, BaseRoomSize);
-            Coord topRight = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, room.Bounds.TopRight + Coord.UnitX, BaseRoomSize);
-            Coord bottomLeft = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, room.Bounds.BottomLeft + Coord.UnitY, BaseRoomSize);
-            Coord bottomRight = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, room.Bounds.BottomRight + Coord.One, BaseRoomSize);
+            Coord topLeft = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, room.Bounds.TopLeft);
+            Coord topRight = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, room.Bounds.TopRight + Coord.UnitX);
+            Coord bottomLeft = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, room.Bounds.BottomLeft + Coord.UnitY);
+            Coord bottomRight = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, room.Bounds.BottomRight + Coord.One);
     
             Vector2 topLeftV = tilemap.CoordToWorldPoint(topLeft) + Vector2.One * 0.1f;
             Vector2 topRightV = tilemap.CoordToWorldPoint(topRight) + (-Vector2.UnitX + Vector2.UnitY) * 0.1f;
@@ -297,8 +297,8 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
                 new Color((room.Flags & RoomFlags.LadderRoom) != 0 ? 255 : 0, MathUtils.InverseLerp(20, 0, room.Distance), MathUtils.InverseLerp(20, 0, room.Distance), 0.1f), 0);
             foreach (SubRoomConnection connection in room.Connections)
             {
-                Coord from = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, connection.From.Position, BaseRoomSize) + Coord.One * BaseRoomSize / 2;
-                Coord to = RoomMath.TransformRoomPos(CaveSystemManager.CurrentLevel, connection.To.Position, BaseRoomSize) + Coord.One * BaseRoomSize / 2;
+                Coord from = RoomMath.TransformRoomPos(level, connection.From.Position) + Coord.One * level.BaseRoomSize / 2;
+                Coord to = RoomMath.TransformRoomPos(level, connection.To.Position) + Coord.One * level.BaseRoomSize / 2;
                 Vector2 fromPos = tilemap.CoordToWorldPoint(from);
                 Vector2 toPos = tilemap.CoordToWorldPoint(to);
                 gizmos.DrawLine(fromPos + Vector2.One * 0.5f, toPos + Vector2.One * 0.5f, Color.Red, lifetime: 0);

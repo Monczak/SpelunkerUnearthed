@@ -11,7 +11,11 @@ using YamlDotNet.Serialization;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 
-public class CaveSystem(IBiomeProvider biomeProvider, RoomDecisionEngine roomDecisionEngine, IEnumerable<IRoomLayoutProcessor> roomLayoutProcessors) : IYamlSaveable<CaveSystem>
+public class CaveSystem(
+    IBiomeProvider biomeProvider, 
+    RoomDecisionEngine roomDecisionEngine, 
+    IEnumerable<IRoomLayoutProcessor> roomLayoutProcessors)
+    : IYamlSaveable<CaveSystem>
 {
     public int Seed { get; private set; }
     
@@ -28,7 +32,7 @@ public class CaveSystem(IBiomeProvider biomeProvider, RoomDecisionEngine roomDec
         
     }
     
-    public void Generate(int seed)
+    public void Generate(int seed, int baseRoomSize)
     {
         Seed = seed;
         ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGenRng).Seed(seed);
@@ -41,7 +45,8 @@ public class CaveSystem(IBiomeProvider biomeProvider, RoomDecisionEngine roomDec
         var firstLevel = new CaveSystemLevel(new CaveSystemLevelProperties(new Coord(0, 0), new Coord(3, 3)))
         {
             Depth = 0, 
-            MapGenSeed = ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGenRng).Next()
+            MapGenSeed = ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGenRng).Next(),
+            BaseRoomSize = baseRoomSize
         };
         levelQueue.Enqueue(firstLevel);
         
@@ -72,7 +77,8 @@ public class CaveSystem(IBiomeProvider biomeProvider, RoomDecisionEngine roomDec
                         new CaveSystemLevel(new CaveSystemLevelProperties(ladderRoom.Position, new Coord(3, 3)))
                         {
                             Depth = level.Depth + 1,
-                            MapGenSeed = ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGenRng).Next()
+                            MapGenSeed = ServiceRegistry.Get<RandomProvider>().Request(Constants.CaveSystemGenRng).Next(),
+                            BaseRoomSize = baseRoomSize
                         };
                     levelQueue.Enqueue(newLevel);
                 }

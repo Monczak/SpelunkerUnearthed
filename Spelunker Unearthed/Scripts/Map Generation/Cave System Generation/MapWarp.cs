@@ -2,7 +2,7 @@ using MariEngine;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 
-public record MapWarp(
+public readonly record struct MapWarp(
     int FromLevel,
     int ToLevel,
     Coord FromCoord,

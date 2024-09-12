@@ -1,3 +1,4 @@
+using MariEngine;
 using MariEngine.Components;
 using MariEngine.Events;
 using MariEngine.Logging;
@@ -11,18 +12,31 @@ public class GameplayManager(WorldManager worldManager) : Component
     {
         base.Initialize();
         
-        ServiceRegistry.Get<EventManager>().Bind(this, "ChangeCaveSystemLevel", ChangeCaveSystemLevel);
+        ServiceRegistry.Get<EventManager>().Bind(this, "TriggerWarp", TriggerWarp);
     }
 
-    private void ChangeCaveSystemLevel(int levelDelta)
+    private void TriggerWarp(Coord fromPosition)
     {
         var currentLevel = worldManager.CaveSystemManager.CurrentLevel;
-        var newDepth = currentLevel.Depth + levelDelta;
+        if (!currentLevel.MapWarps.TryGetValue(fromPosition, out var warp))
+        {
+            Logger.LogWarning($"No warp specified for tile {fromPosition}!");
+            return;
+        }
 
-        Logger.LogDebug($"Changing level to {newDepth}");
-        var newLevel = worldManager.CaveSystemManager.CaveSystem.Levels[newDepth];
-        worldManager.StartLoadLevelTask(newLevel);
-        // TODO: This should also properly clean the light map (maybe do this in Tilemap or LightMap itself)
+        Logger.LogDebug($"Warping using {warp}");
+        var newLevel = worldManager.CaveSystemManager.CaveSystem.Levels[warp.ToLevel];
+        worldManager.StartLoadLevelTask(newLevel)
+            .ContinueWith(task =>
+            {
+                if (task.IsFaulted)
+                {
+                    Logger.LogError($"Failed to load level {warp}: {task.Exception}");
+                    return;
+                }
+
+                worldManager.SpawnPlayerFromWarp(warp);
+            });
     }
 
     protected override void OnDestroy()

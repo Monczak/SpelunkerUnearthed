@@ -22,6 +22,16 @@ public static class RoomMath
         Coord boundsTopLeft = level.BoundingBox.TopLeft;
         return (pos - boundsTopLeft) * level.BaseRoomSize;
     }
+
+    public static Coord RoomPosToWorldPos(CaveSystemLevel level, Room room, Coord pos)
+    {
+        return pos + room.Position * level.BaseRoomSize;
+    }
+
+    public static Coord WorldPosToRoomPos(CaveSystemLevel level, Room room, Coord pos)
+    {
+        return pos - RoomPosToWorldPos(level, room, pos);
+    }
     
     
     public static CoordBounds GetRoomBounds(CaveSystemLevel level, Room room)

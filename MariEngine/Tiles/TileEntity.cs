@@ -31,12 +31,15 @@ public class TileEntity(string name) : IAudioListener, IPriorityItem
             
             PositionUpdated?.Invoke(this, oldPosition, position);
             
-            Tilemap.StepOn(this, position);
+            if (TriggerStepEvents)
+                Tilemap.StepOn(this, position);
         }
     }
     
     public Vector2 SmoothedPosition { get; private set; }
     public float PositionSmoothing { get; set; }
+    
+    public bool TriggerStepEvents { get; set; }
 
     public Tilemap Tilemap { get; private set; }
     

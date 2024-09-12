@@ -17,7 +17,10 @@ using SpelunkerUnearthed.Scripts.Utils;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration;
 
-public class CaveSystemManager([Inject] IBiomeProvider biomeProvider, [Inject] RoomDecisionEngine roomDecisionEngine, [Inject] IEnumerable<IRoomLayoutProcessor> roomLayoutProcessors) : Component
+public class CaveSystemManager(
+    [Inject] IBiomeProvider biomeProvider, 
+    [Inject] RoomDecisionEngine roomDecisionEngine, 
+    [Inject] IEnumerable<IRoomLayoutProcessor> roomLayoutProcessors) : Component
 {
     public CaveSystem CaveSystem { get; private set; } = new(biomeProvider, roomDecisionEngine, roomLayoutProcessors);
 

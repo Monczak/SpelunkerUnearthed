@@ -13,9 +13,9 @@ using SpelunkerUnearthed.Scripts.Utils;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
 
-public class RoomConnectionProcessor : MapProcessor
+public class RoomConnectionProcessor : IMapProcessor
 {
-    public override void ProcessMap(TileBuffer walls, TileBuffer ground, CaveSystemLevel level)
+    public void ProcessMap(TileBuffer walls, TileBuffer ground, CaveSystemLevel level)
     {
         var connections = level.Rooms
             .SelectMany(room => room.Connections)

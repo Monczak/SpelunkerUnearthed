@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using MariEngine;
 using MariEngine.Debugging;
+using MariEngine.Logging;
 using MariEngine.Tiles;
 using SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 using SpelunkerUnearthed.Scripts.MapGeneration.Features;
@@ -8,9 +9,9 @@ using SpelunkerUnearthed.Scripts.Utils;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
 
-public class LadderFeaturePlacementProcessor : MapProcessor
+public class LadderFeaturePlacementProcessor : IMapProcessor
 {
-    public override void ProcessMap(TileBuffer walls, TileBuffer ground, CaveSystemLevel level)
+    public void ProcessMap(TileBuffer walls, TileBuffer ground, CaveSystemLevel level)
     {
         foreach (var room in level.Rooms)
         {

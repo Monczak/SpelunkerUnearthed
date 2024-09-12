@@ -4,7 +4,7 @@ using SpelunkerUnearthed.Scripts.MapGeneration.CaveSystemGeneration;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration.MapProcessors;
 
-public abstract class MapProcessor
+public interface IMapProcessor
 {
-    public abstract void ProcessMap(TileBuffer walls, TileBuffer ground, CaveSystemLevel level);
+    void ProcessMap(TileBuffer walls, TileBuffer ground, CaveSystemLevel level);
 }

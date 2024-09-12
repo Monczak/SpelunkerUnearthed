@@ -32,21 +32,22 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
     private Dictionary<Room, CameraBounds> cameraBoundsMap = new();
     private int cameraBoundsOversize = 5;
 
-    private SortedList<int, MapProcessor> mapProcessors = new();
+    private SortedList<int, IMapProcessor> mapProcessors = new();
     private SortedList<int, IRoomMapProcessor> roomMapProcessors = new();
+    private SortedList<int, ICaveSystemProcessor> caveSystemProcessors = new();
     
     public int BaseRoomSize => 16;
     public int WorkerThreads { get; set; } = 8;
     
     public bool IsGenerating { get; private set; }
 
-    public WorldManager AddMapProcessor(MapProcessor processor, int priority)
+    public WorldManager AddMapProcessor(IMapProcessor processor, int priority)
     {
         mapProcessors.Add(-priority, processor);
         return this;
     }
 
-    public WorldManager AddMapProcessor<T>(int priority) where T : MapProcessor
+    public WorldManager AddMapProcessor<T>(int priority) where T : IMapProcessor
     {
         AddMapProcessor(Activator.CreateInstance<T>(), priority);
         return this;
@@ -61,6 +62,18 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
     public WorldManager AddRoomMapProcessor<T>(int priority) where T : IRoomMapProcessor
     {
         AddRoomMapProcessor(Activator.CreateInstance<T>(), priority);
+        return this;
+    }
+
+    public WorldManager AddCaveSystemProcessor(ICaveSystemProcessor processor, int priority)
+    {
+        caveSystemProcessors.Add(-priority, processor);
+        return this;
+    }
+
+    public WorldManager AddCaveSystemProcessor<T>(int priority) where T : ICaveSystemProcessor
+    {
+        caveSystemProcessors.Add(-priority, Activator.CreateInstance<T>());
         return this;
     }
 
@@ -80,9 +93,8 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
             }
             
             using var context = ServiceRegistry.Get<SaveLoadSystem>().LoadSaveFile("TestSave");
-            context.Save(CaveSystemManager.CaveSystem, Save.World.CaveSystem);
 
-            foreach (CaveSystemLevel level in CaveSystemManager.CaveSystem.Levels)
+            foreach (var level in CaveSystemManager.CaveSystem.Levels)
             {
                 ServiceRegistry.Get<RandomProvider>().RequestPositionBased(Constants.MapGenRng).Seed(level.MapGenSeed);
                 
@@ -90,6 +102,16 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
                 
                 context.Save(walls, Save.World.Levels.Level(level.Depth).Walls);
                 context.Save(ground, Save.World.Levels.Level(level.Depth).Ground);
+            }
+
+            foreach (var (_, caveSystemProcessor) in caveSystemProcessors)
+            {
+                caveSystemProcessor.ProcessCaveSystem(CaveSystemManager.CaveSystem);
+            }
+            
+            context.Save(CaveSystemManager.CaveSystem, Save.World.CaveSystem);
+            foreach (var level in CaveSystemManager.CaveSystem.Levels)
+            {
                 context.Save(level, Save.World.Levels.Level(level.Depth).LevelData);
             }
         });
@@ -186,23 +208,29 @@ public class WorldManager(CaveSystemManager caveSystemManager, Tilemap tilemap, 
         tilemap.GetComponent<LightMap>().ForceUpdate();
         Logger.Log($"Loading level: light map baking completed", stopwatch);
         
-        Logger.Log($"Loading level: finishing up", stopwatch);
-        SpawnPlayer(level, playerController);
-
         Logger.Log($"Level loading completed", stopwatch);
     }
     
-    private void SpawnPlayer(CaveSystemLevel level, PlayerController playerController)
+    public void SpawnPlayerAtEntrance(CaveSystemLevel level)
     {
         foreach (Room room in level.Rooms)
         {
             if ((room.Flags & RoomFlags.Entrance) != 0)
             {
+                playerController.OwnerEntity.TriggerStepEvents = false;
                 playerController.OwnerEntity.Position = RoomMath.RoomPosToTilemapPos(level, room,
                     room.PointsOfInterest[PointOfInterestType.PlayerSpawnPoint][0].Position);
+                playerController.OwnerEntity.TriggerStepEvents = true;
                 break;
             }
         }
+    }
+
+    public void SpawnPlayerFromWarp(MapWarp warp)
+    {
+        playerController.OwnerEntity.TriggerStepEvents = false;
+        playerController.OwnerEntity.Position = warp.ToCoord;
+        playerController.OwnerEntity.TriggerStepEvents = true;
     }
 
     private void SetupRoomCameraBounds(CaveSystemLevel level)

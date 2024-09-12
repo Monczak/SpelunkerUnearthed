@@ -25,7 +25,7 @@ public partial class CaveSystemLevel(CaveSystemLevelProperties properties) : ISa
     
     public List<Room> Rooms { get; private init; } = [];
     
-    public List<MapWarp> MapWarps { get; private init; } = [];
+    public Dictionary<Coord, MapWarp> MapWarps { get; private init; } = [];
 
     private Dictionary<Coord, Room> map = new();
 
@@ -138,6 +138,11 @@ public partial class CaveSystemLevel(CaveSystemLevelProperties properties) : ISa
             map[coord] = newRoom;
     }
 
+    public void AddWarp(MapWarp warp)
+    {
+        MapWarps[warp.FromCoord] = warp;
+    }
+
     private bool OverlapsRoom(Room room) => OverlapsRoom(room.Bounds);
 
     private bool OverlapsRoom(CoordBounds bounds)
@@ -179,6 +184,7 @@ public partial class CaveSystemLevel(CaveSystemLevelProperties properties) : ISa
         public CoordBounds BoundingBox { get; init; }
         public Dictionary<Room, HashSet<SubRoomConnection>> Connections { get; init; }
         public CaveSystemLevelProperties Properties { get; init; }
+        public Dictionary<Coord, MapWarp> MapWarps { get; init; }
     }
 
     public void Serialize(Stream stream)
@@ -192,7 +198,8 @@ public partial class CaveSystemLevel(CaveSystemLevelProperties properties) : ISa
             BoundingBox = BoundingBox,
             Connections = Rooms.Select(room => new { room, connections = room.Connections })
                 .ToDictionary(data => data.room, data => data.connections),
-            Properties = properties
+            Properties = properties,
+            MapWarps = MapWarps
         };
         
         var writer = new StreamWriter(stream);
@@ -223,7 +230,8 @@ public partial class CaveSystemLevel(CaveSystemLevelProperties properties) : ISa
             MapGenSeed = data.MapGenSeed,
             BaseRoomSize = data.BaseRoomSize,
             Rooms = data.Rooms,
-            BoundingBox = data.BoundingBox
+            BoundingBox = data.BoundingBox,
+            MapWarps = data.MapWarps
         };
         
         foreach (var room in level.Rooms)

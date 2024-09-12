@@ -6,11 +6,8 @@ using YamlDotNet.Serialization;
 
 namespace SpelunkerUnearthed.Scripts.MapGeneration;
 
-public readonly struct PointOfInterest(PointOfInterestType poiType, Coord position)
+public readonly record struct PointOfInterest(PointOfInterestType PoiType, Coord Position)
 {
-    public PointOfInterestType PoiType { get; } = poiType;
-    public Coord Position { get; } = position;
-    
     public class YamlConverter : IYamlTypeConverter
     {
         public bool Accepts(Type type)

@@ -77,17 +77,31 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         // {
         //     worldManager.LoadWorld();
         //     var firstLevel = worldManager.CaveSystemManager.CaveSystem.Levels[1];
-        //     return worldManager.StartLoadLevelTask(firstLevel).ContinueWith(_ => TestBiomeGeneration());
-        // })
-        // .ContinueWith(task =>
-        // {
-        //     if (task.IsFaulted)
-        //         Logger.LogError($"Level loading failed: {task.Exception}");
+        //     return worldManager.StartLoadLevelTask(firstLevel)
+        //         .ContinueWith(task =>
+        //         {
+        //             if (task.IsFaulted)
+        //             {
+        //                 Logger.LogError($"Level loading failed: {task.Exception}");
+        //                 return;
+        //             }
+        //
+        //             worldManager.SpawnPlayerAtEntrance(worldManager.CaveSystemManager.CurrentLevel);
+        //         });
         // });
         
         worldManager.LoadWorld();
         var firstLevel = worldManager.CaveSystemManager.CaveSystem.Levels[1];
-        worldManager.StartLoadLevelTask(firstLevel).ContinueWith(_ => TestBiomeGeneration());
+        worldManager.StartLoadLevelTask(firstLevel).ContinueWith(task =>
+        {
+            if (task.IsFaulted)
+            {
+                Logger.LogError($"Level loading failed: {task.Exception}");
+                return;
+            }
+            
+            worldManager.SpawnPlayerAtEntrance(worldManager.CaveSystemManager.CurrentLevel);
+        });
         
         ServiceRegistry.Get<DebugScreen>().AddLine(this, biomeDebugLine);
     }
@@ -228,7 +242,8 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
             .AddMapProcessor<RoomConnectionProcessor>(0)
             .AddMapProcessor<LadderFeaturePlacementProcessor>(-10)
             .AddRoomMapProcessor<PlayerSpawnPointProcessor>(0) // TODO: Load all processors using reflection
-            .AddRoomMapProcessor<LadderPlacementProcessor>(-10);
+            .AddRoomMapProcessor<LadderPlacementProcessor>(-10)
+            .AddCaveSystemProcessor<LadderWarpCreatorProcessor>(0);
 
         ComponentFactory.AddDependency(worldManager);
         ComponentFactory.AddDependency(ambienceController);

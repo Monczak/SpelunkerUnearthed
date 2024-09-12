@@ -8,3 +8,5 @@ Light:
   Color: "#edc28a"
   Intensity: 0.7
   Radius: 7
+Behaviors:
+  - LadderBehavior

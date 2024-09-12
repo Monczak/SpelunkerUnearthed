@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MariEngine.Logging;
 using MariEngine.Services;
 
 namespace MariEngine.Events;
@@ -37,7 +38,10 @@ public class EventManager : Service
     public void Notify(string eventName, params object[] args)
     {
         if (!handlers.TryGetValue(eventName, out var contextDict))
+        {
+            Logger.LogWarning($"No handler for event {eventName}!");
             return;
+        }
 
         foreach (var handler in contextDict.Values.SelectMany(handlerList => handlerList))
         {

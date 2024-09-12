@@ -78,8 +78,7 @@ public class LightMap : Component
     protected internal override void Initialize()
     {
         tilemap = GetComponent<Tilemap>();
-        lightSources = new Dictionary<LightSource, LightSourceData>();
-        staticLightSources = new Dictionary<Coord, LightSourceData>();
+        ClearLightSources();
 
         toRemove = [];
         dirtyLightSources = [];
@@ -102,6 +101,18 @@ public class LightMap : Component
     public void Resize(Coord newSize)
     {
         map = new Vector3[newSize.X, newSize.Y];
+        ClearStaticLightSources();
+    }
+
+    public void ClearLightSources()
+    {
+        lightSources = new Dictionary<LightSource, LightSourceData>();
+        ClearStaticLightSources();
+    }
+
+    public void ClearStaticLightSources()
+    {
+        staticLightSources = new Dictionary<Coord, LightSourceData>();
     }
 
     protected override void Update(GameTime gameTime)

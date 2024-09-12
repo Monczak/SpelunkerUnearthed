@@ -4,22 +4,23 @@ namespace MariEngine.Tiles;
 
 public abstract class TileBehavior
 {
+    // TODO: Add Tile parameter
     public virtual void Update(GameTime gameTime)
     {
         
     }
 
-    public virtual void OnPlaced(Coord position)
+    public virtual void OnPlaced(Tile tile, Coord position)
     {
         
     }
 
-    public virtual void OnMined(Coord position)
+    public virtual void OnMined(Tile tile, Coord position)
     {
         
     }
 
-    public virtual void OnSteppedOn(Coord position, TileEntity steppingEntity)
+    public virtual void OnSteppedOn(Tile tile, Coord position, TileEntity steppingEntity)
     {
         
     }

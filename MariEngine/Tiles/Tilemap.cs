@@ -96,7 +96,8 @@ public class Tilemap : Component
         (Width, Height) = newSize;
         foreach (var layerId in layerIds) layers[layerId] = new TileBuffer(Width, Height);
 
-        GetComponent<LightMap>()?.Resize(newSize);
+        var lightMap = GetComponent<LightMap>();
+        lightMap?.Resize(newSize);
     }
 
     public void Place(Tile tile, Coord coord, TilemapLayer layerId)

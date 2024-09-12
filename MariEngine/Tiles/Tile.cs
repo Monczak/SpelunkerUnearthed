@@ -38,19 +38,19 @@ public class Tile : Resource<TileData>
     public void OnPlaced(Coord position)
     {
         foreach (var behavior in Behaviors)
-            behavior.OnPlaced(position);
+            behavior.OnPlaced(this, position);
     }
     
     public void OnMined(Coord position)
     {
         foreach (var behavior in Behaviors)
-            behavior.OnMined(position);
+            behavior.OnMined(this, position);
     }
     
     public void OnSteppedOn(Coord position, TileEntity steppingEntity)
     {
         foreach (var behavior in Behaviors)
-            behavior.OnSteppedOn(position, steppingEntity);
+            behavior.OnSteppedOn(this, position, steppingEntity);
     }
 
     protected internal override void BuildFromData(TileData data)

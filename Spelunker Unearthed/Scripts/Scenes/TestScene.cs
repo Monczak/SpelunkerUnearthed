@@ -43,6 +43,7 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
 
     private CaveSystemManager caveSystemManager;
     private WorldManager worldManager;
+    private GameplayManager gameplayManager;
 
     private CameraController cameraController;
 
@@ -236,6 +237,11 @@ public class TestScene(GameWindow window, GraphicsDeviceManager graphics) : Scen
         player.AttachComponent(new PlayerBiomeObserver(worldManager, ambienceController));
 
         managersEntity.AttachComponent(worldManager);
+
+        gameplayManager = new GameplayManager(worldManager);
+        managersEntity.AttachComponent(gameplayManager);
+        
+        AddEntity(managersEntity);
 
         Entity uiEntity = new("UI") { Priority = 1000 };
         canvas = new Canvas();

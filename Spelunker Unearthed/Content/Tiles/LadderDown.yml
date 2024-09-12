@@ -9,4 +9,4 @@ Light:
   Intensity: 1
   Radius: 5
 Behaviors:
-  - LadderDownBehavior
+  - LadderBehavior
